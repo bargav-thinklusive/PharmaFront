@@ -10,7 +10,7 @@ interface RightColumnProps {
 
 const RightColumn: React.FC<RightColumnProps> = ({ sections, renderTOC, activeId, recordTitle }) => {
   return (
-    <div className="w-72 max-w-[18rem] min-w-[16rem] overflow-x-auto sticky top-8 self-start">
+    <div className="w-72 max-w-[18rem] min-w-[16rem]">
       <TocPanel sections={sections} renderTOC={renderTOC} activeId={activeId} recordTitle={recordTitle} />
     </div>
   );

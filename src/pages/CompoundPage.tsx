@@ -100,22 +100,48 @@ const CompoundPage: React.FC = () => {
 
   // Setup IntersectionObserver for section highlighting (observe all registered refs)
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
     const observer = new window.IntersectionObserver(
       (entries) => {
-        const visible = entries.filter(e => e.isIntersecting);
-        if (visible.length > 0) {
-          // Pick the first visible section (topmost)
-          const vid = visible[0].target.id;
-          setActiveId(vid);
-        }
+        // Clear previous timeout
+        clearTimeout(timeoutId);
+        
+        // Debounce the highlighting change
+        timeoutId = setTimeout(() => {
+          const visible = entries.filter(e => e.isIntersecting);
+          if (visible.length > 0) {
+            // Find the section with the highest intersection ratio
+            let bestMatch = visible[0];
+            let highestRatio = bestMatch.intersectionRatio;
+            
+            visible.forEach(entry => {
+              if (entry.intersectionRatio > highestRatio) {
+                bestMatch = entry;
+                highestRatio = entry.intersectionRatio;
+              }
+            });
+            
+            // Only update if the intersection ratio is significant (more than 60% visible)
+            if (highestRatio > 0.6) {
+              const vid = bestMatch.target.id;
+              setActiveId(vid);
+            }
+          }
+        }, 150); // 150ms debounce delay
       },
-      { rootMargin: '-20% 0px -20% 0px', threshold: 0.1 }
+      { rootMargin: '-5% 0px -5% 0px', threshold: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9] }
     );
+    
     // Observe all refs that were set by renderSection
     Object.values(sectionRefs.current).forEach((el) => {
       if (el) observer.observe(el);
     });
-    return () => observer.disconnect();
+    
+    return () => {
+      clearTimeout(timeoutId);
+      observer.disconnect();
+    };
   }, [sections]);
 
   // Listen for manual activeId changes from TOC clicks
@@ -127,6 +153,41 @@ const CompoundPage: React.FC = () => {
     return () => window.removeEventListener('setActiveId', handleSetActiveId as EventListener);
   }, []);
 
+  // Auto-open parent dropdowns when subsections are active
+  useEffect(() => {
+    if (activeId && activeId !== 'summary') {
+      const parts = activeId.split('-');
+      if (parts.length > 1) {
+        const sectionParts = parts[0].split('.');
+        if (sectionParts.length > 1) {
+          // Open all parent sections recursively
+          const openParentDropdowns = (sections: any[], currentPath: string[], level: number = 0) => {
+            if (level >= currentPath.length - 1) return;
+            
+            const parentId = currentPath.slice(0, level + 1).join('.');
+            const parentSection = sections.find((section: any, idx: number) => {
+              const sectionId = (level === 0 ? '' : currentPath.slice(0, level).join('.') + '.') + (idx + 1);
+              return sectionId === parentId;
+            });
+            
+            if (parentSection) {
+              const normalized = (parentSection.TOCHeading || '').replace(/\s+/g, '').toLowerCase();
+              const parentHtmlId = `${parentId}-${normalized}`;
+              setOpenDropdowns(prev => ({ ...prev, [parentHtmlId]: true }));
+              
+              // Recursively open deeper parent sections
+              if (Array.isArray(parentSection.Section)) {
+                openParentDropdowns(parentSection.Section, currentPath, level + 1);
+              }
+            }
+          };
+          
+          openParentDropdowns(sections, sectionParts);
+        }
+      }
+    }
+  }, [activeId, sections]);
+
   function renderTOC(sections: any[], level = 1, parentIdx = ''): React.ReactNode {
     return (
       <ul className={`text-[13px] text-black bg-white ${level > 1 ? 'ml-4 mt-1 border-l border-blue-100 pl-2' : ''}`}>
@@ -136,13 +197,17 @@ const CompoundPage: React.FC = () => {
           const htmlId = `${sectionId}-${normalized}`;
           const hasSub = Array.isArray(section.Section) && section.Section.length > 0;
           const isOpen = openDropdowns[htmlId] ?? false;
-              const isActive = activeId === htmlId || activeId.startsWith(sectionId + '.');
+          const isActive = activeId === htmlId;
+          
+          // Only highlight the exact active section, not parent sections
+          const shouldHaveActiveStyling = isActive;
+          
           return (
             <React.Fragment key={htmlId}>
               <li>
-                <div className={`flex items-center group rounded transition-colors ${isActive && level === 1 ? 'bg-blue-100' : level === 1 ? 'bg-blue-50' : ''}`}>
+                <div className={`flex items-center group rounded transition-colors ${isActive && level === 1 ? 'bg-blue-500' : level === 1 ? 'bg-blue-50' : isActive && level > 1 ? 'bg-blue-500' : ''}`}>
                   <button
-                    className={`w-full text-left px-2 py-1 rounded hover:bg-blue-100 transition-colors ${isActive ? 'font-bold text-black' : 'text-black'}`}
+                    className={`w-full text-left px-2 py-1 rounded hover:bg-blue-500 transition-colors cursor-pointer ${shouldHaveActiveStyling ? 'font-bold text-black' : 'text-black'}`}
                     style={{ background: 'none', color: 'black', outline: 'none' }}
                     onClick={() => {
                       const el = document.getElementById(htmlId);
@@ -150,8 +215,8 @@ const CompoundPage: React.FC = () => {
                       if (hasSub) setOpenDropdowns((o: any) => ({ ...o, [htmlId]: !isOpen }));
                     }}
                   >
-                    <span className="inline-block w-10 font-semibold text-black">{sectionId}</span>
-                    <span className="text-black">{section.TOCHeading}</span>
+                    <span className="inline-block w-10 font-semibold" style={{ color: 'black' }}>{sectionId}</span>
+                    <span style={{ color: 'black' }}>{section.TOCHeading}</span>
                   </button>
                   {hasSub && level === 1 && (
                     <button
@@ -197,7 +262,7 @@ const CompoundPage: React.FC = () => {
           />
         </div>
         {/* Right: TOC as separate component */}
-        <div className="w-72 max-w-[18rem] min-w-[16rem] overflow-x-auto sticky top-8 self-start">
+        <div className="w-72 max-w-[18rem] min-w-[16rem] self-start">
           <RightContent
             sections={sections}
             renderTOC={renderTOC}
