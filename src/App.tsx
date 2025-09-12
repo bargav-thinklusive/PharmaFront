@@ -11,7 +11,7 @@ import Submit from './pages/Submit';
 import Docs from './pages/Docs';
 import Contacts from './pages/Contacts';
 import ResultList from './pages/results/ResultList';
-import CompoundPage from './pages/CompoundPage';
+import CompoundDetailsPage from './pages/CompoundDetailsPage';
 
 
 
@@ -28,7 +28,7 @@ function App() {
             <Route path="/docs" element={<Docs />} />
             <Route path="/contacts" element={<Contacts />} />
             <Route path=":ccategory/:searchtext" element={<ResultList />} />
-            <Route path=":ccategory/:searchtext/:cid" element={<CompoundPage />} />
+            <Route path=":ccategory/:searchtext/:cid" element={<CompoundDetailsPage />} />
           </Routes>
         </Body>
         <Footer />

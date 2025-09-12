@@ -28,9 +28,10 @@ const mockData = {
 
 interface CompoundSummaryProps {
   record?: any;
+  activeId?: string;
 }
 
-const CompoundSummary: FC<CompoundSummaryProps> = ({ record }) => {
+const CompoundSummary: FC<CompoundSummaryProps> = ({ record, activeId }) => {
   const navigate = useNavigate();
 
   // Use record if provided, otherwise fallback to mockData
@@ -56,18 +57,20 @@ const CompoundSummary: FC<CompoundSummaryProps> = ({ record }) => {
     <div className="w-full bg-white/90">
       <div className="max-w-3xl mx-auto pt-6">
         <div className="text-xs text-black mb-2">COMPOUND SUMMARY</div>
-        <h1
-          className="text-3xl font-bold text-black mb-6 cursor-pointer hover:underline"
-          onClick={handleNavigateHome}
-          title="Go to Home"
-        >
-          {data.title}
-        </h1>
+        <div className={`border-b-4 border-blue-300 flex items-center mb-2`}>
+          <h1
+            className="text-3xl font-bold text-black mb-0 cursor-pointer pl-1 py-1"
+            onClick={handleNavigateHome}
+            title="Go to Home"
+          >
+            {data.title}
+          </h1>
+        </div>
         <div className="border-2 border-sky-400 rounded bg-white">
           <table className="w-full text-sm text-black">
             <tbody>
               <tr className="align-top border-b border-blue-100">
-                <td className="w-56 p-3 text-black font-semibold">PubChem CID</td>
+                <td className="w-56 p-3 text-black font-semibold">ChemBank CID</td>
                 <td className="p-3">
                   <span className="text-base font-semibold text-black">{data.cid}</span>
                 </td>
@@ -145,3 +148,4 @@ const CompoundSummary: FC<CompoundSummaryProps> = ({ record }) => {
 };
 
 export default CompoundSummary;
+//export { default } from '../components/SummaryCard';
