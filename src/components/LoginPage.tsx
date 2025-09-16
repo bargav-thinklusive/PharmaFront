@@ -5,12 +5,11 @@ const containerStyle: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  minHeight: '100vh', // use minHeight to cover full screen
-  width: '100vw',     // force full width
+  minHeight: 'calc(100vh - 64px)', // account for header
+  width: '100vw',
   margin: 0,
   padding: 0,
-  overflow: 'hidden', // prevent scrolling
-  background: 'linear-gradient(135deg, #0f8d41, #2196f3)', // Blue-Green gradient
+  background: 'linear-gradient(135deg, #0f8d41, #2196f3)',
 };
 
 const formStyle: React.CSSProperties = {
@@ -53,24 +52,12 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const validateEmail = (email: string) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  };
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleLogin = () => {
-    if (!email) {
-      setError('Please enter email');
-      return;
-    }
-    if (!validateEmail(email)) {
-      setError('Please enter a valid email');
-      return;
-    }
-    if (!password) {
-      setError('Please enter password');
-      return;
-    }
+    if (!email) return setError('Please enter email');
+    if (!validateEmail(email)) return setError('Please enter a valid email');
+    if (!password) return setError('Please enter password');
 
     setError('');
     navigate('/'); // Redirect to Home
@@ -80,20 +67,8 @@ const Login: React.FC = () => {
     <div style={containerStyle}>
       <div style={formStyle}>
         <h2 style={{ textAlign: 'center', color: '#0f8d41' }}>Login</h2>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={inputStyle}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={inputStyle}
-        />
+        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
+        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} style={inputStyle} />
         {error && <span style={errorStyle}>{error}</span>}
         <button onClick={handleLogin} style={buttonStyle}>Login</button>
       </div>

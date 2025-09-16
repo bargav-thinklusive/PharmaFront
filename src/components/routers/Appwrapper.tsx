@@ -10,20 +10,18 @@ import ResultList from '../Results/ResultList';
 import CompoundDetailsPage from '../CompoundDetails/CompoundDetailsPage';
 import Body from '../../pages/Body';
 import Footer from '../../pages/Footer';
-
+import NotFound from '../../pages/NotFound';
 
 const AppWrapper = () => {
   const location = useLocation();
-
-  // Hide Header and Footer on login page
-  const hideHeaderFooter = location.pathname === '/login';
+  const isLoginPage = location.pathname === '/login';
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {!hideHeaderFooter && <Header />}
+      <Header isLoginPage={isLoginPage} />
 
       {/* main content grows to push footer down */}
-      <div style={{ flex: 1 }}>
+      
         <Body>
           <Routes>
             <Route path="/login" element={<Login />} />
@@ -34,11 +32,12 @@ const AppWrapper = () => {
             <Route path="/contacts" element={<Contacts />} />
             <Route path=":ccategory/:searchtext" element={<ResultList />} />
             <Route path=":ccategory/:searchtext/:cid" element={<CompoundDetailsPage />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Body>
-      </div>
+      
 
-      {!hideHeaderFooter && <Footer />}
+      {!isLoginPage && <Footer />}
     </div>
   );
 };

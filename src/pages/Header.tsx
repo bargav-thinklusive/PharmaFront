@@ -1,4 +1,4 @@
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import MainLogo from '../assets/MainLogo.png';
 import { useState, useRef, useEffect } from 'react';
 
@@ -6,7 +6,7 @@ const navStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  background: '#0f8d41ff', // dark green
+  background: '#36b669',
   color: 'white',
   padding: '0.5rem 2rem',
   width: '100%',
@@ -52,22 +52,22 @@ const dropdownStyle: React.CSSProperties = {
   background: 'white',
   color: 'black',
   border: '1px solid #ccc',
-  borderRadius: '4px',
-  padding: '0.5rem 1rem',
+  borderRadius: '6px',
+  padding: '0.5rem 0',
   marginTop: '0.5rem',
-  minWidth: '100px',
+  minWidth: '140px',
   boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
   zIndex: 100,
 };
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  isLoginPage: boolean;
+}
+
+const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Hide header on login page
-  if (location.pathname === '/login') return null;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -86,38 +86,94 @@ const Header: React.FC = () => {
 
   return (
     <header style={navStyle}>
-      <NavLink to="/" style={{ display: 'flex', alignItems: 'center', gap: '1rem', textDecoration: 'none' }}>
-        <img src={MainLogo} alt="Main Logo" style={{ height: 40, width: 40, objectFit: 'contain', cursor: 'pointer' }} />
-        <span style={{ fontWeight: 700, fontSize: '1.5rem', letterSpacing: 1, color: 'white', cursor: 'pointer' }}>ChemBank</span>
+      <NavLink
+        to="/"
+        style={{ display: 'flex', alignItems: 'center', gap: '1rem', textDecoration: 'none' }}
+      >
+        <img
+          src={MainLogo}
+          alt="Main Logo"
+          style={{ height: 40, width: 40, objectFit: 'contain', cursor: 'pointer' }}
+        />
+        <span style={{ fontWeight: 700, fontSize: '1.5rem', letterSpacing: 1, color: 'white', cursor: 'pointer' }}>
+          ChemBank
+        </span>
       </NavLink>
 
       <nav style={tabsStyle}>
-        <NavLink to="/about" style={({ isActive }) => isActive ? { ...linkStyle, ...activeLinkStyle } : linkStyle}>About</NavLink>
-        <NavLink to="/submit" style={({ isActive }) => isActive ? { ...linkStyle, ...activeLinkStyle } : linkStyle}>Submit</NavLink>
-        <NavLink to="/docs" style={({ isActive }) => isActive ? { ...linkStyle, ...activeLinkStyle } : linkStyle}>Docs</NavLink>
-        <NavLink to="/contacts" style={({ isActive }) => isActive ? { ...linkStyle, ...activeLinkStyle } : linkStyle}>Contacts</NavLink>
+        <NavLink
+          to="/about"
+          style={({ isActive }) => (isActive ? { ...linkStyle, ...activeLinkStyle } : linkStyle)}
+        >
+          About
+        </NavLink>
 
-        {/* User Profile */}
-        <div style={userProfileStyle} ref={dropdownRef} onClick={() => setDropdownOpen(prev => !prev)}>
-          <span>👤 User</span>
-          {dropdownOpen && (
-            <div style={dropdownStyle}>
-              <button
-                onClick={handleLogout}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'black',
-                  width: '100%',
-                  textAlign: 'left',
-                }}
-              >
-                Logout
-              </button>
-            </div>
-          )}
-        </div>
+        {!isLoginPage && (
+          <NavLink
+            to="/submit"
+            style={({ isActive }) => (isActive ? { ...linkStyle, ...activeLinkStyle } : linkStyle)}
+          >
+            Submit
+          </NavLink>
+        )}
+
+        {!isLoginPage && (
+          <NavLink
+            to="/docs"
+            style={({ isActive }) => (isActive ? { ...linkStyle, ...activeLinkStyle } : linkStyle)}
+          >
+            Docs
+          </NavLink>
+        )}
+
+        <NavLink
+          to="/contacts"
+          style={({ isActive }) => (isActive ? { ...linkStyle, ...activeLinkStyle } : linkStyle)}
+        >
+          Contacts
+        </NavLink>
+
+        {!isLoginPage && (
+          <div style={userProfileStyle} ref={dropdownRef} onClick={() => setDropdownOpen((prev) => !prev)}>
+            <span>👤 User</span>
+            {dropdownOpen && (
+              <div style={dropdownStyle}>
+                <button
+                  style={{
+                    backgroundColor: '#3678f4ff',
+                    border: '1px solid #3678f4ff',
+                    borderRadius: '4px',
+                    width: '100%',
+                    padding: '0.5rem 1rem',
+                    marginBottom: '0.25rem',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    color: "#ffffff"
+                  }}
+                >
+                  <NavLink to="/profile" style={{ textDecoration: 'none', width: '100%', display: 'block' }}>
+                    Profile
+                  </NavLink>
+                </button>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    backgroundColor: '#3678f4ff',
+                    border: '1px solid #3678f4ff',
+                    borderRadius: '4px',
+                    width: '100%',
+                    padding: '0.5rem 1rem',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    color: "#ffffff"
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </nav>
     </header>
   );
