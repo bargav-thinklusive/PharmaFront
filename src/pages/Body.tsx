@@ -6,7 +6,7 @@ interface BodyProps {
 }
 
 const Body: React.FC<BodyProps> = ({ children }) => (
-  <main style={{ minHeight: '80vh', padding: '2rem', background: '#f5f5f5', width: '100vw', margin: 0 }}>
+  <main style={{ minHeight: '100vh',  background: '#f5f5f5', width: '100vw', margin: 0,paddingTop: "65px" }}>
     {children}
   </main>
 );
