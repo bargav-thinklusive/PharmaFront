@@ -31,7 +31,7 @@ interface CompoundSummaryProps {
   activeId?: string;
 }
 
-const CompoundSummary: FC<CompoundSummaryProps> = ({ record, activeId }) => {
+const CompoundSummary: FC<CompoundSummaryProps> = ({ record,  }) => {
   const navigate = useNavigate();
 
   // Use record if provided, otherwise fallback to mockData
@@ -148,4 +148,3 @@ const CompoundSummary: FC<CompoundSummaryProps> = ({ record, activeId }) => {
 };
 
 export default CompoundSummary;
-//export { default } from '../components/SummaryCard';

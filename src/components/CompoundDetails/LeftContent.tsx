@@ -20,5 +20,3 @@ const LeftContent: React.FC<LeftContentProps> = ({ sections, renderSection }) =>
 export default LeftContent;
 
 
-
-
