@@ -3,7 +3,7 @@ import Header from '../../pages/Header';
 import Login from '../LoginPage';
 import Home from '../../pages/Home';
 import About from '../../pages/About';
-import Submit from '../../pages/Submit';
+//import Submit from '../../pages/Submit';
 import Docs from '../../pages/Docs';
 import Contacts from '../../pages/Contacts';
 import ResultList from '../Results/ResultList';
@@ -27,7 +27,7 @@ const AppWrapper = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
-            <Route path="/submit" element={<Submit />} />
+            {/* <Route path="/submit" element={<Submit />} /> */}
             <Route path="/docs" element={<Docs />} />
             <Route path="/contacts" element={<Contacts />} />
             <Route path=":ccategory/:searchtext" element={<ResultList />} />

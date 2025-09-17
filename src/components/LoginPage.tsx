@@ -5,7 +5,8 @@ const containerStyle: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  minHeight: 'calc(100vh - 64px)', // account for header
+  minHeight: '100vh', // Full viewport height
+  height: '100vh', // Ensure exact viewport height
   width: '100vw',
   margin: 0,
   padding: 0,
@@ -54,7 +55,18 @@ const Login: React.FC = () => {
 
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (error) setError(''); // Clear error when user starts typing
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    if (error) setError(''); // Clear error when user starts typing
+  };
+
   const handleLogin = () => {
+    if (!email && !password) return setError('Please enter email and password');
     if (!email) return setError('Please enter email');
     if (!validateEmail(email)) return setError('Please enter a valid email');
     if (!password) return setError('Please enter password');
@@ -67,8 +79,20 @@ const Login: React.FC = () => {
     <div style={containerStyle}>
       <div style={formStyle}>
         <h2 style={{ textAlign: 'center', color: '#0f8d41' }}>Login</h2>
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} style={inputStyle} />
+        <input 
+          type="email" 
+          placeholder="Email" 
+          value={email} 
+          onChange={handleEmailChange}
+          style={inputStyle} 
+        />
+        <input 
+          type="password" 
+          placeholder="Password" 
+          value={password} 
+          onChange={handlePasswordChange}
+          style={inputStyle} 
+        />
         {error && <span style={errorStyle}>{error}</span>}
         <button onClick={handleLogin} style={buttonStyle}>Login</button>
       </div>

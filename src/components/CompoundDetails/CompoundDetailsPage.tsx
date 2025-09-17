@@ -147,55 +147,61 @@ const CompoundDetailsPage: React.FC = () => {
   };
 
   // Render TOC
-  const renderTOC = (sections: any[], level = 1, parentIdx = ''): React.ReactNode => (
-    <ul className="list-none m-0 p-0">
-      {sections.map((section: any, idx: number) => {
-        const sectionId = (parentIdx ? parentIdx + '.' : '') + (idx + 1);
-        const normalized = (section.TOCHeading || '').replace(/\s+/g, '').toLowerCase();
-        const htmlId = `${sectionId}-${normalized}`;
-        const hasSub = Array.isArray(section.Section) && section.Section.length > 0;
-        const isOpen = openDropdowns[htmlId] ?? false;
-        const isActive = activeId === htmlId;
+// Render TOC
+const renderTOC = (sections: any[], level = 1, parentIdx = ''): React.ReactNode => (
+  <ul
+    className={`list-none m-0 p-0 ${
+      level > 1 ? 'ml-4 pl-3 border-l border-gray-400' : ''
+    }`}
+  >
+    {sections.map((section: any, idx: number) => {
+      const sectionId = (parentIdx ? parentIdx + '.' : '') + (idx + 1);
+      const normalized = (section.TOCHeading || '').replace(/\s+/g, '').toLowerCase();
+      const htmlId = `${sectionId}-${normalized}`;
+      const hasSub = Array.isArray(section.Section) && section.Section.length > 0;
+      const isOpen = openDropdowns[htmlId] ?? false;
+      const isActive = activeId === htmlId;
 
-        return (
-          <li key={htmlId} id={`toc-${htmlId}`} className="mb-1">
-            <div
-              className={`flex justify-between items-center rounded transition-colors ${
-                isActive ? 'bg-blue-500 text-white' : 'bg-blue-50 text-black'
+      return (
+        <li key={htmlId} id={`toc-${htmlId}`} className="mb-1">
+          <div
+            className={`flex justify-between items-center rounded transition-colors ${
+              isActive ? 'bg-blue-500 text-white' : 'bg-blue-50 text-black'
+            }`}
+          >
+            <button
+              className={`w-full text-left px-2 py-0.5 rounded transition-colors ${
+                level === 1 ? 'text-sm ' : level === 2 ? 'text-xs font-medium' : 'text-[11px]'
               }`}
+              onClick={() => {
+                const el = document.getElementById(htmlId);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                setTimeout(() => window.dispatchEvent(new CustomEvent('setActiveId', { detail: htmlId })), 100);
+              }}
             >
+              <span className="inline-block w-12">{sectionId}</span>
+              {section.TOCHeading}
+            </button>
+
+            {hasSub && (
               <button
-                className={`w-full text-left px-2 py-0.5 rounded transition-colors ${
-                  level === 1 ? 'text-sm ' : level === 2 ? 'text-xs font-medium' : 'text-[11px]'
-                }`}
-                onClick={() => {
-                  const el = document.getElementById(htmlId);
-                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  setTimeout(() => window.dispatchEvent(new CustomEvent('setActiveId', { detail: htmlId })), 100);
-                }}
+                className="ml-1 px-1 py-1 text-xs hover:bg-blue-200 rounded transition-colors"
+                onClick={() => setOpenDropdowns((prev) => ({ ...prev, [htmlId]: !prev[htmlId] }))}
+                tabIndex={-1}
+                aria-label={isOpen ? 'Collapse' : 'Expand'}
               >
-                <span className="inline-block w-12">{sectionId}</span>
-                {section.TOCHeading}
+                {isOpen ? '▼' : '▶'}
               </button>
+            )}
+          </div>
 
-              {hasSub && (
-                <button
-                  className="ml-1 px-1 py-1 text-xs hover:bg-blue-200 rounded transition-colors"
-                  onClick={() => setOpenDropdowns((prev) => ({ ...prev, [htmlId]: !prev[htmlId] }))}
-                  tabIndex={-1}
-                  aria-label={isOpen ? 'Collapse' : 'Expand'}
-                >
-                  {isOpen ? '▼' : '▶'}
-                </button>
-              )}
-            </div>
+          {hasSub && isOpen && renderTOC(section.Section, level + 1, sectionId)}
+        </li>
+      );
+    })}
+  </ul>
+);
 
-            {hasSub && isOpen && renderTOC(section.Section, level + 1, sectionId)}
-          </li>
-        );
-      })}
-    </ul>
-  );
 
   return (
     <div className="w-full min-h-[60vh] flex flex-col items-center bg-white/80 py-8 text-black">
