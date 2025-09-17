@@ -8,8 +8,8 @@ const Home: React.FC = () => {
     <div
       className="w-full min-h-screen bg-gradient-to-b from-blue-900 to-blue-600 flex flex-col items-center"
       style={{
-        paddingTop: 64, // header height
-        paddingBottom: 64, // footer height
+        // paddingTop: 64, // header height
+        // paddingBottom: 64, // footer height
         boxSizing: 'border-box',
       }}
     >
