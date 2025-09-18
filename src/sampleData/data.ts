@@ -10487,3 +10487,269 @@ export interface Record {
 
 
 
+export const sampleDrugsData = [
+  {
+    cid: "D001",
+    MarketInformation: {
+      BrandName: "CardiRelief",
+      Indication: "Treatment of hypertension",
+      ApprovedFor: "Adults",
+      ApprovedCountries: ["USA", "India"],
+      ApprovedDate: "2018-06-15",
+      GenericName: "Losartan Potassium",
+      GenericApprovedDate: "2022-09-01",
+      PotentialGenericAvailability: "Yes, 2027",
+      SpecialStatus: "Orphan Drug",
+      PatentExclusivityInfo: "Patent expiry: 2027"
+    },
+    DrugSubstance: {
+      PhysicalAndChemicalProperties: {
+        ChemicalStructure: "C22H23ClN6O",
+        PotencyClassification: "Moderate",
+        ElementalFormula: "C22H23ClN6O",
+        BCSClass: "II",
+        MolecularWeight: "422.9 g/mol",
+        AverageIsotopicMass: "422.93 g/mol",
+        IUPACName: "2-butyl-4-chloro-1-...imidazole-5-methanol",
+        Solubility: "Slightly soluble in water"
+      },
+      ProcessDevelopment: {
+        AvailableDMFvendors: ["ABC Pharma"],
+        PotencyClassification: "Moderate",
+        ManufacturingSite: "Hyderabad, India",
+        ManufacturingRoute: "Synthetic",
+        PolymorphStudies: "Form A selected",
+        RegulatoryStartingMaterials: "Tetrazole derivative",
+        RSMsAndIntermediateSpecifications: "ICH Q7",
+        DrugSubstanceSpecifications: "Purity ≥ 99%",
+        ImpurityQualification: "All <0.15%",
+        GenotoxicImpuritiesAssessment: "No alerts",
+        NitrosaminesAssessment: "No risk",
+        FateOfImpuritiesStudies: "Forced degradation",
+        CPPsAndCQAStudies: "pH, solvent",
+        OtherInformation: "Validated process"
+      },
+      AnalyticalDevelopment: {
+        RSMMethods: "HPLC",
+        IPCTestMethods: "NMR",
+        FinalAPIMethods: "LC-MS",
+        ResidualSolventRiskAssessment: "Below limits",
+        RSMSynthesis: "Confirmed",
+        StabilityOfDrugSubstance: "24M stable"
+      },
+      AgencyFeedback: "FDA requested dissolution method validation"
+    },
+    DrugProduct: {
+      Information: {
+        DosageForms: "Tablet",
+        Strength: "50 mg",
+        TargetPopulation: "Adults",
+        MaximumDailyDose: "100 mg",
+        DevelopmentProgramDesignation: "Priority review",
+        StorageAndShippingConditions: "Below 30°C"
+      },
+      Formulation: {
+        FormulationComposition: [
+          { Component: "Losartan Potassium", Function: "Active", Quantity: "50 mg" }
+        ],
+        InactiveIngredients: [
+          { IngredientName: "Microcrystalline Cellulose", Percent_w_w: "15%" }
+        ],
+        MaximumDailyDose: "100 mg",
+        UnmetClinicalNeed: "Once-daily dosing",
+        ManufacturingProcess: "Wet granulation",
+        ExcipientsGrade: "USP",
+        ImpuritiesAndProcessImpurities: "Below limits",
+        Specification: "Assay 95–105%",
+        TestMethods: "HPLC",
+        ResidualSolventsRiskAssessment: "Ethanol low",
+        NitrosamineRiskAssessment: "Negligible",
+        StabilityStudies: "24M RT, 6M accelerated",
+        PackagingMaterial: "HDPE",
+        Presentation: "Blister",
+        DOE_CPP_CQA_CMAs: "Compression force",
+        DissolutionStudies: "85% in 30 min",
+        FoodStudyReports: "No food effect",
+        CurrentLabel: "FDA 2018",
+        EmbossingDebossing: "Logo embossed"
+      }
+    },
+    References: ["FDA Orange Book 2022", "PubChem"]
+  },
+  {
+    cid: "D002",
+    MarketInformation: {
+      BrandName: "NeuroCalm",
+      Indication: "Epilepsy management",
+      ApprovedFor: "Adults and children >12",
+      ApprovedCountries: ["USA", "EU"],
+      ApprovedDate: "2016-03-10",
+      GenericName: "Levetiracetam",
+      GenericApprovedDate: "2021-05-22",
+      PotentialGenericAvailability: "Yes",
+      SpecialStatus: "None",
+      PatentExclusivityInfo: "Patent expired"
+    },
+    DrugSubstance: {
+      PhysicalAndChemicalProperties: {
+        ChemicalStructure: "C8H14N2O2",
+        PotencyClassification: "Low",
+        ElementalFormula: "C8H14N2O2",
+        BCSClass: "I",
+        MolecularWeight: "170.21 g/mol",
+        AverageIsotopicMass: "170.22 g/mol",
+        IUPACName: "2S)-2-(2-oxopyrrolidin-1-yl)butanamide",
+        Solubility: "Highly soluble in water"
+      },
+      ProcessDevelopment: {
+        AvailableDMFvendors: ["GlobalChem"],
+        PotencyClassification: "Low",
+        ManufacturingSite: "USA",
+        ManufacturingRoute: "Synthetic",
+        PolymorphStudies: "Single stable form",
+        RegulatoryStartingMaterials: "Butanamide",
+        RSMsAndIntermediateSpecifications: "ICH",
+        DrugSubstanceSpecifications: "Purity >99%",
+        ImpurityQualification: "Qualified",
+        GenotoxicImpuritiesAssessment: "None",
+        NitrosaminesAssessment: "Not applicable",
+        FateOfImpuritiesStudies: "Yes",
+        CPPsAndCQAStudies: "Temp, solvent",
+        OtherInformation: "Robust synthesis"
+      },
+      AnalyticalDevelopment: {
+        RSMMethods: "IR",
+        IPCTestMethods: "HPLC",
+        FinalAPIMethods: "HPLC-UV",
+        ResidualSolventRiskAssessment: "Compliant",
+        RSMSynthesis: "Fingerprinting",
+        StabilityOfDrugSubstance: "36M"
+      },
+      AgencyFeedback: "Accepted without major queries"
+    },
+    DrugProduct: {
+      Information: {
+        DosageForms: "Tablet, oral solution",
+        Strength: "250 mg, 500 mg",
+        TargetPopulation: "Adults & adolescents",
+        MaximumDailyDose: "3000 mg",
+        DevelopmentProgramDesignation: "Standard",
+        StorageAndShippingConditions: "RT"
+      },
+      Formulation: {
+        FormulationComposition: [
+          { Component: "Levetiracetam", Function: "Active", Quantity: "500 mg" }
+        ],
+        InactiveIngredients: [
+          { IngredientName: "Lactose", Percent_w_w: "20%" }
+        ],
+        MaximumDailyDose: "3000 mg",
+        UnmetClinicalNeed: "Improved tolerability",
+        ManufacturingProcess: "Direct compression",
+        ExcipientsGrade: "Ph.Eur",
+        ImpuritiesAndProcessImpurities: "Controlled",
+        Specification: "Assay 98–102%",
+        TestMethods: "HPLC",
+        ResidualSolventsRiskAssessment: "No issues",
+        NitrosamineRiskAssessment: "Low",
+        StabilityStudies: "36M",
+        PackagingMaterial: "Blister",
+        Presentation: "10s, 30s",
+        DOE_CPP_CQA_CMAs: "Blend uniformity",
+        DissolutionStudies: "NLT 85%/30 min",
+        FoodStudyReports: "No food effect",
+        CurrentLabel: "FDA 2016",
+        EmbossingDebossing: "None"
+      }
+    },
+    References: ["FDA Label", "ICH Q8"]
+  },
+  {
+    cid: "D003",
+    MarketInformation: {
+      BrandName: "OncoCure",
+      Indication: "Breast cancer",
+      ApprovedFor: "Adults",
+      ApprovedCountries: ["USA"],
+      ApprovedDate: "2020-08-01",
+      GenericName: "Palbociclib",
+      GenericApprovedDate: "",
+      PotentialGenericAvailability: "2030",
+      SpecialStatus: "Breakthrough therapy",
+      PatentExclusivityInfo: "Expires 2030"
+    },
+    DrugSubstance: {
+      PhysicalAndChemicalProperties: {
+        ChemicalStructure: "C24H29N7O2",
+        PotencyClassification: "High",
+        ElementalFormula: "C24H29N7O2",
+        BCSClass: "II",
+        MolecularWeight: "447.54 g/mol",
+        AverageIsotopicMass: "447.53 g/mol",
+        IUPACName: "6-acetyl-8-cyclopentyl-5-methyl-2-...",
+        Solubility: "Low solubility"
+      },
+      ProcessDevelopment: {
+        AvailableDMFvendors: ["PharmaTech"],
+        PotencyClassification: "High",
+        ManufacturingSite: "USA",
+        ManufacturingRoute: "Synthetic",
+        PolymorphStudies: "Stable crystalline form",
+        RegulatoryStartingMaterials: "Cyclopentyl amine",
+        RSMsAndIntermediateSpecifications: "Defined",
+        DrugSubstanceSpecifications: "Purity ≥ 99.8%",
+        ImpurityQualification: "Yes",
+        GenotoxicImpuritiesAssessment: "Controlled",
+        NitrosaminesAssessment: "None",
+        FateOfImpuritiesStudies: "Yes",
+        CPPsAndCQAStudies: "Reaction time",
+        OtherInformation: "Toxicology complete"
+      },
+      AnalyticalDevelopment: {
+        RSMMethods: "HPLC",
+        IPCTestMethods: "NMR",
+        FinalAPIMethods: "LC-MS",
+        ResidualSolventRiskAssessment: "Low",
+        RSMSynthesis: "Confirmed",
+        StabilityOfDrugSubstance: "24M"
+      },
+      AgencyFeedback: "Fast-track review"
+    },
+    DrugProduct: {
+      Information: {
+        DosageForms: "Capsule",
+        Strength: "125 mg",
+        TargetPopulation: "Adults",
+        MaximumDailyDose: "125 mg",
+        DevelopmentProgramDesignation: "Breakthrough therapy",
+        StorageAndShippingConditions: "2–8°C"
+      },
+      Formulation: {
+        FormulationComposition: [
+          { Component: "Palbociclib", Function: "Active", Quantity: "125 mg" }
+        ],
+        InactiveIngredients: [
+          { IngredientName: "Povidone", Percent_w_w: "10%" }
+        ],
+        MaximumDailyDose: "125 mg",
+        UnmetClinicalNeed: "Targeted therapy",
+        ManufacturingProcess: "Encapsulation",
+        ExcipientsGrade: "USP",
+        ImpuritiesAndProcessImpurities: "Below limits",
+        Specification: "Assay 98–102%",
+        TestMethods: "LC-MS",
+        ResidualSolventsRiskAssessment: "Compliant",
+        NitrosamineRiskAssessment: "Low",
+        StabilityStudies: "24M",
+        PackagingMaterial: "Blister",
+        Presentation: "21-capsule packs",
+        DOE_CPP_CQA_CMAs: "Capsule fill weight",
+        DissolutionStudies: "In vitro profiles",
+        FoodStudyReports: "Food effect observed",
+        CurrentLabel: "FDA 2020",
+        EmbossingDebossing: "None"
+      }
+    },
+    References: ["FDA 2020 Approval", "ICH Q3B"]
+  }
+];
