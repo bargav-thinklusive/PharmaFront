@@ -371,8 +371,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import MainLogo from "../assets/MainLogo.png";
+interface HeaderProps{
+  isLoginPage?: boolean;
+}
 
-const Header: React.FC = () => {
+const Header: React.FC<HeaderProps> = ({isLoginPage}) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -391,7 +394,7 @@ const Header: React.FC = () => {
   }, []);
 
   // detect login page
-  const isLoginPage = location.pathname === "/login";
+  //const isLoginPage = location.pathname === "/login";
 
   // detect about/contacts pages
   const isAboutOrContacts =
