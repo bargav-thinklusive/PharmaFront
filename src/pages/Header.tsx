@@ -372,7 +372,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import MainLogo from "../assets/MainLogo.png";
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  isLoginPage?: boolean; // optional prop to indicate if on login page
+}
+
+
+const Header: React.FC<HeaderProps> = ({isLoginPage}) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -391,7 +396,7 @@ const Header: React.FC = () => {
   }, []);
 
   // detect login page
-  const isLoginPage = location.pathname === "/login";
+  //const isLoginPage = location.pathname === "/login";
 
   // detect about/contacts pages
   const isAboutOrContacts =
@@ -500,38 +505,25 @@ const Header: React.FC = () => {
                     borderRadius: "6px",
                     boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
                     marginTop: "0.5rem",
-                    minWidth: "140px",
+                    minWidth: "100px",
                     overflow: "hidden",
                   }}
                 >
                   <Link
-                    to="/profile"
-                    style={{
-                      display: "block",
-                      padding: "0.5rem 1rem",
-                      background: "#3678f4ff",
-                      color: "white",
-                      textDecoration: "none",
-                      borderBottom: "1px solid #ccc",
-                    }}
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    Profile
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    style={{
-                      width: "100%",
-                      background: "#3678f4ff",
-                      border: "none",
-                      padding: "0.5rem 1rem",
-                      color: "white",
-                      textAlign: "left",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Logout
-                  </button>
+  to="/profile"
+  className="block px-4 py-2 border-b border-gray-300 text-black hover:bg-[#3678f4ff] hover:text-white transition-colors duration-200"
+  onClick={() => setDropdownOpen(false)}
+>
+  Profile
+</Link>
+
+<button
+  onClick={handleLogout}
+  className="w-full text-left px-4 py-2 text-black hover:bg-[#3678f4ff] hover:text-white transition-colors duration-200 cursor-pointer"
+>
+  Logout
+</button>
+
                 </div>
               )}
             </div>
