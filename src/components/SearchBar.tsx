@@ -120,7 +120,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             onChange={handleInputChange}
             autoFocus
           />
-          <select
+          {/* <select
             className="px-6 py-4 text-lg bg-gray-100 border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium border-l"
             value={category}
             onChange={handleCategoryChange}
@@ -128,7 +128,24 @@ const SearchBar: React.FC<SearchBarProps> = ({
             <option value="compound">Compound</option>
             <option value="taxonomy">Taxonomy</option>
             <option value="genre">Genre</option>
-          </select>
+          </select> */}
+          <div className="relative">
+  <select
+    className="px-6 py-4 text-lg bg-gray-100 border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium border-l appearance-none pr-10"
+    value={category}
+    onChange={handleCategoryChange}
+  >
+    <option value="compound">Compound</option>
+    <option value="taxonomy">Taxonomy</option>
+    <option value="genre">Genre</option>
+  </select>
+
+  {/* Custom Arrow */}
+  <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600">
+    ▼
+  </span>
+</div>
+
         </div>
       </form>
 
