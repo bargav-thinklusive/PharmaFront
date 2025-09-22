@@ -1,15 +1,15 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
-import Header from '../../pages/Header';
-import Login from '../LoginPage';
-import Home from '../../pages/Home';
-import About from '../../pages/About';
-import Docs from '../../pages/Docs';
-import Contacts from '../../pages/Contacts';
-import ResultList from '../Results/ResultList';
-import CompoundDetailsPage from '../CompoundDetails/CompoundDetailsPage';
-import Body from '../../pages/Body';
-import Footer from '../../pages/Footer';
-import NotFound from '../../pages/NotFound';
+import Header from '../pages/Header';
+import Login from '../components/LoginPage';
+import Home from '../pages/Home';
+import About from '../pages/About';
+import Docs from '../pages/Docs';
+import Contacts from '../pages/Contacts';
+import ResultList from '../components/Results/ResultList';
+import CompoundDetailsPage from '../components/CompoundDetails/CompoundDetailsPage';
+import Body from '../pages/Body';
+import Footer from '../pages/Footer';
+import NotFound from '../pages/NotFound';
 
 const AppWrapper = () => {
   const location = useLocation();
