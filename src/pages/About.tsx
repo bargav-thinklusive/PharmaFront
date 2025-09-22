@@ -2,7 +2,7 @@ import React from 'react';
 
 const About: React.FC = () => (
   <div className="h-full w-full bg-gray-50 flex flex-col">
-    <div className="flex-1 p-8">
+    <div className="flex-1 py-16">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">About ChemBank</h2>
       <div className="max-w-4xl">
         <p className="text-gray-600 mb-6">
