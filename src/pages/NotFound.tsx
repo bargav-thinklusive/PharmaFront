@@ -5,7 +5,7 @@ const NotFound: React.FC = () => {
   const navigate = useNavigate();
 
   const handleGoToHome = () => {
-    navigate('/');
+    navigate('/home');
   };
 
   const handleContact = () => {

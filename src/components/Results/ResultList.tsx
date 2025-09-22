@@ -82,7 +82,7 @@ const ResultList: React.FC = () => {
 
   return (
     <div className="w-full min-h-[60vh] flex flex-col items-center bg-white/80 py-8">
-      <div className="w-full max-w-5xl">
+      <div className="w-full max-w-5xl py-16">
         {/* SearchBar with value controlled by searchValue */}
           {searchtext && !cid && (
             <SearchBar value={searchValue} setValue={setSearchValue} initialCategory={ccategory} />

@@ -72,7 +72,7 @@ const Login: React.FC = () => {
     if (!password) return setError('Please enter password');
 
     setError('');
-    navigate('/'); // Redirect to Home
+    navigate('/home'); // Redirect to Home
   };
 
   return (
