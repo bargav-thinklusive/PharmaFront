@@ -9,11 +9,10 @@ const AppWrapper = () => {
   const isLoginPage = location.pathname === '/login';
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="min-h-screen flex flex-col">
       <Header isLoginPage={isLoginPage} />
 
       <Body>
-        
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           

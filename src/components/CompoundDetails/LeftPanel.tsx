@@ -15,7 +15,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ item, sections, renderSection,  s
   return (
     <div className="flex-1 flex flex-col gap-6 min-w-0">
       {/* Title & Summary */}
-      <div id="summary" ref={(el) => setSummaryRef && setSummaryRef(el)} className='py-10'>
+      <div id="summary" ref={(el) => setSummaryRef && setSummaryRef(el)} >
         <CompoundSummary record={item.Record}  />
       </div>
 
