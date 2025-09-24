@@ -6,7 +6,7 @@ interface BodyProps {
 
 const Body: React.FC<BodyProps> = ({ children }) => {
   return (
-    <main className="flex-1 overflow-auto">
+    <main className="flex-1 pt-16"> {/* pt-16 accounts for fixed header height */}
       {children}
     </main>
   );
