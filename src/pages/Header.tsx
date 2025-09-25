@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import CompanyLogo from "../assets/cmc.png"
+import CompanyLogo from "../assets/cmcintel.png"
 
 interface HeaderProps {
   isLoginPage?: boolean; // optional prop to indicate if on login page

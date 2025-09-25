@@ -10484,6 +10484,384 @@ export interface Record {
   Section: Section[];
 }
 
+export const drugData=[{
+    "cid":"D001",
+  "marketInformation": {
+    "brandName": "Xalkori",
+    "indication": "ALK- or ROS1-positive non‑small cell lung cancer (NSCLC), as well as certain forms of ALK-positive anaplastic large cell lymphoma (ALCL) and inflammatory myofibroblastic tumors (IMT)",
+    "approvedFor": "Pfizer Inc.",
+    "approvedCountries": "Globally approved in more than 90 countries. Approved in the US and EU.",
+    "approvedDate": "2011",
+    "genericName": "Generic not available yet",
+    "genericApprovedDate": "N/A",
+    "potentialGenericAvailability": "Nov, 2029 (based on patent expiration, this can change based on legal challenges and licensing agreements.)",
+    "specialStatus": "Orphan Drug Designation available for pediatric ALCL treatment until Jan 14, 2028",
+    "patentExclusivityInfo": ""
+  },
+  "drugSubstance": {
+    "physicalAndChemicalProperties": {
+      "chemicalName": "Crizotinib",
+      "chemicalStructure": "See media/image1.png",
+      "potencyClassification": "",
+      "elementalFormula": "C21H22Cl2FN5O",
+      "bcsClass": "Class IV (low solubility and low permeability)",
+      "molecularWeight": "450.3 g/mol",
+      "averageIsotopicMass": "449.11854397 g/mol",
+      "structureName": "(R)-3-[1-(2,6-Dichloro-3-fluorophenyl)ethoxy]-5-[1-(piperidin-4-yl)-1H-pyrazol-4-yl]pyridin-2-amine",
+      "solubility": "Insoluble in water. Solubility decreases as pH increases, dropping from >10 mg/mL at pH 1.6 to <0.1 mg/mL at pH 8.2.",
+      "pka": "Has two pKa values: 9.4 (piperidinium cation) and 5.6 (pyridinium cation).",
+      "logp": "The partition coefficient (octanol/water) at pH 7.4 is 1.65."
+    },
+    "processDevelopment": {
+      "availableDmfVendors": [
+        "LGM Pharma",
+        "Chongqing Huapont Pharmaceutical",
+        "Navinta",
+        "Wuxi further pharmaceutical CO"
+      ],
+      "vendorReference": "http://pharmacompass.com/manufacturers-suppliers-exporters/crizotinib",
+      "potencyClassification": "",
+      "manufacturingSites": [
+        {
+          "vendor": "LGM Pharma",
+          "location": "USA"
+        },
+        {
+          "vendor": "Chongqing Huapont Pharmaceutical",
+          "location": "China"
+        },
+        {
+          "vendor": "Navinta",
+          "location": "USA"
+        }
+      ],
+      "manufacturingRoute": "See Appendix 1",
+      "polymorphStudies": "Only one crystalline form has been found, thermodynamically stable form A",
+      "regulatoryStartingMaterials": "",
+      "rsmAndIntermediateSpecifications": "",
+      "drugSubstanceSpecifications": "Appendix 2: DS Specification",
+      "forcedDegradationStudies": "Stress studies were performed at high temperatures, and no significant degradation was observed after 14 days stored at 100°C. Minor degradation was observed when crizotinib was exposed to strongly acidic, strongly basic, intense light and oxidative conditions.",
+      "impurityQualification": "",
+      "genotoxicImpuritiesAssessment": "",
+      "nitrosaminesAssessment": "",
+      "fateOfImpurities": "",
+      "cppsAndCqaStudies": "",
+      "otherInformation": ""
+    },
+    "analyticalDevelopment": {
+      "rsmMethods": "",
+      "ipcTestMethods": "",
+      "finalApiMethods": "",
+      "residualSolventRiskAssessment": "",
+      "rsmSynthesis": "",
+      "stabilityOfDrugSubstance": "",
+      "drugSubstanceSites": "Manufacturing, Analytical Testing and Release are performed at: Pfizer Ireland Pharmaceuticals Little Island County Cork Ireland",
+      "dsImpurities": "",
+      "dsImpurityMethods": ""
+    }
+  },
+  "drugProduct": {
+    "information": {
+      "dosageForms": "Capsules, Oral pellets(encapsulated)",
+      "strengths": [
+        {
+          "strength": "200 mg",
+          "description": "hard gelatin capsule, size 1, white opaque body and pink opaque cap, with 'Pfizer' on the cap and 'CRZ 200' on the body.",
+          "type": "capsule"
+        },
+        {
+          "strength": "250 mg",
+          "description": "hard gelatin capsule, size 0, pink opaque cap and body, with 'Pfizer' on the cap and 'CRZ 250' on the body.",
+          "type": "capsule"
+        },
+        {
+          "strength": "20 mg",
+          "description": "Oral Pellets: hard gelatin capsule, size 4, white opaque body and light blue opaque cap, printed with black ink 'Pfizer' on the cap and 'CRZ 20' on the body.",
+          "type": "oral_pellets"
+        },
+        {
+          "strength": "50 mg",
+          "description": "Oral Pellets: hard gelatin capsule, size 3, light gray opaque body and gray opaque cap, printed with black ink 'Pfizer' on the cap and 'CRZ 50' on the body.",
+          "type": "oral_pellets"
+        },
+        {
+          "strength": "150 mg",
+          "description": "Oral Pellets: hard gelatin capsule, size 0, light blue opaque body and cap, printed with black ink 'Pfizer' on the cap and 'CRZ 150' on the body.",
+          "type": "oral_pellets"
+        }
+      ],
+      "targetPopulation": "Adults",
+      "maximumDailyDose": "1000 mg, 2*250 mg capsules taken twice daily",
+      "storageAndShippingConditions": "USP CRT",
+      "developmentProgramDesignation": "Xalkori (crizotinib) received multiple developmental program designations from the FDA for different indications, including Breakthrough Therapy, Orphan Drug, Fast Track, Priority Review, and Accelerated Approval. Appendix 3",
+      "dpFormulation": "",
+      "unmetClinicalNeed": "",
+      "manufacturingProcess": "",
+      "excipientsgGrade": "",
+      "impurities": "",
+      "specification": "",
+      "testMethods": "",
+      "residualSolventsRiskAssessment": "",
+      "nitrosamineRiskAssessment": "",
+      "stabilityStudies": "",
+      "dissolutionStudies": "",
+      "baBeStudies": "",
+      "foodStudyReports": "",
+      "currentLabel": "",
+      "dpEmbossingDebossingInfo": "",
+      "currentExpirationDating": {
+        "oralPellets": "24 months from the date of manufacture",
+        "capsules": "15 months from the date of manufacture when first approved by the FDA in 2011. The specific expiration for a particular bottle can be found printed on the outer package."
+      },
+      "foodInteractions": [
+        "Avoid grapefruit products. Grapefruit inhibits CYP3A4 metabolism, which may increase the serum levels of crizotinib.",
+        "Take with or without food. High-fat food decreases drug absorption, but not to a clinically significant extent."
+      ],
+      "drugDrugInteractions": [
+        "Avoid St. John's Wort. This herb induces CYP3A4 metabolism, which may reduce serum levels of crizotinib."
+      ],
+      "packagingAndStorageConditions": {
+        "200mg": {
+          "description": "Hard gelatin capsule with pink opaque cap and white opaque body, printed with black ink 'Pfizer' on the cap, 'CRZ 200' on the body",
+          "packaging": "Bottles of 60 capsules: NDC 0069-8141-20",
+          "type": "capsules",
+          "storageTemperature": "Store at room temperature 20° to 25°C (68° to 77°F); excursions permitted between 15° to 30°C (59° to 86°F) [see USP Controlled Room Temperature]."
+        },
+        "250mg": {
+          "description": "Hard gelatin capsule with pink opaque cap and body, printed with black ink 'Pfizer' on the cap, 'CRZ 250' on the body",
+          "packaging": "Bottles of 60 capsules: NDC 0069-8140-20",
+          "type": "capsules",
+          "storageTemperature": "Store at room temperature 20° to 25°C (68° to 77°F); excursions permitted between 15° to 30°C (59° to 86°F) [see USP Controlled Room Temperature]."
+        },
+        "20mg": {
+          "description": "Hard gelatin capsule, size 4, light blue opaque cap and white opaque body, printed with black ink 'Pfizer' on the cap, 'CRZ 20' on the body",
+          "packaging": "Bottles of 60 capsules: NDC 0069-0251-60",
+          "type": "oral_pellets",
+          "storageTemperature": "Store at room temperature 20° to 25°C (68° to 77°F); excursions permitted between 15° to 30°C (59° to 86°F) [see USP Controlled Room Temperature]."
+        },
+        "50mg": {
+          "description": "Hard gelatin capsule, size 3, gray opaque cap and light gray opaque body, printed with black ink 'Pfizer' on the cap, 'CRZ 50' on the body",
+          "packaging": "Bottles of 60 capsules: NDC 0069-0507-60",
+          "type": "oral_pellets",
+          "storageTemperature": "Store at room temperature 20° to 25°C (68° to 77°F); excursions permitted between 15° to 30°C (59° to 86°F) [see USP Controlled Room Temperature]."
+        },
+        "150mg": {
+          "description": "Hard gelatin capsule, size 0, light blue opaque cap and body, printed with black ink 'Pfizer' on the cap, 'CRZ 150' on the body",
+          "packaging": "Bottles of 60 capsules: NDC 0069-1500-60",
+          "type": "oral_pellets",
+          "storageTemperature": "Store at room temperature 20° to 25°C (68° to 77°F); excursions permitted between 15° to 30°C (59° to 86°F) [see USP Controlled Room Temperature]."
+        },
+        
+      },
+      "labeling": "Appendix 4: Labeling Information",
+      "developmentProgramDesignationDetails": "Appendix 5: Development program designation"
+    }
+  },
+  "appendices": {
+    "appendix1": {
+      "title": "API Synthetic route",
+      "reference": "https://pubs.acs.org/doi/10.1021/acs.oprd.0c00302",
+      "description": "Crizotinib API is manufactured through a stepwise synthetic organic chemistry process that constructs the pyrazole and pyridine rings separately, joins them via ether linkage to the dichloro-fluoroaryl group, and resolves the final product to the R-enantiomer.",
+      "manufacturingEmphasis": "chiral control, impurity management, and recrystallization for purity",
+      "synthesisSteps": [
+        {
+          "step": "A",
+          "title": "Chiral benzylic alcohol",
+          "description": "Prepare (S)-1-(2,6-dichloro-3-fluorophenyl)ethanol (enantiopure). In Pfizer's enabling route the downstream Mitsunobu inverts this center, delivering the (R) configuration in the API."
+        },
+        {
+          "step": "B",
+          "title": "Mitsunobu etherification (installs the 3-ethoxy)",
+          "substrates": "5-bromo-3-hydroxy-2-nitropyridine + (S)-benzylic alcohol",
+          "conditions": "PPh₃ / DIAD, toluene, 0--25 °C → then EtOH crystallization to purge TPPO",
+          "yield": "~80--90% yield with retained ee after inversion"
+        },
+        {
+          "step": "C",
+          "title": "Chemoselective nitro → amine reduction (builds the 2-amine)",
+          "method": "Hydrogenation (H₂, sponge-Ni or Raney-Ni, MeOH, ambient--40 °C)",
+          "product": "(R)-5-bromo-3-[1-(2,6-dichloro-3-fluorophenyl)ethoxy]pyridin-2-amine (CAS 877399-00-3)"
+        },
+        {
+          "step": "D",
+          "title": "Pyrazolyl-piperidine boron partner",
+          "description": "Prepare 1-(1-Boc-4-piperidinyl)-1H-pyrazol-4-yl boronic acid/ester (commercial or in-house). This is the coupling partner for the 5-bromo pyridinamine."
+        },
+        {
+          "step": "E",
+          "title": "Suzuki--Miyaura at C-5 of pyridine",
+          "substrates": "(R)-5-bromo pyridin-2-amine (from Step C) + Boc-protected pyrazolyl-piperidinyl boronic acid",
+          "conditions": "Pd(PPh₃)₄ (~2--3 mol %), Na₂CO₃ (aq), DMF (with water), ~60 °C"
+        },
+        {
+          "step": "F",
+          "title": "Global deprotection / finish",
+          "method": "Acidolysis of Boc (e.g., HCl/EtOH or HCl/dioxane) → neutralization/recrystallization to the free base crizotinib"
+        }
+      ],
+      "currentManufacturers": "Pfizer sites across the globe"
+    },
+    "appendix2": {
+      "title": "DS Specification",
+      "specifications": {
+        "description": "A white pale-yellow powder. Non-hygroscopic",
+        "assay": "",
+        "relatedSubstances": "",
+        "chiral": "",
+        "polymorph": "Amorphous form is used",
+        "idByHplc": "",
+        "idByFtir": "",
+        "particleSizeDistribution": "",
+        "residueOnIgnition": "",
+        "heavyMetals": "",
+        "palladium": "Limit set as per EMA/CHMP/SWP/4666/2000 Option 2a"
+      }
+    },
+    "appendix3": {
+      "title": "Formulation composition",
+      "note": "All excipients used in the formulation are compendial and are conventional for solid oral dosage forms.",
+      "inactiveIngredients": [
+        {
+          "name": "SILICON DIOXIDE",
+          "unii": "ETJ7Z6XBU4"
+        },
+        {
+          "name": "MICROCRYSTALLINE CELLULOSE",
+          "unii": "OP1R32D61U"
+        },
+        {
+          "name": "ANHYDROUS DIBASIC CALCIUM PHOSPHATE",
+          "unii": "L11K75P92J"
+        },
+        {
+          "name": "MAGNESIUM STEARATE",
+          "unii": "70097M6I30"
+        },
+        {
+          "name": "GELATIN, UNSPECIFIED",
+          "unii": "2G86QN327L"
+        },
+        {
+          "name": "TITANIUM DIOXIDE",
+          "unii": "15FIX9V2JP"
+        },
+        {
+          "name": "FERRIC OXIDE RED",
+          "unii": "1K09F3G675"
+        },
+        {
+          "name": "SHELLAC",
+          "unii": "46N107B71O"
+        },
+        {
+          "name": "PROPYLENE GLYCOL",
+          "unii": "6DC9Q167V3"
+        },
+        {
+          "name": "AMMONIA",
+          "unii": "5138Q19F1X"
+        },
+        {
+          "name": "POTASSIUM HYDROXIDE",
+          "unii": "WZH3C48M4T"
+        },
+        {
+          "name": "FERROSOFERRIC OXIDE",
+          "unii": "XM0M87F357"
+        },
+        {
+          "name": "SODIUM STARCH GLYCOLATE TYPE A",
+          "unii": "H8AV0SQX4D"
+        }
+      ]
+    },
+    "appendix_4": {
+      "title": "Labeling Information",
+      "labels": [
+        "PRINCIPAL DISPLAY PANEL - 250 mg Capsule Bottle Label",
+        "PRINCIPAL DISPLAY PANEL - 200 mg Capsule Bottle Label",
+        "PRINCIPAL DISPLAY PANEL - 20 mg Oral Pellets Label",
+        "PRINCIPAL DISPLAY PANEL - 50 mg Oral Pellets Label",
+        "PRINCIPAL DISPLAY PANEL - 150 mg Oral Pellets Label"
+      ]
+    },
+    "appendix_5": {
+      "title": "Development program designation",
+      "description": "Xalkori (crizotinib) received multiple developmental program designations from the FDA for different indications, including Breakthrough Therapy, Orphan Drug, Fast Track, Priority Review, and Accelerated Approval.",
+      "designations": {
+        "breakthrough_therapy": [
+          {
+            "indication": "ROS1-positive non-small cell lung cancer (NSCLC)",
+            "date": "April 2015"
+          },
+          {
+            "indication": "MET exon 14 alterations",
+            "date": "May 2018"
+          },
+          {
+            "indication": "ALK-positive anaplastic large cell lymphoma (ALCL)",
+            "date": "May 2018"
+          }
+        ],
+        "orphan_drug": [
+          {
+            "indication": "Anaplastic lymphoma kinase (ALK)-positive NSCLC",
+            "date": "September 2010"
+          },
+          {
+            "indication": "ALK-positive anaplastic large cell lymphoma (ALCL)",
+            "date": "September 2012"
+          },
+          {
+            "indication": "ALK-positive inflammatory myofibroblastic tumor (IMT)",
+            "date": "Not specified"
+          }
+        ],
+        "fast_track": [
+          {
+            "indication": "ALK-positive advanced NSCLC",
+            "date": "December 2010"
+          }
+        ],
+        "accelerated_approval_and_priority_review": [
+          {
+            "indication": "ALK-positive NSCLC",
+            "date": "August 2011",
+            "type": "accelerated_approval"
+          },
+          {
+            "indication": "ROS1-positive NSCLC",
+            "date": "March 2016",
+            "type": "priority_review"
+          }
+        ]
+      }
+    }
+  },
+  "references": [
+    {
+      "title": "Pfizer OPRD process paper (six-step enabling route; Mitsunobu ↔ Suzuki ↔ H₂/Ni): de Koning et al. 2011.",
+      "url": "https://pubs.acs.org/doi/10.1021/op200131n"
+    },
+    {
+      "title": "Process patent with explicit conditions (Mitsunobu in THF/toluene; Suzuki in DMF/Na₂CO₃; Boc deprotection HCl/EtOH): US 9,604,966.",
+      "url": "https://patents.google.com/patent/US9604966B2/en"
+    },
+    {
+      "title": "J. Med. Chem. chemistry note (Mitsunobu of 5-bromo-3-hydroxy-2-nitropyridine alcoholates to intermediates): design paper.",
+      "url": "https://pubs.acs.org/doi/10.1021/jm401805h"
+    },
+    {
+      "title": "Commercial intermediates listing (confirms structures/CAS used on route): Ruifu Chemical.",
+      "url": "https://www.ruifuchemical.com/cas-877399-00-3-product/"
+    },
+    {
+      "title": "EMA EPAR (API as free base in product): Xalkori (crizotinib).",
+      "url": "https://www.ema.europa.eu/en/documents/assessment-report/xalkori-epar-public-assessment-report_en.pdf"
+    }
+  ]
+},
 
+]
 
 
