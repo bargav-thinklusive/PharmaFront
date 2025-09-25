@@ -14,12 +14,12 @@ const CompoundInformation: React.FC = () => {
 
     return (
 
-        <div className="py-16 max-w-5xl mx-auto pl-8">
+        <div className="w-full min-h-[60vh] flex flex-col items-center bg-white/80 py-8 text-black">
 
             {drugData.map((drug, index) => (
-                <div className='flex flex-row justify-between gap-12'>
+                <div className='w-full max-w-7xl flex flex-row md:flex-row gap-4'>
 
-                    <div className=''>
+                    <div className='flex-1 flex flex-col gap-6 min-w-0'>
 
                         <div className='mb-10'>
                             <Summary drug={drug} />
