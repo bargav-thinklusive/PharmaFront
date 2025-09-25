@@ -209,10 +209,11 @@
 
 
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface TableProps {
   drug: any;
+  activeSection: string;
 }
 
 const toTitleCase = (str: unknown): string => {
@@ -228,12 +229,34 @@ const toTitleCase = (str: unknown): string => {
 const normalizeKey = (k: string) =>
   String(k).replace(/[^a-z0-9]/gi, "").toLowerCase();
 
-const Table: React.FC<TableProps> = ({ drug }) => {
+const Table: React.FC<TableProps> = ({ drug, activeSection }) => {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
   const toggleSection = (key: string) => {
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
+
+  useEffect(() => {
+    if (!activeSection) return;
+    const newOpen: Record<string, boolean> = {};
+    if (activeSection.startsWith('section-1-')) {
+      newOpen['marketInformation'] = true;
+    } else if (activeSection.startsWith('section-2-')) {
+      newOpen['drugSubstance'] = true;
+      if (activeSection.startsWith('section-2-1')) {
+        newOpen['drugSubstance.physicalAndChemicalProperties'] = true;
+      } else if (activeSection.startsWith('section-2-2')) {
+        newOpen['drugSubstance.processDevelopment'] = true;
+      } else if (activeSection.startsWith('section-2-3')) {
+        newOpen['drugSubstance.analyticalDevelopment'] = true;
+      }
+    } else if (activeSection.startsWith('section-3-')) {
+      newOpen['drugProduct'] = true;
+    } else if (activeSection.startsWith('section-4-')) {
+      // references, no sub
+    }
+    setOpenSections(newOpen);
+  }, [activeSection]);
 
   const hasContent = (val: any): boolean => {
     if (val === null || val === undefined) return false;
@@ -283,7 +306,7 @@ const Table: React.FC<TableProps> = ({ drug }) => {
       hasContent(drug[key])
   );
 
-  // Build final sections: Title & Summary once + mainKeys + References once (if exists)
+  // Build final sections: Title & Summary always + mainKeys + References once (if exists)
   const sectionKeys: string[] = ["title_and_summary", ...mainKeys];
   if ("references" in drug && hasContent(drug.references)) {
     sectionKeys.push("references");
@@ -296,7 +319,7 @@ const Table: React.FC<TableProps> = ({ drug }) => {
       </h3>
 
       {sectionKeys.map((key, idx) => {
-        const sectionNumber = idx + 1;
+        const sectionNumber = idx;
 
         // Special handling for title_and_summary
         let sectionValue: any = null;
@@ -331,19 +354,25 @@ const Table: React.FC<TableProps> = ({ drug }) => {
         return (
           <div key={key} className="mb-1">
             <div
-              onClick={() => expandable && toggleSection(key)}
-              className={`flex justify-between items-center py-1 px-2 hover:bg-blue-50 rounded cursor-pointer text-sm`}
-              role={expandable ? "button" : undefined}
-              tabIndex={expandable ? 0 : -1}
+              onClick={() => {
+                const element = document.getElementById(`section-${sectionNumber}`);
+                if (element) element.scrollIntoView({ behavior: 'smooth' });
+                if (expandable) toggleSection(key);
+              }}
+              className={`flex justify-between items-center py-1 px-2 hover:bg-blue-50 rounded cursor-pointer text-sm ${activeSection === `section-${sectionNumber}` ? 'bg-blue-500 text-white' : ''}`}
+              role="button"
+              tabIndex={0}
               onKeyDown={(e) => {
-                if (expandable && (e.key === "Enter" || e.key === " ")) {
+                if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
-                  toggleSection(key);
+                  const element = document.getElementById(`section-${sectionNumber}`);
+                  if (element) element.scrollIntoView({ behavior: 'smooth' });
+                  if (expandable) toggleSection(key);
                 }
               }}
             >
               <span className="text-gray-800">
-                {sectionNumber}. {displayName(key)}
+                {idx === 0 ? '' : `${sectionNumber}. `}{displayName(key)}
               </span>
               {expandable ? (
                 <span className="text-gray-400 text-xs">
@@ -372,10 +401,12 @@ const Table: React.FC<TableProps> = ({ drug }) => {
                   return (
                     <div key={subKey} className="mb-1">
                       <div
-                        onClick={() =>
-                          childExpandable && toggleSection(`${key}.${subKey}`)
-                        }
-                        className={`flex justify-between items-center py-1 px-2 hover:bg-blue-50 rounded cursor-pointer text-sm`}
+                        onClick={() => {
+                          const element = document.getElementById(`section-${sectionNumber}-${i + 1}`);
+                          if (element) element.scrollIntoView({ behavior: 'smooth' });
+                          if (childExpandable) toggleSection(`${key}.${subKey}`);
+                        }}
+                        className={`flex justify-between items-center py-1 px-2 hover:bg-blue-50 rounded cursor-pointer text-sm ${activeSection === `section-${sectionNumber}-${i + 1}` ? 'bg-blue-500 text-white' : ''}`}
                       >
                         <span className="text-gray-800">
                           {subsectionNumber} {toTitleCase(subKey)}
@@ -397,7 +428,11 @@ const Table: React.FC<TableProps> = ({ drug }) => {
                               return (
                                 <div
                                   key={gcKey}
-                                  className="flex justify-between items-center py-1 px-2 rounded text-sm"
+                                  onClick={() => {
+                                    const element = document.getElementById(`section-${sectionNumber}-${i + 1}-${j + 1}`);
+                                    if (element) element.scrollIntoView({ behavior: 'smooth' });
+                                  }}
+                                  className={`flex justify-between items-center py-1 px-2 rounded text-sm cursor-pointer hover:bg-blue-50 ${activeSection && `section-${sectionNumber}-${i + 1}-${j + 1}` === activeSection ? 'bg-blue-500 text-white' : ''}`}
                                 >
                                   <span className="text-gray-800">
                                     {numbering} {toTitleCase(gcKey)}

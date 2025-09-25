@@ -89,15 +89,17 @@ import React from 'react'
 
 interface SummaryProps {
   drug: any;
+  index: number;
+  sectionId: number;
 }
 
-const Summary: React.FC<SummaryProps> = ({ drug }) => {
+const Summary: React.FC<SummaryProps> = ({ drug, index, sectionId }) => {
 
   return (
     <div className='w-full bg-white/90'>
       <div className='max-w-3xl pt-6'>
         <div className='text-xs text-black mb-2'>COMPOUND SUMMARY</div>
-        <h1 className='text-3xl font-bold text-black mb-4 cursor-pointer pl-1 py-1 text-left'>
+        <h1 id={`section-${sectionId}`} className='text-3xl font-bold text-black mb-4 cursor-pointer pl-1 py-1 text-left'>
           {drug.marketInformation.brandName || ""}
         </h1>
       </div>
