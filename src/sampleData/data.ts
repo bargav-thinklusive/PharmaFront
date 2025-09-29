@@ -10657,52 +10657,132 @@ export const drugData=[{
       "developmentProgramDesignationDetails": "Appendix 5: Development program designation"
     }
   },
+
   "appendices": {
-    "appendix1": {
-      "title": "API Synthetic route",
+    "appendix1":{
+      
+      "name": "API Synthetic Route",
       "reference": "https://pubs.acs.org/doi/10.1021/acs.oprd.0c00302",
-      "description": "Crizotinib API is manufactured through a stepwise synthetic organic chemistry process that constructs the pyrazole and pyridine rings separately, joins them via ether linkage to the dichloro-fluoroaryl group, and resolves the final product to the R-enantiomer.",
-      "manufacturingEmphasis": "chiral control, impurity management, and recrystallization for purity",
+      "description": "Crizotinib API is manufactured through a stepwise synthetic organic chemistry process that constructs the pyrazole and pyridine rings separately, joins them via ether linkage to the dichloro-fluoroaryl group, and resolves the final product to the R-enantiomer. Manufacturing emphasizes chiral control, impurity management, and recrystallization for purity.",
+      "modularSynthesis": {
+        "overview": "The synthesis is modular, built from heteroaryl intermediates:",
+        "steps": [
+          {
+            "name": "Pyrazole Core Formation",
+            "details": [
+              "Constructed from hydrazine derivatives + diketone or equivalent starting materials.",
+              "Functionalization introduces the piperidin-4-yl substituent."
+            ]
+          },
+          {
+            "name": "Pyridine Intermediate",
+            "details": [
+              "Prepared via nucleophilic substitution and amination chemistry.",
+              "Introduces the amine group at the 2-position."
+            ]
+          },
+          {
+            "name": "Ether Coupling",
+            "details": [
+              "Key step: O-alkylation (ether formation) between the pyridine ring and the dichloro-fluorophenyl moiety.",
+              "Typically achieved under basic conditions with appropriate leaving groups."
+            ]
+          },
+          {
+            "name": "Chiral Resolution / Enantioselective Step",
+            "details": [
+              "The API used in Xalkori is the R-enantiomer.",
+              "Resolution achieved either by:",
+              "Chiral chromatography, or",
+              "Diastereomeric salt formation and recrystallization, depending on scale."
+            ]
+          },
+          {
+            "name": "Final Purification & Salt Form",
+            "details": [
+              "API is isolated as crizotinib free base (not a salt form).",
+              "Purified by recrystallization, meeting ICH impurity thresholds."
+            ]
+          },
+          {
+            "name":"Crizotinib (PF-02341066) | Route overview",
+            "details": ["3-position ether on pyridine via Mitsunobu from the benzylic alcohol",
+          "5-position aryl–aryl bond via Suzuki–Miyaura to install the pyrazol-4-yl-piperidin-4-yl fragment",
+          "Nitro → amine reduction on the pyridine core (gives the 2-amine)"],
+          }
+        ]
+      },
+      "processDocumentation": "Pfizer's published process-development paper plus process patents that describe scalable conditions.",
       "synthesisSteps": [
         {
           "step": "A",
           "title": "Chiral benzylic alcohol",
-          "description": "Prepare (S)-1-(2,6-dichloro-3-fluorophenyl)ethanol (enantiopure). In Pfizer's enabling route the downstream Mitsunobu inverts this center, delivering the (R) configuration in the API."
+          "description": "Prepare (S)-1-(2,6-dichloro-3-fluorophenyl)ethanol (enantiopure). In Pfizer's enabling route the downstream Mitsunobu inverts this center, delivering the (R) configuration in the API.",
+          "links": [
+            "https://www.researchgate.net/publication/278699491_Fit-for-Purpose_Development_of_the_Enabling_Route_to_Crizotinib_PF-02341066?utm_source=chatgpt.com"
+          ]
         },
         {
           "step": "B",
           "title": "Mitsunobu etherification (installs the 3-ethoxy)",
-          "substrates": "5-bromo-3-hydroxy-2-nitropyridine + (S)-benzylic alcohol",
-          "conditions": "PPh₃ / DIAD, toluene, 0--25 °C → then EtOH crystallization to purge TPPO",
-          "yield": "~80--90% yield with retained ee after inversion"
+          "description":"substrates: 5-bromo-3-hydroxy-2-nitropyridine + (S)-benzylic alcohol,conditions: Typical conditions (scaleable): PPh₃ / DIAD, toluene, 0--25 °C → then EtOH crystallization to purge TPPO; delivers 5-bromo-3-[1-(2,6-dichloro-3-fluorophenyl)ethoxy]-2-nitropyridine in ~80--90% yield with retained ee after inversion.yield: ~80--90% yield with retained ee after inversion,",
+          "links": [
+            "https://www.researchgate.net/publication/278699491_Fit-for-Purpose_Development_of_the_Enabling_Route_to_Crizotinib_PF-02341066?utm_source=chatgpt.com",
+            "https://pmc.ncbi.nlm.nih.gov/articles/PMC8173612/?utm_source=chatgpt.com",
+            "https://pubs.acs.org/doi/10.1021/acsomega.1c01996?utm_source=chatgpt.com",
+            "https://patents.google.com/patent/US9604966B2/en?utm_source=chatgpt.com"
+          ]
         },
         {
           "step": "C",
           "title": "Chemoselective nitro → amine reduction (builds the 2-amine)",
-          "method": "Hydrogenation (H₂, sponge-Ni or Raney-Ni, MeOH, ambient--40 °C)",
-          "product": "(R)-5-bromo-3-[1-(2,6-dichloro-3-fluorophenyl)ethoxy]pyridin-2-amine (CAS 877399-00-3)"
+          "description":"method: Hydrogenation (H₂, sponge-Ni or Raney-Ni, MeOH, ambient--40 °C) converts the nitro to give (R)-5-bromo-3-[1-(2,6-dichloro-3-fluorophenyl)ethoxy]pyridin-2-amine.,product: (R)-5-bromo-3-[1-(2,6-dichloro-3-fluorophenyl)ethoxy]pyridin-2-amine (CAS 877399-00-3)",
+          "links": [
+            "https://www.lookchem.com/casno877399-52-5.html?utm_source=chatgpt.com",
+            "https://www.ruifuchemical.com/cas-877399-00-3-product/?utm_source=chatgpt.com"
+          ]
         },
         {
           "step": "D",
           "title": "Pyrazolyl-piperidine boron partner",
-          "description": "Prepare 1-(1-Boc-4-piperidinyl)-1H-pyrazol-4-yl boronic acid/ester (commercial or in-house). This is the coupling partner for the 5-bromo pyridinamine."
+          "description": "Prepare 1-(1-Boc-4-piperidinyl)-1H-pyrazol-4-yl boronic acid/ester. This is the coupling partner for the 5-bromo pyridinamine.",
+          "links": [
+            "https://www.ruifuchemical.com/cas-877399-00-3-product/?utm_source=chatgpt.com",
+            "https://patents.google.com/patent/US9604966B2/en?utm_source=chatgpt.com"
+          ]
         },
         {
           "step": "E",
           "title": "Suzuki--Miyaura at C-5 of pyridine",
-          "substrates": "(R)-5-bromo pyridin-2-amine (from Step C) + Boc-protected pyrazolyl-piperidinyl boronic acid",
-          "conditions": "Pd(PPh₃)₄ (~2--3 mol %), Na₂CO₃ (aq), DMF (with water), ~60 °C"
+          "description":"substrates: (R)-5-bromo pyridin-2-amine (from Step C) + Boc-protected pyrazolyl-piperidinyl boronic acid,conditions: Representative conditions: Pd(PPh₃)₄, Na₂CO₃ (aq), DMF/H₂O, ∼60 °C, giving the Boc-protected crizotinib precursor in high yield, chromatography-free.",
+          "links": [
+            "https://patents.google.com/patent/US9604966B2/en?utm_source=chatgpt.com",
+            "https://commonorganicchemistry.com/Rxn_Pages/Suzuki/Suzuki.htm?utm_source=chatgpt.com"
+          ]
         },
         {
           "step": "F",
           "title": "Global deprotection / finish",
-          "method": "Acidolysis of Boc (e.g., HCl/EtOH or HCl/dioxane) → neutralization/recrystallization to the free base crizotinib"
+          "description":"method: Acidolysis of Boc (e.g., HCl/EtOH or HCl/dioxane) → neutralization/recrystallization to the free base crizotinib.",
+          "links": [
+            "https://patents.google.com/patent/US9604966B2/en?utm_source=chatgpt.com",
+            "https://www.ema.europa.eu/en/documents/assessment-report/xalkori-epar-public-assessment-report_en.pdf?utm_source=chatgpt.com"
+          ]
+        },{
+            "step": "G",
+            "title":"Why this is the industrial route",
+            "description":"Chiral center control: single inversion at Mitsunobu gives the desired (R) configuration with no racemization; ee is preserved through downstream steps.Robust scale-ups: chromatography-free EtOH crystallizations purge TPPO; sponge-Ni H₂ reduction and Suzuki run cleanly at moderate T.  Proven at >100 kg scale in Pfizer’s process-development report.",
+            "links":[
+                "https://www.researchgate.net/publication/278699491_Fit-for-Purpose_Development_of_the_Enabling_Route_to_Crizotinib_PF-02341066?utm_source=chatgpt.com",
+                "https://pmc.ncbi.nlm.nih.gov/articles/PMC8173612/?utm_source=chatgpt.com",
+                "https://pubs.acs.org/doi/10.1021/op200131n?utm_source=chatgpt.com"
+            ]
         }
       ],
+      
       "currentManufacturers": "Pfizer sites across the globe"
     },
-    "appendix2": {
-      "title": "DS Specification",
+    "appendix2":{      "name": "DS Specification",
       "specifications": {
         "description": "A white pale-yellow powder. Non-hygroscopic",
         "assay": "",
@@ -10717,127 +10797,62 @@ export const drugData=[{
         "palladium": "Limit set as per EMA/CHMP/SWP/4666/2000 Option 2a"
       }
     },
-    "appendix3": {
-      "title": "Formulation composition",
-      "note": "All excipients used in the formulation are compendial and are conventional for solid oral dosage forms.",
+    "appendix3":{
+            "name": "Formulation Composition",
+      "note": "All excipients used in the formulation are compendial and conventional for solid oral dosage forms.",
       "inactiveIngredients": [
-        {
-          "name": "SILICON DIOXIDE",
-          "unii": "ETJ7Z6XBU4"
-        },
-        {
-          "name": "MICROCRYSTALLINE CELLULOSE",
-          "unii": "OP1R32D61U"
-        },
-        {
-          "name": "ANHYDROUS DIBASIC CALCIUM PHOSPHATE",
-          "unii": "L11K75P92J"
-        },
-        {
-          "name": "MAGNESIUM STEARATE",
-          "unii": "70097M6I30"
-        },
-        {
-          "name": "GELATIN, UNSPECIFIED",
-          "unii": "2G86QN327L"
-        },
-        {
-          "name": "TITANIUM DIOXIDE",
-          "unii": "15FIX9V2JP"
-        },
-        {
-          "name": "FERRIC OXIDE RED",
-          "unii": "1K09F3G675"
-        },
-        {
-          "name": "SHELLAC",
-          "unii": "46N107B71O"
-        },
-        {
-          "name": "PROPYLENE GLYCOL",
-          "unii": "6DC9Q167V3"
-        },
-        {
-          "name": "AMMONIA",
-          "unii": "5138Q19F1X"
-        },
-        {
-          "name": "POTASSIUM HYDROXIDE",
-          "unii": "WZH3C48M4T"
-        },
-        {
-          "name": "FERROSOFERRIC OXIDE",
-          "unii": "XM0M87F357"
-        },
-        {
-          "name": "SODIUM STARCH GLYCOLATE TYPE A",
-          "unii": "H8AV0SQX4D"
-        }
+        { "ingredientName": "SILICON DIOXIDE (UNII: ETJ7Z6XBU4)", "strength": "" },
+        { "ingredientName": "MICROCRYSTALLINE CELLULOSE (UNII: OP1R32D61U)", "strength": "" },
+        { "ingredientName": "ANHYDROUS DIBASIC CALCIUM PHOSPHATE (UNII: L11K75P92J)", "strength": "" },
+        { "ingredientName": "MAGNESIUM STEARATE (UNII: 70097M6I30)", "strength": "" },
+        { "ingredientName": "GELATIN, UNSPECIFIED (UNII: 2G86QN327L)", "strength": "" },
+        { "ingredientName": "TITANIUM DIOXIDE (UNII: 15FIX9V2JP)", "strength": "" },
+        { "ingredientName": "FERRIC OXIDE RED (UNII: 1K09F3G675)", "strength": "" },
+        { "ingredientName": "SHELLAC (UNII: 46N107B71O)", "strength": "" },
+        { "ingredientName": "PROPYLENE GLYCOL (UNII: 6DC9Q167V3)", "strength": "" },
+        { "ingredientName": "AMMONIA (UNII: 5138Q19F1X)", "strength": "" },
+        { "ingredientName": "POTASSIUM HYDROXIDE (UNII: WZH3C48M4T)", "strength": "" },
+        { "ingredientName": "FERROSOFERRIC OXIDE (UNII: XM0M87F357)", "strength": "" },
+        { "ingredientName": "SODIUM STARCH GLYCOLATE TYPE A (UNII: H8AV0SQX4D)", "strength": "" }
       ]
     },
-    "appendix_4": {
-      "title": "Labeling Information",
+    "appendix4":{
+      
+      "name": "Labeling Information",
       "labels": [
-        "PRINCIPAL DISPLAY PANEL - 250 mg Capsule Bottle Label",
-        "PRINCIPAL DISPLAY PANEL - 200 mg Capsule Bottle Label",
-        "PRINCIPAL DISPLAY PANEL - 20 mg Oral Pellets Label",
-        "PRINCIPAL DISPLAY PANEL - 50 mg Oral Pellets Label",
-        "PRINCIPAL DISPLAY PANEL - 150 mg Oral Pellets Label"
+        { "label": "250 mg Capsule Bottle", "image": "image2" },
+        { "label": "200 mg Capsule Bottle", "image": "image3" },
+        { "label": "20 mg Oral Pellets", "image": "image4" },
+        { "label": "50 mg Oral Pellets", "image": "image5" },
+        { "label": "150 mg Oral Pellets", "image": "image6" }
       ]
     },
-    "appendix_5": {
-      "title": "Development program designation",
+    "appendix5":{
+            "name": "Development Program Designation",
       "description": "Xalkori (crizotinib) received multiple developmental program designations from the FDA for different indications, including Breakthrough Therapy, Orphan Drug, Fast Track, Priority Review, and Accelerated Approval.",
       "designations": {
-        "breakthrough_therapy": [
-          {
-            "indication": "ROS1-positive non-small cell lung cancer (NSCLC)",
-            "date": "April 2015"
-          },
-          {
-            "indication": "MET exon 14 alterations",
-            "date": "May 2018"
-          },
-          {
-            "indication": "ALK-positive anaplastic large cell lymphoma (ALCL)",
-            "date": "May 2018"
-          }
+        "Breakthrough Therapy": [
+          "ROS1-positive non-small cell lung cancer (NSCLC): In April 2015, the FDA granted Breakthrough Therapy status for Xalkori in treating patients with ROS1-positive NSCLC.",
+          "MET exon 14 alterations: In May 2018, Xalkori received Breakthrough Therapy designation for treating patients with metastatic NSCLC who have MET exon 14 alterations.",
+          "ALK-positive anaplastic large cell lymphoma (ALCL): At the same time in May 2018, it also received this designation for treating relapsed or refractory ALK-positive ALCL."
         ],
-        "orphan_drug": [
-          {
-            "indication": "Anaplastic lymphoma kinase (ALK)-positive NSCLC",
-            "date": "September 2010"
-          },
-          {
-            "indication": "ALK-positive anaplastic large cell lymphoma (ALCL)",
-            "date": "September 2012"
-          },
-          {
-            "indication": "ALK-positive inflammatory myofibroblastic tumor (IMT)",
-            "date": "Not specified"
-          }
+        "Orphan Drug": [
+          "Anaplastic lymphoma kinase (ALK)-positive NSCLC: This designation was given in September 2010 to encourage the development of the drug for this rare form of lung cancer.",
+          "ALK-positive anaplastic large cell lymphoma (ALCL): In September 2012, Xalkori was designated as an Orphan Drug for ALCL.",
+          "ALK-positive inflammatory myofibroblastic tumor (IMT): The FDA also granted this designation for treating ALK-positive IMT."
         ],
-        "fast_track": [
-          {
-            "indication": "ALK-positive advanced NSCLC",
-            "date": "December 2010"
-          }
+        "Fast Track": [
+          "ALK-positive advanced NSCLC: This designation was given in December 2010 to expedite the review of Xalkori for patients with ALK-positive NSCLC."
         ],
-        "accelerated_approval_and_priority_review": [
-          {
-            "indication": "ALK-positive NSCLC",
-            "date": "August 2011",
-            "type": "accelerated_approval"
-          },
-          {
-            "indication": "ROS1-positive NSCLC",
-            "date": "March 2016",
-            "type": "priority_review"
-          }
+        "Accelerated Approval and Priority Review": [
+          "ALK-positive NSCLC: The FDA granted accelerated approval for Xalkori for ALK-positive NSCLC in August 2011, reflecting the drug's potential for a serious condition.",
+          "ROS1-positive NSCLC: In March 2016, the FDA approved Xalkori for ROS1-positive NSCLC and granted the application Priority Review status."
         ]
       }
     }
   },
+
+
   "references": [
     {
       "title": "Pfizer OPRD process paper (six-step enabling route; Mitsunobu ↔ Suzuki ↔ H₂/Ni): de Koning et al. 2011.",
