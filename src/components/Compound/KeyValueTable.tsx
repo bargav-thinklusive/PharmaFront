@@ -36,13 +36,13 @@ const renderLink = (text: string) => {
 };
 
 const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, className = '' }) => {
-  console.log("data",data)
+
   const filteredData = Object.entries(data || {}).filter(
     ([_, value]) => value && value.toString().toLowerCase() !== 'n/a' && (typeof value !== 'object' || Array.isArray(value))
   );
 
   if (filteredData.length === 0) return null;
-console.log("filter",filteredData);
+
   return (
     <div className={`border-2 border-sky-400 rounded bg-white max-w-3xl ${className}`}>
       <table className="w-full text-sm text-black">

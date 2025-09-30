@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { maindata } from "../sampleData/data";
+import { drugData } from "../sampleData/data";
 
 interface SearchBarProps {
   value?: string;
@@ -16,59 +16,103 @@ const SearchBar: React.FC<SearchBarProps> = ({
   setCategory,
 }) => {
   const [search, setSearch] = useState(value || "");
-  const [category, setCategoryState] = useState(initialCategory || "compound");
+  const validCategories = [
+    "all",
+    "brandName",
+    "genericName",
+    "chemicalName",
+    "structureName",
+  ];
+  const initialCat =
+    initialCategory && validCategories.includes(initialCategory)
+      ? initialCategory
+      : "all";
+  const [category, setCategoryState] = useState(initialCat);
   const [suggestions, setSuggestions] = useState<any[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(true);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // Hide suggestions whenever the route (pathname) changes
+  // Hide suggestions when route changes
   useEffect(() => {
     setShowSuggestions(false);
-    setSuggestions([]); // just in case
   }, [location.pathname]);
 
-  // sync prop value -> local search state
+  // Compute suggestions
   useEffect(() => {
-    if (typeof value === "string" && value !== search) setSearch(value);
-  }, [value]);
-
-  useEffect(() => {
-    if (initialCategory && initialCategory !== category)
-      setCategoryState(initialCategory);
-  }, [initialCategory]);
-
-  // compute suggestions only when showSuggestions is true
-  useEffect(() => {
-    if (!search.trim() || !showSuggestions) {
+    if (!search.trim()) {
       setSuggestions([]);
       return;
     }
 
-    let items: any[] = [];
-    if (category === "compound") {
-      const comp = maindata.find((d: any) => d.Compound);
-      items = (comp?.Compound as any[]) || [];
-    } else if (category === "taxonomy") {
-      const tax = maindata.find((d: any) => d.Taxonomy);
-      items = (tax?.Taxonomy as any[]) || [];
-    } else if (category === "genre") {
-      const gen = maindata.find((d: any) => d.Genre);
-      items = (gen?.Genre as any[]) || [];
-    }
+    const q = search.trim().toLowerCase();
+    const matches: any[] = [];
+    const seen = new Set<string>();
 
-    const q = search.toLowerCase();
-    const matches = items.filter((item) => {
-      const title =
-        (item?.Record?.RecordTitle as string) ||
-        String(item?.Record?.RecordNumber || "");
-      return title.toLowerCase().includes(q);
+    drugData.forEach((item) => {
+      if (category === "all") {
+        const fields = [
+          { text: item?.marketInformation?.brandName || "", type: "brandName" },
+          { text: item?.marketInformation?.genericName || "", type: "genericName" },
+          {
+            text:
+              item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName ||
+              "",
+            type: "chemicalName",
+          },
+          {
+            text:
+              item?.drugSubstance?.physicalAndChemicalProperties?.structureName ||
+              "",
+            type: "structureName",
+          },
+          { text: item?.cid || "", type: "cid" },
+          //{ text: item?.marketInformation?.indication || "", type: "indication" },
+        ];
+
+        fields.forEach((field) => {
+          if (field.text && field.text.toLowerCase().includes(q)) {
+            const key = `${item.cid}-${field.text}`;
+            if (!seen.has(key)) {
+              seen.add(key);
+              matches.push({
+                ...item,
+                matchedField: field.type,
+                matchedText: field.text,
+              });
+            }
+          }
+        });
+      } else if (category === "brandName") {
+        const text = item?.marketInformation?.brandName || "";
+        if (text && text.toLowerCase().includes(q)) {
+          matches.push({ ...item, matchedText: text });
+        }
+      } else if (category === "genericName") {
+        const text = item?.marketInformation?.genericName || "";
+        if (text && text.toLowerCase().includes(q)) {
+          matches.push({ ...item, matchedText: text });
+        }
+      } else if (category === "chemicalName") {
+        const text =
+          item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName || "";
+        if (text && text.toLowerCase().includes(q)) {
+          matches.push({ ...item, matchedText: text });
+        }
+      } else if (category === "structureName") {
+        const text =
+          item?.drugSubstance?.physicalAndChemicalProperties?.structureName || "";
+        if (text && text.toLowerCase().includes(q)) {
+          matches.push({ ...item, matchedText: text });
+        }
+      }
     });
 
-    setSuggestions(matches.slice(0, 8));
-  }, [search, category, showSuggestions]);
+    //setSuggestions(matches.slice(0, 50)); // limit to 50 results
+    setSuggestions(matches);
+  }, [search, category]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,25 +123,31 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-    if (setValue) setValue(e.target.value);
-    setShowSuggestions(true); // user typed — show suggestions again
-  };
-
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCategoryState(e.target.value);
-    if (setCategory) setCategory(e.target.value);
+    const newValue = e.target.value;
+    setSearch(newValue);
+    if (setValue) setValue(newValue);
     setShowSuggestions(true);
   };
 
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newCategory = e.target.value;
+    setCategoryState(newCategory);
+    if (setCategory) setCategory(newCategory);
+    setSearch("");
+    if (setValue) setValue("");
+    setSuggestions([]);
+    setShowSuggestions(false);
+  };
+
   const handleSelect = (item: any) => {
-    const searchText = item.Record.RecordTitle || item.Record.RecordNumber;
+    const searchText =
+      item.matchedText || item?.marketInformation?.brandName || item?.cid || "";
     navigate(`/${category}/${encodeURIComponent(searchText)}`);
     setSearch(searchText);
     setShowSuggestions(false);
   };
 
-  // close dropdown when clicking outside
+  // Close dropdown on outside click
   useEffect(() => {
     const onDocClick = (ev: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(ev.target as Node)) {
@@ -109,7 +159,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
   }, []);
 
   return (
-    <div className="w-full flex flex-col items-center mb-8 relative" ref={wrapperRef}>
+    <div
+      className="w-full flex flex-col items-center mb-8 relative"
+      ref={wrapperRef}
+    >
       <form className="w-full flex justify-center" onSubmit={handleSubmit}>
         <div className="flex w-full max-w-2xl bg-white rounded shadow overflow-hidden">
           <input
@@ -120,51 +173,58 @@ const SearchBar: React.FC<SearchBarProps> = ({
             onChange={handleInputChange}
             autoFocus
           />
-          {/* <select
-            className="px-6 py-4 text-lg bg-gray-100 border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium border-l"
-            value={category}
-            onChange={handleCategoryChange}
-          >
-            <option value="compound">Compound</option>
-            <option value="taxonomy">Taxonomy</option>
-            <option value="genre">Genre</option>
-          </select> */}
+
           <div className="relative">
-  <select
-    className="px-6 py-4 text-lg bg-gray-100 border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium border-l appearance-none pr-10"
-    value={category}
-    onChange={handleCategoryChange}
-  >
-    <option value="compound">Compound</option>
-    <option value="taxonomy">Taxonomy</option>
-    <option value="genre">Genre</option>
-  </select>
+            <select
+              className="px-6 py-4 text-lg bg-gray-100 border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium border-l appearance-none pr-10"
+              value={category}
+              onChange={handleCategoryChange}
+            >
+              <option value="all">All</option>
+              <option value="brandName">Brand </option>
+              <option value="genericName">Generic</option>
+              <option value="chemicalName">Chemical</option>
+              <option value="structureName">Structure</option>
+            </select>
 
-  {/* Custom Arrow */}
-  <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600">
-    ▼
-  </span>
-</div>
-
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600">
+              ▼
+            </span>
+          </div>
         </div>
       </form>
 
-      {/* Suggestions dropdown */}
-      {showSuggestions && suggestions.length > 0 && (
-        <ul className="absolute top-full mt-1 w-full max-w-2xl bg-white border border-gray-200 rounded shadow-lg z-10 max-h-60 overflow-y-auto">
-          {suggestions.map((item) => {
-            const searchText = item.Record.RecordTitle || item.Record.RecordNumber;
-            return (
-              <li
-                key={item.Record.RecordNumber + "-" + String(searchText)}
-                className="px-4 py-2 cursor-pointer hover:bg-blue-100"
-                onClick={() => handleSelect(item)}
-              >
-                {searchText}
+      {/* Suggestions dropdown with scroll */}
+      {showSuggestions && search.trim() && (
+        <div className="absolute top-full mt-1 w-full max-w-2xl bg-white border border-gray-200 rounded shadow-lg z-10">
+          <ul className="max-h-[50vh] overflow-y-auto">
+            {suggestions.length > 0 ? (
+              suggestions.map((item, index) => {
+                const displayText =
+                  item.matchedText ||
+                  item?.marketInformation?.brandName ||
+                  item?.cid ||
+                  "";
+                return (
+                  <li
+                    key={item.cid + "-" + index + "-" + String(displayText)}
+                    className="px-4 py-2 cursor-pointer hover:bg-blue-100"
+                    onClick={() => handleSelect(item)}
+                  >
+                    {displayText}
+                  </li>
+                );
+              })
+            ) : (
+              <li className="px-4 py-3 text-gray-500 text-center">
+                No items found for "{search}" in{" "}
+                {category === "all"
+                  ? "any category"
+                  : category.replace(/([A-Z])/g, " $1").toLowerCase()}
               </li>
-            );
-          })}
-        </ul>
+            )}
+          </ul>
+        </div>
       )}
     </div>
   );
