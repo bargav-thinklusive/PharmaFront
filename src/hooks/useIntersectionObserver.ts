@@ -11,22 +11,23 @@ export const useIntersectionObserver = () => {
 
         if (!isScrolling) return;
 
-        // Find the most specific visible section near the top
+        // Find the section whose top is closest to the viewport top, preferring shallower depth
         let bestEntry: IntersectionObserverEntry | null = null;
-        let bestDepth = -1;
-        let bestTopDistance = Infinity;
+        let bestDistance = Infinity;
+        let bestDepth = Infinity;
 
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
 
           const rect = entry.boundingClientRect;
           const depth = entry.target.id.split('-').length;
-          const topDistance = Math.abs(rect.top - 100);
+          const distanceFromTop = Math.abs(rect.top - 100); // 100px from top
 
-          // Prioritize deeper sections that are closer to top
-          if (depth > bestDepth || (depth === bestDepth && topDistance < bestTopDistance)) {
+          // Prioritize closer to top, then shallower depth
+          if (distanceFromTop < bestDistance ||
+              (distanceFromTop === bestDistance && depth < bestDepth)) {
+            bestDistance = distanceFromTop;
             bestDepth = depth;
-            bestTopDistance = topDistance;
             bestEntry = entry;
           }
         }
@@ -36,8 +37,8 @@ export const useIntersectionObserver = () => {
         }
       },
       {
-        threshold: [0, 0.1, 0.5, 1.0],
-        rootMargin: '-150px 0px -70% 0px'
+        threshold: 0.5,
+        rootMargin: '-100px 0px -40% 0px'
       }
     );
 

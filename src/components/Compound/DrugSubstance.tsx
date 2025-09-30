@@ -1,5 +1,6 @@
 import React from 'react';
 import KeyValueTable from './KeyValueTable';
+import ManufacturingSites from './ManufacturingSites';
 import { formatKey } from '../../utils/formatKey';
 
 interface DrugSubstanceProps {
@@ -15,14 +16,22 @@ const PhysicalAndChemicalProperties: React.FC<{ data: any }> = ({ data }) => (
   </div>
 );
 
-const ProcessDevelopment: React.FC<{ data: any }> = ({ data }) => (
-  <div className="mb-6 ml-6">
-    <h2 id="section-2-2" className="text-xl font-bold border-blue-400 border-b-3 pb-1 mb-4">
-      2.2. Process Development
-    </h2>
-    <KeyValueTable data={data} />
-  </div>
-);
+const ProcessDevelopment: React.FC<{ data: any; manufacturingSites: any }> = ({ data, manufacturingSites }) => {
+  // Exclude manufacturingSites and plain objects from the data, but keep arrays and primitives
+  const filteredData = data ? Object.fromEntries(
+    Object.entries(data).filter(([key, value]) => key !== 'manufacturingSites' && (typeof value !== 'object' || Array.isArray(value)))
+  ) : {};
+
+  return (
+    <div className="mb-6 ml-6">
+      <h2 id="section-2-2" className="text-xl font-bold border-blue-400 border-b-3 pb-1 mb-4">
+        2.2. Process Development
+      </h2>
+      <KeyValueTable data={filteredData} />
+      {manufacturingSites && <ManufacturingSites manufacturingSites={manufacturingSites} />}
+    </div>
+  );
+};
 
 const AnalyticalDevelopment: React.FC<{ data: any }> = ({ data }) => (
   <div className="mb-6 ml-6">
@@ -50,7 +59,7 @@ const DrugSubstance: React.FC<DrugSubstanceProps> = ({ drugSubstance }) => {
       </h1>
 
       <PhysicalAndChemicalProperties data={drugSubstance?.physicalAndChemicalProperties} />
-      <ProcessDevelopment data={drugSubstance?.processDevelopment} />
+      <ProcessDevelopment data={drugSubstance?.processDevelopment} manufacturingSites={drugSubstance?.processDevelopment?.manufacturingSites} />
       <AnalyticalDevelopment data={drugSubstance?.analyticalDevelopment} />
     </div>
   );
