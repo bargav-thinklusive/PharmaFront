@@ -135,18 +135,9 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
     setOpenSections(newOpen);
   }, [activeSection, sectionStructure]);
 
-  // Scroll active section to top and TOC item into view when it changes
+  // Scroll TOC item into view when it changes
   useEffect(() => {
     if (activeSection) {
-      // Scroll the main content section to top
-      const element = document.getElementById(activeSection);
-      if (element) {
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
-
       // Scroll the TOC item into view
       const tocItem = document.querySelector(`[data-section-id="${activeSection}"]`);
       if (tocItem) {
