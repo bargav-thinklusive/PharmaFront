@@ -2,6 +2,7 @@ import React from 'react';
 import KeyValueTable from './KeyValueTable';
 import ManufacturingSites from './ManufacturingSites';
 import { formatKey } from '../../utils/formatKey';
+import AppendixLink from '../AppendixLink';
 
 interface DrugSubstanceProps {
   drugSubstance: any;
@@ -45,7 +46,7 @@ const AnalyticalDevelopment: React.FC<{ data: any }> = ({ data }) => (
           <h3 id={`section-2-3-${idx + 1}`} className="font-bold border-blue-400 border-b-2 pb-1">
             2.3.{idx + 1} {formatKey(key)}
           </h3>
-          <p>{String(value)}</p>
+          <p><AppendixLink text={String(value)} /></p>
         </div>
       ))}
   </div>

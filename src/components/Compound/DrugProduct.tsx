@@ -1,5 +1,6 @@
 import React from 'react';
 import { formatKey } from '../../utils/formatKey';
+import AppendixLink from '../AppendixLink';
 
 interface DrugProductProps {
   drugProduct: any;
@@ -66,7 +67,7 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
     <div>
       {Object.entries(value).map(([k, v], i) => (
         <p key={i}>
-          <strong>{formatKey(k)}:</strong> {String(v)}
+          <strong>{formatKey(k)}:</strong> <AppendixLink text={String(v)} />
         </p>
       ))}
     </div>
@@ -74,7 +75,7 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
 
   const renderArrayData = (value: any[]) => (
     <div>
-      {value.map((v: any, i) => <p key={i}>{i + 1}. {v}</p>)}
+      {value.map((v: any, i) => <p key={i}>{i + 1}. <AppendixLink text={v} /></p>)}
     </div>
   );
 
@@ -119,7 +120,7 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
         <h2 id={sectionId} className="text-lg font-bold border-blue-400 border-b-3 pb-1 mb-1">
           3.{sectionCounter}. {formatKey(key)}
         </h2>
-        {Array.isArray(value) ? renderArrayData(value) : <p>{String(value)}</p>}
+        {Array.isArray(value) ? renderArrayData(value) : <p><AppendixLink text={String(value)} /></p>}
       </div>
     );
   };

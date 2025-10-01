@@ -1,5 +1,6 @@
 import React from 'react';
 import { formatKey } from '../../utils/formatKey';
+import AppendixLink from '../AppendixLink';
 
 interface KeyValueTableProps {
   data: Record<string, any>;
@@ -32,7 +33,7 @@ const renderLink = (text: string) => {
       </a>
     );
   }
-  return text;
+  return <AppendixLink text={text} />;
 };
 
 const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, className = '' }) => {
