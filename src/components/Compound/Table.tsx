@@ -1,3 +1,6 @@
+
+
+
 import React, { useState, useEffect, useMemo } from "react";
 
 interface TableProps {
@@ -33,20 +36,20 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
 
   const sectionStructure = useMemo(() => [
     {
-      id: 0,
+      id: 1,
       key: 'title_and_summary',
       title: 'Title and Summary',
       hasSubsections: false
     },
     {
-      id: 1,
+      id: 2,
       key: 'marketInformation',
       title: 'Market Information',
       hasSubsections: false,
       data: drug?.marketInformation
     },
     {
-      id: 2,
+      id: 3,
       key: 'drugSubstance',
       title: 'Drug Substance',
       hasSubsections: true,
@@ -59,21 +62,21 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
       ]
     },
     {
-      id: 3,
+      id: 4,
       key: 'drugProduct',
       title: 'Drug Product',
       hasSubsections: true,
       data: drug?.drugProduct?.information
     },
     {
-      id: 4,
+      id: 5,
       key: 'appendices',
       title: 'Appendices',
       hasSubsections: true,
       data: drug?.appendices
     },
     {
-      id: 5,
+      id: 6,
       key: 'references',
       title: 'References',
       hasSubsections: false,
@@ -132,6 +135,29 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
     setOpenSections(newOpen);
   }, [activeSection, sectionStructure]);
 
+  // Scroll active section to top and TOC item into view when it changes
+  useEffect(() => {
+    if (activeSection) {
+      // Scroll the main content section to top
+      const element = document.getElementById(activeSection);
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+
+      // Scroll the TOC item into view
+      const tocItem = document.querySelector(`[data-section-id="${activeSection}"]`);
+      if (tocItem) {
+        tocItem.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest'
+        });
+      }
+    }
+  }, [activeSection]);
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -183,6 +209,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
         return (
           <div key={subsection.key} className="mb-1">
             <div
+              data-section-id={subsectionId}
               onClick={(e) => {
                 e.stopPropagation();
                 scrollToSection(subsectionId);
@@ -220,6 +247,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                   return (
                     <div
                       key={gcKey}
+                      data-section-id={subSubsectionId}
                       onClick={(e) => {
                         e.stopPropagation();
                         scrollToSection(subSubsectionId);
@@ -258,6 +286,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
         return (
           <div key={appendixKey} className="mb-1">
             <div
+              data-section-id={subsectionId}
               onClick={(e) => {
                 e.stopPropagation();
                 scrollToSection(subsectionId);
@@ -290,6 +319,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                 {appendixKey === 'appendix1' && appendixData.modularSynthesis && (
                   <div className="mb-1">
                     <div
+                      data-section-id={`section-${section.id}-${i + 1}-1`}
                       onClick={(e) => {
                         e.stopPropagation();
                         scrollToSection(`section-${section.id}-${i + 1}-1`);
@@ -305,6 +335,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                     {appendixData.synthesisSteps && (
                       <div className="ml-4 mt-1">
                         <div
+                          data-section-id={`section-${section.id}-${i + 1}-2`}
                           onClick={(e) => {
                             e.stopPropagation();
                             scrollToSection(`section-${section.id}-${i + 1}-2`);
@@ -327,6 +358,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                     return (
                       <div key={specKey} className="mb-1">
                         <div
+                          data-section-id={`section-${section.id}-${i + 1}-${j + 1}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             scrollToSection(`section-${section.id}-${i + 1}-${j + 1}`);
@@ -346,6 +378,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                 {appendixKey === 'appendix3' && appendixData.inactiveIngredients && (
                   <div className="mb-1">
                     <div
+                      data-section-id={`section-${section.id}-${i + 1}-1`}
                       onClick={(e) => {
                         e.stopPropagation();
                         scrollToSection(`section-${section.id}-${i + 1}-1`);
@@ -366,6 +399,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                     return (
                       <div key={designationKey} className="mb-1">
                         <div
+                          data-section-id={`section-${section.id}-${i + 1}-${j + 1}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             scrollToSection(`section-${section.id}-${i + 1}-${j + 1}`);
@@ -402,6 +436,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
         return (
           <div
             key={subKey}
+            data-section-id={subsectionId}
             onClick={(e) => {
               e.stopPropagation();
               scrollToSection(subsectionId);
@@ -436,6 +471,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
         return (
           <div key={section.key} className="mb-1">
             <div
+              data-section-id={sectionId}
               onClick={(e) => {
                 e.stopPropagation();
                 scrollToSection(sectionId);

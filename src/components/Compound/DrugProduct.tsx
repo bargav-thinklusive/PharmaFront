@@ -80,13 +80,13 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
   );
 
   const renderSection = (key: string, value: any, sectionCounter: number) => {
-    const sectionId = `section-3-${sectionCounter}`;
+    const sectionId = `section-4-${sectionCounter}`;
 
     if (key === "strengths" && Array.isArray(value)) {
       return (
         <div key={key} className="mb-6 ml-6">
           <h2 id={sectionId} className="text-lg font-bold border-blue-400 border-b-3 pb-1 mb-2">
-            3.{sectionCounter}. Strengths
+            4.{sectionCounter}. Strengths
           </h2>
           {renderStrengthsTable(value)}
         </div>
@@ -97,7 +97,7 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
       return (
         <div key={key} className="mb-6 ml-6">
           <h2 id={sectionId} className="text-lg font-bold border-blue-400 border-b-3 pb-1 mb-2">
-            3.{sectionCounter}. Packaging And Storage Conditions
+            4.{sectionCounter}. Packaging And Storage Conditions
           </h2>
           {renderPackagingTable(value)}
         </div>
@@ -108,7 +108,7 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
       return (
         <div key={key} className="mb-6 ml-6">
           <h2 id={sectionId} className="text-lg font-bold border-blue-400 border-b-3 pb-1 mb-2">
-            3.{sectionCounter}. {formatKey(key)}
+            4.{sectionCounter}. {formatKey(key)}
           </h2>
           {renderObjectData(value)}
         </div>
@@ -118,7 +118,7 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
     return (
       <div key={key} className="mb-4 ml-6">
         <h2 id={sectionId} className="text-lg font-bold border-blue-400 border-b-3 pb-1 mb-1">
-          3.{sectionCounter}. {formatKey(key)}
+          4.{sectionCounter}. {formatKey(key)}
         </h2>
         {Array.isArray(value) ? renderArrayData(value) : <p><AppendixLink text={String(value)} /></p>}
       </div>
@@ -127,8 +127,8 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
 
   return (
     <div className="mb-10">
-      <h1 id="section-3" className="text-2xl font-bold border-blue-400 border-b-4 pb-1 mb-4">
-        3. Drug Product
+      <h1 id="section-4" className="text-2xl font-bold border-blue-400 border-b-4 pb-1 mb-4">
+        4. Drug Product
       </h1>
       {(() => {
         let sectionCounter = 0;

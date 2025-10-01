@@ -14,8 +14,8 @@ const ManufacturingSites: React.FC<ManufacturingSitesProps> = ({ manufacturingSi
 
   return (
     <div className="mb-6 ml-6">
-      <h2 id="section-2-2-1" className="text-xl font-bold border-blue-400 border-b-3 pb-1 mb-4">
-        2.2.1 Manufacturing Sites
+      <h2 id="section-3-2-1" className="text-xl font-bold border-blue-400 border-b-3 pb-1 mb-4">
+        3.2.1 Manufacturing Sites
       </h2>
       <div className="border-2 border-sky-400 rounded bg-white max-w-3xl">
         <table className="w-full text-sm text-black">

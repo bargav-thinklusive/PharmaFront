@@ -28,9 +28,9 @@ const CompoundInformation: React.FC = () => {
         <div className="w-full min-h-[60vh] flex flex-col items-center bg-white/80 py-8 text-black">
             <div className='w-full max-w-7xl flex flex-row gap-4'>
                 <div className='flex-1 flex flex-col gap-6 min-w-0 mr-80'>
-                    {/* Title and Summary - Section 0 */}
-                    <div className='mb-10' id="section-0">
-                        <Summary drug={drug} sectionId={0} />
+                    {/* Title and Summary - Section 1 */}
+                    <div className='mb-10' id="section-1">
+                        <Summary drug={drug} sectionId={1} />
                     </div>
 
                     <MarketInformation marketInformation={drug.marketInformation} />

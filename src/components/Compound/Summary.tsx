@@ -10,12 +10,15 @@ const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
     <div className='w-full bg-white/90'>
       <div className='max-w-3xl pt-6'>
         <div className='text-xs text-black mb-2'>COMPOUND SUMMARY</div>
-        <h1 
-          id={`section-${sectionId}`} 
+        <h1
+          id={`section-${sectionId}`}
           className='text-3xl font-bold text-black mb-4 cursor-pointer pl-1 py-1 text-left'
         >
-          {drug.marketInformation?.brandName || "N/A"}
+          {sectionId}. Title and Summary
         </h1>
+        <div className='text-xl font-semibold text-black mb-2'>
+          {drug.marketInformation?.brandName || "N/A"}
+        </div>
       </div>
 
       <div className='border-2 border-sky-400 rounded bg-white max-w-3xl'>

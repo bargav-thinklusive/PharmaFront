@@ -4,48 +4,46 @@ export const useIntersectionObserver = () => {
   const [activeSection, setActiveSection] = useState<string>('');
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries: IntersectionObserverEntry[]) => {
-        // Only update if user is scrolling, not clicking
-        const isScrolling = !document.querySelector('[data-clicking="true"]');
+    const updateActiveSection = () => {
+      // Only update if user is scrolling, not clicking
+      const isScrolling = !document.querySelector('[data-clicking="true"]');
 
-        if (!isScrolling) return;
+      if (!isScrolling) return;
 
-        // Find the section whose top is closest to the viewport top, preferring shallower depth
-        let bestEntry: IntersectionObserverEntry | null = null;
-        let bestDistance = Infinity;
-        let bestDepth = Infinity;
+      const headings = document.querySelectorAll('[id^="section-"]');
+      let bestSection = '';
+      let bestDistance = Infinity;
+      let bestDepth = 0;
 
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
+      headings.forEach((heading) => {
+        const rect = heading.getBoundingClientRect();
+        const depth = heading.id.split('-').length;
+        const distanceFromTop = Math.abs(rect.top);
 
-          const rect = entry.boundingClientRect;
-          const depth = entry.target.id.split('-').length;
-          const distanceFromTop = Math.abs(rect.top - 100); // 100px from top
-
-          // Prioritize closer to top, then shallower depth
-          if (distanceFromTop < bestDistance ||
-              (distanceFromTop === bestDistance && depth < bestDepth)) {
-            bestDistance = distanceFromTop;
-            bestDepth = depth;
-            bestEntry = entry;
-          }
+        // Pick the section closest to viewport top, preferring deeper sections
+        if (distanceFromTop < bestDistance || (distanceFromTop === bestDistance && depth > bestDepth)) {
+          bestDistance = distanceFromTop;
+          bestDepth = depth;
+          bestSection = heading.id;
         }
+      });
 
-        if (bestEntry !== null) {
-          setActiveSection(bestEntry.target.id);
-        }
-      },
-      {
-        threshold: 0.5,
-        rootMargin: '-100px 0px -40% 0px'
+      if (bestSection) {
+        setActiveSection(bestSection);
       }
-    );
+    };
 
-    const headings = document.querySelectorAll('[id^="section-"]');
-    headings.forEach((h) => observer.observe(h));
+    const handleScroll = () => {
+      updateActiveSection();
+    };
 
-    return () => observer.disconnect();
+    // Initial update
+    updateActiveSection();
+
+    // Listen to scroll events
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleNavigate = useCallback((sectionId: string) => {
@@ -60,3 +58,4 @@ export const useIntersectionObserver = () => {
 
   return { activeSection, handleNavigate };
 };
+
