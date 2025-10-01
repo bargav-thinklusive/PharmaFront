@@ -7,6 +7,7 @@ interface SearchBarProps {
   setValue?: (v: string) => void;
   initialCategory?: string;
   setCategory?: (cat: string) => void;
+  disableCategorySelect?: boolean;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -14,6 +15,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   setValue,
   initialCategory,
   setCategory,
+  disableCategorySelect,
 }) => {
   const [search, setSearch] = useState(value || "");
   const validCategories = [
@@ -179,6 +181,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               className="px-6 py-4 text-lg bg-gray-100 border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium border-l appearance-none pr-10"
               value={category}
               onChange={handleCategoryChange}
+              disabled={disableCategorySelect}
             >
               <option value="all">All</option>
               <option value="brandName">Brand </option>
