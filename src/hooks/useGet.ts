@@ -1,5 +1,5 @@
 import  { useState } from 'react'
-import axiosInstance from '../services/AxiosService'
+import axiosInstance from '../services/shared/AxiosService'
 
 const useGet = () => {
     const [data,setData]=useState(null)

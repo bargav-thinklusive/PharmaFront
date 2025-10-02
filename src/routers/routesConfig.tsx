@@ -1,4 +1,5 @@
 import Login from "../components/LoginPage";
+import Register from "../components/RegisterPage";
 import Home from '../pages/Home';
 import About from '../pages/About';
 import Contacts from '../pages/Contacts';
@@ -7,6 +8,7 @@ import NotFound from "../pages/NotFound";
 import CompoundInformation from "../components/Compound/CompoundInformation";
 
 export const routesConfig=[
+    {path:"/register",element:<Register />},
     {path:"/login",element:<Login />},
     {path:"/home",element:<Home />},
     {path:"/about",element:<About />},

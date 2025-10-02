@@ -1,6 +1,6 @@
 import React from 'react';
 import { IoIosLink } from 'react-icons/io';
-import { formatKey } from '../../utils/formatKey';
+import { formatKey } from '../../utils/utils';
 
 interface AppendicesSectionProps {
   appendices: any;

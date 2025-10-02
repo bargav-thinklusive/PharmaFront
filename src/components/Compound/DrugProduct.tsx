@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatKey } from '../../utils/formatKey';
+import { formatKey } from '../../utils/utils';
 import AppendixLink from '../AppendixLink';
 
 interface DrugProductProps {
