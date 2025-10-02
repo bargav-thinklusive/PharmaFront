@@ -103,14 +103,15 @@ const ResultList: React.FC = () => {
                   />
                 </div>
                 <div className="flex flex-col space-y-2 text-left min-w-0 break-words w-full justify-start">
-                  {synonymsText && (
+                  {/* {synonymsText && (
                     <p
                       className="text-md text-blue-600 font-semibold cursor-pointer hover:underline"
                       onClick={() => handleNaviageToParticularItem(cid)}
                     >
                       {synonymsText}
                     </p>
-                  )}
+                  )} */}
+                  <p className="text-md text-blue-600 font-semibold cursor-pointer hover:underline" onClick={() => handleNaviageToParticularItem(cid)}><strong>{brandName}</strong> </p>
                   <p className="text-gray-800"><strong>Drug CID:</strong> <span className="text-black">{cid}</span></p>
                   <p className="text-gray-800"><strong>Brand Name:</strong> <span className="text-black">{brandName}</span></p>
                   <p className="text-gray-800"><strong>Generic Name:</strong> <span className="text-black">{genericName}</span></p>

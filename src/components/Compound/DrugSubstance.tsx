@@ -2,7 +2,7 @@ import React from 'react';
 import KeyValueTable from './KeyValueTable';
 import ManufacturingSites from './ManufacturingSites';
 import { formatKey } from '../../utils/utils';
-import AppendixLink from '../AppendixLink';
+import AppendixLink from './AppendixLink';
 
 interface DrugSubstanceProps {
   drugSubstance: any;

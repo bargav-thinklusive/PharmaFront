@@ -9,7 +9,7 @@ interface AppendicesSectionProps {
 const Appendix1: React.FC<{ appendix1: any }> = ({ appendix1 }) => (
   <div>
     <div className="ml-6">
-      <div className="flex flex-row justify-between align-center border-blue-400 border-b-4">
+      <div className="flex flex-row justify-between align-center border-blue-400 border-b-4 mt-4">
         <h2 id="section-5-1" className="font-semibold">5.1 {appendix1.name}</h2>
         <a
           href={appendix1.reference}
@@ -22,12 +22,12 @@ const Appendix1: React.FC<{ appendix1: any }> = ({ appendix1 }) => (
       <p>{appendix1.description}</p>
     </div>
     <div className="ml-10">
-      <h3 id="section-5-1-1" className="font-semibold border-blue-400 border-b-4">5.1.1 Modular Synthesis</h3>
+      <h3 id="section-5-1-1" className="font-semibold border-blue-400 border-b-4 mt-4">5.1.1 Modular Synthesis</h3>
       <p>{appendix1.modularSynthesis.overview}</p>
       <div className="ml-12">
         {appendix1.modularSynthesis.steps.map((step: any, index: number) => (
           <React.Fragment key={index}>
-            <div className="font-semibold border-blue-400 border-b-4">
+            <div className="font-semibold border-blue-400 border-b-4 mt-4">
               <strong>5.1.1.{index + 1} {step.name}</strong>
             </div>
             {step.details.map((detail: string, detailIndex: number) => (
@@ -38,11 +38,11 @@ const Appendix1: React.FC<{ appendix1: any }> = ({ appendix1 }) => (
       </div>
     </div>
     <div className="ml-10">
-      <h3 id="section-5-1-2" className="font-semibold border-blue-400 border-b-4">5.1.2 Synthesis Steps</h3>
+      <h3 id="section-5-1-2" className="font-semibold border-blue-400 border-b-4 mt-4">5.1.2 Synthesis Steps</h3>
       <div className="ml-12">
         {appendix1.synthesisSteps.map((step: any, index: number) => (
           <div key={index} className="mb-4">
-            <div className="font-semibold border-blue-400 border-b-4 pb-1">
+            <div className="font-semibold border-blue-400 border-b-4 pb-1 mt-4">
               5.1.2.{index + 1}. {step.title}
             </div>
             <p>{step.description}</p>
@@ -74,7 +74,7 @@ const Appendix1: React.FC<{ appendix1: any }> = ({ appendix1 }) => (
 const Appendix2: React.FC<{ appendix2: any }> = ({ appendix2 }) => (
   <div className="mt-6">
     <div className="ml-6">
-      <h2 id="section-5-2" className="flex flex-row justify-between align-center border-blue-400 border-b-4 font-bold">
+      <h2 id="section-5-2" className="flex flex-row justify-between align-center border-blue-400 border-b-4 font-bold mt-4">
         5.2 {appendix2.name}
       </h2>
     </div>
@@ -84,7 +84,7 @@ const Appendix2: React.FC<{ appendix2: any }> = ({ appendix2 }) => (
           if (value === undefined || value === "N/A" || (typeof value === "string" && value.trim() === "")) return null;
           return (
             <div key={index} className="mb-2">
-              <h3 id={`section-5-2-${index + 1}`} className="font-semibold border-blue-400 border-b-4 pb-1">
+              <h3 id={`section-5-2-${index + 1}`} className="font-semibold border-blue-400 border-b-4 pb-1 mt-4">
                 5.2.{index + 1} {formatKey(key)}
               </h3>
               <p>{String(value)}</p>
@@ -98,10 +98,10 @@ const Appendix2: React.FC<{ appendix2: any }> = ({ appendix2 }) => (
 
 const Appendix3: React.FC<{ appendix3: any }> = ({ appendix3 }) => (
   <div className="mt-6 ml-6">
-    <h2 id="section-5-3" className="font-bold border-blue-400 border-b-4">5.3 {appendix3.name}</h2>
+    <h2 id="section-5-3" className="font-bold border-blue-400 border-b-4 mt-4">5.3 {appendix3.name}</h2>
     <p>{appendix3.note}</p>
     <div className="ml-10 mt-2">
-      <h3 id="section-5-3-1" className="font-semibold border-blue-400 border-b-4 pb-1">5.3.1 Inactive Ingredients</h3>
+      <h3 id="section-5-3-1" className="font-semibold border-blue-400 border-b-4 pb-1 mt-4">5.3.1 Inactive Ingredients</h3>
       <table className="table-auto border-collapse border border-gray-400 w-full mt-2">
         <thead>
           <tr className="bg-gray-100">
@@ -124,7 +124,7 @@ const Appendix3: React.FC<{ appendix3: any }> = ({ appendix3 }) => (
 
 const Appendix4: React.FC<{ appendix4: any }> = ({ appendix4 }) => (
   <div className="mt-6 ml-6">
-    <h2 id="section-5-4" className="font-bold border-blue-400 border-b-4">5.4 {appendix4.name}</h2>
+    <h2 id="section-5-4" className="font-bold border-blue-400 border-b-4 mt-4">5.4 {appendix4.name}</h2>
     <ul className="list-disc list-inside">
       {appendix4.labels.map((item: any, index: number) => (
         <li key={index}>
@@ -139,12 +139,12 @@ const Appendix4: React.FC<{ appendix4: any }> = ({ appendix4 }) => (
 const Appendix5: React.FC<{ appendix5: any }> = ({ appendix5 }) => (
   <div className="mt-6 ml-6">
     <div>
-      <h2 id="section-5-5" className="font-bold border-blue-400 border-b-4">5.5 {appendix5.name}</h2>
+      <h2 id="section-5-5" className="font-bold border-blue-400 border-b-4 mt-4">5.5 {appendix5.name}</h2>
       <p>{appendix5.description}</p>
       <div className="ml-10 mt-2">
         {Object.entries(appendix5.designations).map(([key, value], index) => (
           <div key={index} className="mb-4">
-            <h3 id={`section-5-5-${index + 1}`} className="font-semibold border-blue-400 border-b-4 pb-1">
+            <h3 id={`section-5-5-${index + 1}`} className="font-semibold border-blue-400 border-b-4 pb-1 mt-4">
               5.5.{index + 1} {formatKey(key)}
             </h3>
             {Array.isArray(value) ? (
