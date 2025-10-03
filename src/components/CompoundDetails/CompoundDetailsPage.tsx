@@ -28,16 +28,16 @@ const CompoundDetailsPage: React.FC = () => {
   const [activeId, setActiveId] = useState<string>('summary');
   const [openDropdowns, setOpenDropdowns] = useState<{ [key: string]: boolean }>(() => {
     const state: { [key: string]: boolean } = {};
-    const traverse = (secs: any[], parentIdx = '') => {
+    const traverse = (secs: any[], parentIdx = '', level = 1) => {
       secs.forEach((sec: any, idx: number) => {
-        const sectionId = (parentIdx ? parentIdx + '.' : '') + (idx + 1);
+        const sectionId = (parentIdx ? parentIdx + '.' : '') + (level === 1 ? idx + 2 : idx + 1);
         const normalized = (sec.TOCHeading || '').replace(/\s+/g, '').toLowerCase();
         const htmlId = `${sectionId}-${normalized}`;
         state[htmlId] = false;
-        if (Array.isArray(sec.Section)) traverse(sec.Section, sectionId);
+        if (Array.isArray(sec.Section)) traverse(sec.Section, sectionId, level + 1);
       });
     };
-    traverse(sections);
+    traverse(sections, '', 1);
     return state;
   });
 
@@ -155,7 +155,7 @@ const renderTOC = (sections: any[], level = 1, parentIdx = ''): React.ReactNode 
     }`}
   >
     {sections.map((section: any, idx: number) => {
-      const sectionId = (parentIdx ? parentIdx + '.' : '') + (idx + 1);
+      const sectionId = (parentIdx ? parentIdx + '.' : '') + (level === 1 ? idx + 2 : idx + 1);
       const normalized = (section.TOCHeading || '').replace(/\s+/g, '').toLowerCase();
       const htmlId = `${sectionId}-${normalized}`;
       const hasSub = Array.isArray(section.Section) && section.Section.length > 0;

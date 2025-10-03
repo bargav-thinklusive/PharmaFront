@@ -6,7 +6,7 @@ import { routesConfig } from './routesConfig';
 
 const AppWrapper = () => {
   const location = useLocation();
-  const isLoginPage = location.pathname === '/login';
+  const isLoginPage = location.pathname === '/login'|| location.pathname === '/register';
 
   return (
     <div className="min-h-screen flex flex-col">
