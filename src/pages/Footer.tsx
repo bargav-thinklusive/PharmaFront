@@ -11,7 +11,7 @@ const Footer: React.FC = () => (
       marginTop: 'auto',
     }}
   >
-    <p style={{ margin: 0 }}>&copy; 2025 ChemBank. All rights reserved.</p>
+    <p style={{ margin: 0 }}>&copy; 2025  CMCINTEL. All rights reserved.</p>
   </footer>
 );
 
