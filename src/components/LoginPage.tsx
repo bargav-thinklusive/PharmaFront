@@ -54,7 +54,7 @@ const Login: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-700 text-lg"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-700 text-lg cursor-pointer"
           >
             {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
           </button>
@@ -66,7 +66,7 @@ const Login: React.FC = () => {
         {/* Login Button */}
         <button
           onClick={handleLogin}
-          className="p-3 rounded-md bg-green-700 text-white font-semibold hover:bg-green-800 transition"
+          className="p-3 rounded-md bg-green-700 text-white font-semibold hover:bg-green-800 transition cursor-pointer"
         >
           Login
         </button>
@@ -76,7 +76,7 @@ const Login: React.FC = () => {
           Don't have an account?{" "}
           <button
             onClick={() => navigate("/register")}
-            className="text-green-700 underline font-medium hover:text-green-900"
+            className="text-green-700 underline font-medium hover:text-green-900 cursor-pointer"
           >
             Register
           </button>

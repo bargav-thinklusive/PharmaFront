@@ -54,7 +54,7 @@ const Register: React.FC = () => {
       setTimeout(() => navigate("/login"), 2000); // redirect after 2s
     } catch (err) {
       setError("Registration failed. Please try again.");
-      toast.error("❌ Registration failed. Please try again.");
+      toast.error("Registration failed. Please try again.");
     }
   };
 
@@ -110,7 +110,7 @@ const Register: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-700 text-lg"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-700 text-lg cursor-pointer"
             >
               {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
             </button>

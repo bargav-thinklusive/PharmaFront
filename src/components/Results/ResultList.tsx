@@ -64,14 +64,14 @@ const ResultList: React.FC = () => {
           {results.map((compound: any) => {
             const cid = compound.cid;
             // Helper to get synonyms
-            function getSynonyms(item: any) {
-              const names = [];
-              if (item?.marketInformation?.brandName) names.push(item.marketInformation.brandName);
-              if (item?.marketInformation?.genericName) names.push(item.marketInformation.genericName);
-              if (item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName) names.push(item.drugSubstance.physicalAndChemicalProperties.chemicalName);
-              if (item?.drugSubstance?.physicalAndChemicalProperties?.structureName) names.push(item.drugSubstance.physicalAndChemicalProperties.structureName);
-              return names;
-            }
+            // function getSynonyms(item: any) {
+            //   const names = [];
+            //   if (item?.marketInformation?.brandName) names.push(item.marketInformation.brandName);
+            //   if (item?.marketInformation?.genericName) names.push(item.marketInformation.genericName);
+            //   if (item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName) names.push(item.drugSubstance.physicalAndChemicalProperties.chemicalName);
+            //   if (item?.drugSubstance?.physicalAndChemicalProperties?.structureName) names.push(item.drugSubstance.physicalAndChemicalProperties.structureName);
+            //   return names;
+            // }
             const handleNaviageToParticularItem = (cid: string) => {
               if (ccategory && cid) {
                 navigate(`/${ccategory}/${searchtext}/${cid}`);
@@ -85,8 +85,8 @@ const ResultList: React.FC = () => {
             const molecularWeight = compound.drugSubstance?.physicalAndChemicalProperties?.molecularWeight || '';
             const approvedDate = compound.marketInformation?.approvedDate || '';
             const chemicalStructure = compound.drugSubstance?.physicalAndChemicalProperties?.chemicalStructure || {};
-            const synonyms = getSynonyms(compound);
-            const synonymsText = synonyms.join('; ');
+            //const synonyms = getSynonyms(compound);
+            //const synonymsText = synonyms.join('; ');
 
             return (
               <div

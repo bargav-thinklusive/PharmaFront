@@ -10,7 +10,7 @@ const AppendixLink: React.FC<AppendixLinkProps> = ({ text }) => {
     if (/^Appendix \d+$/i.test(part)) {
       const num = part.match(/(\d+)/)?.[1];
       if (num) {
-        return <a key={index} href={`#section-4-${num}`} className="text-blue-600 underline">{part}</a>;
+        return <a key={index} href={`#section-5-${num}`} className="text-blue-600 underline">{part}</a>;
       }
     }
     return part;
