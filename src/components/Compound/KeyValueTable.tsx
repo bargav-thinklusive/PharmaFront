@@ -37,27 +37,42 @@ const renderLink = (text: string) => {
 };
 
 const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, className = '' }) => {
-
-  const filteredData = Object.entries(data || {}).filter(
-    ([_, value]) => value && value.toString().toLowerCase() !== 'n/a' && (typeof value !== 'object' || Array.isArray(value))
+  const entries = Object.entries(data || {}).filter(
+    ([_, value]) => typeof value !== 'object' || Array.isArray(value)
   );
 
-  if (filteredData.length === 0) return null;
+  if (entries.length === 0) {
+    return (
+      <div className={`border-2 border-sky-400 rounded bg-white max-w-3xl p-4 ${className}`}>
+        <p className="text-gray-500 italic">No data available</p>
+      </div>
+    );
+  }
 
   return (
     <div className={`border-2 border-sky-400 rounded bg-white max-w-3xl ${className}`}>
       <table className="w-full text-sm text-black">
         <tbody>
-          {filteredData.map(([key, value]) => (
-            <tr key={key} className="border-b border-blue-100">
-              <td className="w-56 p-3 text-black font-semibold">
-                {formatKey(key)}
-              </td>
-              <td className="py-2 px-4 whitespace-pre-wrap">
-                {renderValue(value)}
-              </td>
-            </tr>
-          ))}
+          {entries.map(([key, value]) => {
+            const displayValue = (!value || value.toString().toLowerCase() === 'n/a') 
+              ? 'No data available' 
+              : value;
+            
+            return (
+              <tr key={key} className="border-b border-blue-100">
+                <td className="w-56 p-3 text-black font-semibold">
+                  {formatKey(key)}
+                </td>
+                <td className="py-2 px-4 whitespace-pre-wrap">
+                  {displayValue === 'No data available' ? (
+                    <span className="text-gray-500 italic">{displayValue}</span>
+                  ) : (
+                    renderValue(displayValue)
+                  )}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
