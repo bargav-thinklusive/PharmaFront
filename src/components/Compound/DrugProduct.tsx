@@ -6,6 +6,21 @@ interface DrugProductProps {
   drugProduct: any;
 }
 
+// Reference data for subsections
+const subsectionReferences: { [key: string]: { key: string; link: string } } = {
+  strengths: { key: "REF-4.1", link: "https://example.com/drug-product-strengths" },
+  packagingAndStorageConditions: { key: "REF-4.2", link: "https://example.com/packaging-storage" },
+  dosageForm: { key: "REF-4.3", link: "https://example.com/dosage-form" },
+  routeOfAdministration: { key: "REF-4.4", link: "https://example.com/route-administration" },
+  indication: { key: "REF-4.5", link: "https://example.com/indication" },
+  contraindications: { key: "REF-4.6", link: "https://example.com/contraindications" },
+  warnings: { key: "REF-4.7", link: "https://example.com/warnings" },
+  precautions: { key: "REF-4.8", link: "https://example.com/precautions" },
+  adverseReactions: { key: "REF-4.9", link: "https://example.com/adverse-reactions" },
+  drugInteractions: { key: "REF-4.10", link: "https://example.com/drug-interactions" },
+  default: { key: "REF-4", link: "https://example.com/drug-product-general" }
+};
+
 const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
   const renderStrengthsTable = (strengths: any[]) => (
     <table className="table-auto border-collapse border-b border-blue-400 mb-4">
@@ -79,6 +94,30 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
     </div>
   );
 
+  const renderReference = (key: string, sectionCounter: number) => {
+    // Don't show references for sections 4.11 and 4.12
+    if (sectionCounter === 11 || sectionCounter === 12) {
+      return null;
+    }
+    
+    const reference = subsectionReferences[key] || subsectionReferences.default;
+    return (
+      <div className="mt-3 p-2 bg-gray-50 border-l-4 border-blue-400">
+        <p className="text-sm text-gray-600">
+          <strong>Reference:</strong> {reference.key} - 
+          <a 
+            href={reference.link} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-600 underline hover:text-blue-800 ml-1"
+          >
+            {reference.link}
+          </a>
+        </p>
+      </div>
+    );
+  };
+
   const renderSection = (key: string, value: any, sectionCounter: number) => {
     const sectionId = `section-4-${sectionCounter}`;
 
@@ -89,6 +128,7 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
             4.{sectionCounter}. Strengths
           </h2>
           {renderStrengthsTable(value)}
+          {renderReference(key, sectionCounter)}
         </div>
       );
     }
@@ -100,6 +140,7 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
             4.{sectionCounter}. Packaging And Storage Conditions
           </h2>
           {renderPackagingTable(value)}
+          {renderReference(key, sectionCounter)}
         </div>
       );
     }
@@ -111,6 +152,7 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
             4.{sectionCounter}. {formatKey(key)}
           </h2>
           {renderObjectData(value)}
+          {renderReference(key, sectionCounter)}
         </div>
       );
     }
@@ -121,6 +163,7 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
           4.{sectionCounter}. {formatKey(key)}
         </h2>
         {Array.isArray(value) ? renderArrayData(value) : <p><AppendixLink text={String(value)} /></p>}
+        {renderReference(key, sectionCounter)}
       </div>
     );
   };
@@ -132,12 +175,24 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
       </h1>
       {(() => {
         let sectionCounter = 0;
-        return Object.entries(drugProduct?.information || {})
-          .filter(([_, value]) => value && value.toString().toLowerCase() !== "n/a")
-          .map(([key, value]) => {
-            sectionCounter++;
-            return renderSection(key, value, sectionCounter);
-          });
+        const entries = Object.entries(drugProduct?.information || {});
+        
+        if (entries.length === 0) {
+          return (
+            <div className="ml-6 p-4 text-gray-500 italic">
+              No data available
+            </div>
+          );
+        }
+        
+        return entries.map(([key, value]) => {
+          sectionCounter++;
+          // Replace empty or n/a values with "No data available"
+          const displayValue = (!value || value.toString().toLowerCase() === "n/a") 
+            ? "No data available" 
+            : value;
+          return renderSection(key, displayValue, sectionCounter);
+        });
       })()}
     </div>
   );
