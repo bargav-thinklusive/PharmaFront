@@ -8,6 +8,16 @@ interface KeyValueTableProps {
 }
 
 const renderValue = (value: any) => {
+  // Check if value is empty or n/a
+  const isEmpty = !value ||
+    value.toString().toLowerCase() === 'n/a' ||
+    (typeof value === 'string' && value.trim() === '') ||
+    (Array.isArray(value) && value.length === 0);
+
+  if (isEmpty) {
+    return <span className="text-gray-500 italic">No data available</span>;
+  }
+
   if (Array.isArray(value)) {
     return value.map((item, index) => (
       <span key={index}>
@@ -37,18 +47,17 @@ const renderLink = (text: string) => {
 };
 
 const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, className = '' }) => {
+  if (!data || typeof data !== 'object') return null;
 
-  const filteredData = Object.entries(data || {}).filter(
-    ([_, value]) => value && value.toString().toLowerCase() !== 'n/a' && (typeof value !== 'object' || Array.isArray(value))
-  );
+  const allEntries = Object.entries(data).filter(([key]) => !/^\d+$/.test(key));
 
-  if (filteredData.length === 0) return null;
+  if (allEntries.length === 0) return null;
 
   return (
     <div className={`border-2 border-sky-400 rounded bg-white max-w-3xl ${className}`}>
       <table className="w-full text-sm text-black">
         <tbody>
-          {filteredData.map(([key, value]) => (
+          {allEntries.map(([key, value]) => (
             <tr key={key} className="border-b border-blue-100">
               <td className="w-56 p-3 text-black font-semibold">
                 {formatKey(key)}
