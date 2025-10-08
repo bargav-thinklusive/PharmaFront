@@ -178,10 +178,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
               onChange={handleCategoryChange}
             >
               <option value="all">All</option>
-              <option value="brandName">Brand Name</option>
-              <option value="genericName">Generic Name</option>
-              <option value="chemicalName">Chemical Name</option>
-              <option value="structureName">Structure Name</option>
+              <option value="brandName">Brand</option>
+              <option value="genericName">Generic</option>
+              <option value="chemicalName">Chemical</option>
+              <option value="structureName">Structure</option>
             </select>
             <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600">
               ▼
