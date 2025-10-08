@@ -12,8 +12,10 @@ const MarketInformation: React.FC<MarketInformationProps> = ({ marketInformation
         2. Market Information
       </h1>
       <KeyValueTable data={marketInformation} />
-      <div>
-        <h2 className="text-xl font-bold mt-6 mb-2">References</h2>
+      <div className='flex justify-start items-center'>
+        <p className="font-bold mt-6 mb-2">References:</p>
+        <a href='https://google.com' target="_blank"
+          rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800 block break-words pt-3">google.com</a>
         
       </div>
     </div>
