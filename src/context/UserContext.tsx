@@ -1,17 +1,17 @@
 
 
 import { createContext, useContext, useEffect, type ReactNode } from "react";
-import { useNavigate } from "react-router";
+//import { useNavigate } from "react-router";
 import UserService from "../services/UserService";
 import TokenService from "../services/shared/TokenService";
-import { LOGIN_URL } from "../urlConfig";
+//import { LOGIN_URL } from "../urlConfig";
 import useGet from "../hooks/useGet";
 
 const tokenService = TokenService;
 const UserContext = createContext<any | undefined>(undefined)
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const { fetchData, data: user, loading } = useGet();
 
   const checkTokenAndGetUser=async()=>{
@@ -21,7 +21,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const user=await fetchData(userService.getUserById(id))
       return user
     }else{
-      navigate(LOGIN_URL)
+      //navigate(LOGIN_URL)
     }
   }
 
