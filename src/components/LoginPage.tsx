@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import AuthService from "../services/AuthService";
+//import AuthService from "../services/AuthService";
 import { useUser } from "../context/UserContext";
-import { LOGIN_URL } from "../urlConfig";
+//import { LOGIN_URL } from "../urlConfig";
 
-const authService = new AuthService();
+//const authService = new AuthService();
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const { checkTokenAndGetUser, } = useUser();
 
-
+console.log(checkTokenAndGetUser,loading)
   const validateEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
