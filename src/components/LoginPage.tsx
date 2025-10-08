@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import AuthService from "../services/AuthService";
+import { useUser } from "../context/UserContext";
+import { LOGIN_URL } from "../urlConfig";
+
+const authService = new AuthService();
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -14,6 +19,9 @@ const Login: React.FC = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { checkTokenAndGetUser, } = useUser();
+
 
   const validateEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -24,19 +32,33 @@ const Login: React.FC = () => {
     const hasLowercase = /[a-z]/.test(password);
     const hasNumber = /\d/.test(password);
     const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
-    
+
     return minLength && hasUppercase && hasLowercase && hasNumber && hasSpecialChar;
   };
 
 
-  const handleLogin = () => {
-    if (!email && !password) return setError("Please enter email and password");
-    if (!email) return setError("Please enter email");
-    if (!validateEmail(email)) return setError("Please enter a valid email");
-    if (!password) return setError("Please enter password");
+  const handleLogin = async () => {
+    try {
+      setLoading(true);
+      if (!email && !password) return setError("Please enter email and password");
+      if (!email) return setError("Please enter email");
+      if (!validateEmail(email)) return setError("Please enter a valid email");
+      if (!password) return setError("Please enter password");
 
-    setError("");
-    navigate("/home");
+      setError("");
+      // await authService.login(email, password);
+      // const user: any = await checkTokenAndGetUser();
+      // if (user) {
+      //   navigate("/home");
+      // } else {
+      //   navigate(LOGIN_URL)
+      // }
+navigate("/home");
+    } catch (error: any) {
+      setError("Please Enter a Valid Email and Password");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleResetPassword = () => {
@@ -49,19 +71,19 @@ const Login: React.FC = () => {
     if (!email) return setError("Please enter your email");
     if (!validateEmail(email)) return setError("Please enter a valid email");
     if (!newPassword) return setError("Please enter a new password");
-    
+
     // Use the new password validation
     if (!validatePassword(newPassword)) {
       return setError("Password must contain: 8+ characters, 1 uppercase, 1 lowercase, 1 number, 1 special character");
     }
-    
+
     if (!retypePassword) return setError("Please retype your password");
     if (newPassword !== retypePassword) {
       return setError("New password and retype new password not matched");
     }
 
     setSuccess("Password reset successfully! Redirecting to login...");
-    
+
     setTimeout(() => {
       setIsForgotPassword(false);
       setEmail("");
@@ -189,6 +211,7 @@ const Login: React.FC = () => {
         <button
           onClick={isForgotPassword ? handleResetPassword : handleLogin}
           className="p-3 rounded-md bg-green-700 text-white font-semibold hover:bg-green-800 transition cursor-pointer"
+          //disabled={loading}
         >
           {isForgotPassword ? "Reset Password" : "Login"}
         </button>

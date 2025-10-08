@@ -62,6 +62,12 @@ const DrugSubstance: React.FC<DrugSubstanceProps> = ({ drugSubstance }) => {
       <PhysicalAndChemicalProperties data={drugSubstance?.physicalAndChemicalProperties} />
       <ProcessDevelopment data={drugSubstance?.processDevelopment} manufacturingSites={drugSubstance?.processDevelopment?.manufacturingSites} />
       <AnalyticalDevelopment data={drugSubstance?.analyticalDevelopment} />
+    <div className='flex justify-start items-center'>
+        <p className="font-bold mt-6 mb-2">References:</p>
+        <a href='https://google.com' target="_blank"
+          rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800 block break-words pt-3">google.com</a>
+        
+      </div>
     </div>
   );
 };

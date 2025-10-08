@@ -10496,7 +10496,8 @@ export const drugData=[{
     "genericApprovedDate": "N/A",
     "potentialGenericAvailability": "Nov, 2029 (based on patent expiration, this can change based on legal challenges and licensing agreements.)",
     "specialStatus": "Orphan Drug Designation available for pediatric ALCL treatment until Jan 14, 2028",
-    "patentExclusivityInfo": ""
+    "patentExclusivityInfo": "",
+    "References": ""
   },
   "drugSubstance": {
     "physicalAndChemicalProperties": {
@@ -10510,7 +10511,8 @@ export const drugData=[{
       "structureName": "(R)-3-[1-(2,6-Dichloro-3-fluorophenyl)ethoxy]-5-[1-(piperidin-4-yl)-1H-pyrazol-4-yl]pyridin-2-amine",
       "solubility": "Insoluble in water. Solubility decreases as pH increases, dropping from >10 mg/mL at pH 1.6 to <0.1 mg/mL at pH 8.2.",
       "pka": "Has two pKa values: 9.4 (piperidinium cation) and 5.6 (pyridinium cation).",
-      "logp": "The partition coefficient (octanol/water) at pH 7.4 is 1.65."
+      "logp": "The partition coefficient (octanol/water) at pH 7.4 is 1.65.",
+    "References": ""
     },
     "processDevelopment": {
       "availableDmfVendors": [
@@ -10546,7 +10548,8 @@ export const drugData=[{
       "nitrosaminesAssessment": "",
       "fateOfImpurities": "",
       "cppsAndCqaStudies": "",
-      "otherInformation": ""
+      "otherInformation": "",
+    "References": ""
     },
     "analyticalDevelopment": {
       "rsmMethods": "",
@@ -10557,7 +10560,8 @@ export const drugData=[{
       "stabilityOfDrugSubstance": "",
       "drugSubstanceSites": "Manufacturing, Analytical Testing and Release are performed at: Pfizer Ireland Pharmaceuticals Little Island County Cork Ireland",
       "dsImpurities": "",
-      "dsImpurityMethods": ""
+      "dsImpurityMethods": "",
+    "References": ""
     }
   },
   "drugProduct": {
@@ -10654,7 +10658,8 @@ export const drugData=[{
         
       },
       "labeling": "Appendix 4: Labeling Information",
-      "developmentProgramDesignationDetails": "Appendix 5: Development program designation"
+      "developmentProgramDesignationDetails": "Appendix 5: Development program designation",
+    "References": ""
     }
   },
 

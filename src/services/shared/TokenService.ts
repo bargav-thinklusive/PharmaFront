@@ -1,10 +1,17 @@
+
 import { REACT_API_URL } from "../../urlConfig";
 import { jwtDecode } from "jwt-decode";
 import AuthService from "../AuthService";
 
 class TokenService {
   static baseUrl = REACT_API_URL;
-  static authService = new AuthService();
+  static get authService() {
+    if (!this._authService) {
+      this._authService = new AuthService();
+    }
+    return this._authService;
+  }
+  private static _authService: AuthService | null = null;
 
   static getToken() {
     const token = document.cookie

@@ -1,28 +1,28 @@
-import  { useState } from 'react'
-import axiosInstance from '../services/shared/AxiosService'
+
+import { useState } from "react";
+import axiosInstance from "../services/shared/AxiosService";
+
 
 const useGet = () => {
-    const [data,setData]=useState(null)
-    const [error,setError]=useState(undefined)
-    const [loading,setLoading]=useState(false)
+  const [data, setData] = useState<any>(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-    const getData=async(url:string)=>{
-        try{
-            setLoading(true)
-            const response=await axiosInstance.get(url)
-            setData(response.data)
-            return response.data
-        }catch(error:any){
-            console.error(error)
-            setError(error)
-            throw error 
-        }finally{
-            setLoading(false)
-        }
+  const fetchData = async (url: string) => {
+    try {
+      setLoading(true);
+      const response = await axiosInstance.get(url);
+      setData(response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error(error.message);
+      setError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
     }
+  };
 
-
-  return {getData,data,error,loading}
-}
-
-export default useGet
+  return { fetchData, data, error, loading };
+};
+export default useGet;

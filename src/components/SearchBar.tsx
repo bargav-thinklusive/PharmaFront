@@ -1,35 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { drugData } from "../sampleData/data";
+import { RxCross2 } from "react-icons/rx";
 
 interface SearchBarProps {
-  value?: string;
-  setValue?: (v: string) => void;
-  initialCategory?: string;
-  setCategory?: (cat: string) => void;
-  disableCategorySelect?: boolean;
+  compact?: boolean;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
-  value,
-  setValue,
-  initialCategory,
-  setCategory,
-  disableCategorySelect,
+  compact = false,
 }) => {
-  const [search, setSearch] = useState(value || "");
-  const validCategories = [
-    "all",
-    "brandName",
-    "genericName",
-    "chemicalName",
-    "structureName",
-  ];
-  const initialCat =
-    initialCategory && validCategories.includes(initialCategory)
-      ? initialCategory
-      : "all";
-  const [category, setCategoryState] = useState(initialCat);
+  const [search, setSearch] = useState("");
+  const [category, setCategoryState] = useState("all");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -127,16 +109,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setSearch(newValue);
-    if (setValue) setValue(newValue);
     setShowSuggestions(true);
+  };
+
+  const handleClear = () => {
+    setSearch("");
+    setSuggestions([]);
+    setShowSuggestions(false);
   };
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newCategory = e.target.value;
     setCategoryState(newCategory);
-    if (setCategory) setCategory(newCategory);
     setSearch("");
-    if (setValue) setValue("");
     setSuggestions([]);
     setShowSuggestions(false);
   };
@@ -162,34 +147,42 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <div
-      className="w-full flex flex-col items-center mb-8 relative"
+      className={`w-full flex flex-col items-center ${compact ? 'mb-0' : 'mb-8'} relative`}
       ref={wrapperRef}
     >
       <form className="w-full flex justify-center" onSubmit={handleSubmit}>
         <div className="flex w-full max-w-2xl bg-white rounded shadow overflow-hidden">
-          <input
-            className="flex-1 px-6 py-4 text-lg border-0 focus:ring-0 focus:outline-none text-black caret-blue-700 bg-white placeholder-gray-400"
-            type="text"
-            placeholder="Search..."
-            value={search}
-            onChange={handleInputChange}
-            autoFocus
-          />
-
+          <div className="flex-1 relative">
+            <input
+              className="w-full px-6 py-4 text-lg border-0 focus:ring-0 focus:outline-none text-black caret-blue-700 bg-white placeholder-gray-400 pr-12"
+              type="text"
+              placeholder="Search..."
+              value={search}
+              onChange={handleInputChange}
+              autoFocus
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={handleClear}
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors duration-200 cursor-pointer"
+              >
+                <RxCross2 />
+              </button>
+            )}
+          </div>
           <div className="relative">
             <select
               className="px-6 py-4 text-lg bg-gray-100 border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium border-l appearance-none pr-10"
               value={category}
               onChange={handleCategoryChange}
-              disabled={disableCategorySelect}
             >
               <option value="all">All</option>
-              <option value="brandName">Brand </option>
+              <option value="brandName">Brand</option>
               <option value="genericName">Generic</option>
               <option value="chemicalName">Chemical</option>
               <option value="structureName">Structure</option>
             </select>
-
             <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600">
               ▼
             </span>
@@ -199,8 +192,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
       {/* Suggestions dropdown with scroll */}
       {showSuggestions && search.trim() && (
-        <div className="absolute top-full mt-1 w-full max-w-2xl bg-white border border-gray-200 rounded shadow-lg z-10">
-          <ul className="max-h-[50vh] overflow-y-auto">
+        <div className="absolute top-full mt-1 w-full max-w-2xl bg-white border border-gray-200 rounded shadow-lg z-[1001]">
+          <ul className="max-h-[50vh] overflow-y-auto text-black">
             {suggestions.length > 0 ? (
               suggestions.map((item, index) => {
                 const displayText =
@@ -211,7 +204,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 return (
                   <li
                     key={item.cid + "-" + index + "-" + String(displayText)}
-                    className="px-4 py-2 cursor-pointer hover:bg-blue-100"
+                    className="px-4 py-2 cursor-pointer hover:bg-blue-100 text-black hover:text-black"
                     onClick={() => handleSelect(item)}
                   >
                     {displayText}
