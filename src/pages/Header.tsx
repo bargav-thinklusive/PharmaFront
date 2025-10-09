@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CompanyLogo from "../assets/cmcintel.png";
 import SearchBar from "../components/SearchBar";
+import AuthService from "../services/AuthService";
 
 interface HeaderProps {
   isLoginPage?: boolean; // optional prop to indicate if on login page
@@ -44,7 +45,7 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
   const showSearchBar = !isLoginPage && location.pathname !== "/home" && !showMinimalHeader;
 
   const handleLogout = () => {
-    localStorage.removeItem("user"); // adjust if you use auth context
+    AuthService.logout(); // This deletes token and localStorage user
     setDropdownOpen(false);
     navigate("/login");
   };
