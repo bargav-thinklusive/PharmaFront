@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-//import AuthService from "../services/AuthService";
+import AuthService from "../services/AuthService";
 import { useUser } from "../context/UserContext";
-//import { LOGIN_URL } from "../urlConfig";
+import TokenService from "../services/shared/TokenService";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-//const authService = new AuthService();
+const authService = new AuthService();
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -17,12 +19,18 @@ const Login: React.FC = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showRetypePassword, setShowRetypePassword] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { checkTokenAndGetUser, } = useUser();
+  const { checkTokenAndGetUser } = useUser();
 
 console.log(checkTokenAndGetUser,loading)
+
+  useEffect(() => {
+    if (TokenService.getToken()) {
+      navigate("/home");
+    }
+  }, [navigate]);
+
   const validateEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -46,60 +54,81 @@ console.log(checkTokenAndGetUser,loading)
       if (!password) return setError("Please enter password");
 
       setError("");
-      // await authService.login(email, password);
-      // const user: any = await checkTokenAndGetUser();
-      // if (user) {
-      //   navigate("/home");
-      // } else {
-      //   navigate(LOGIN_URL)
-      // }
-navigate("/home");
+      await toast.promise(
+        authService.login(email, password),
+        {
+          pending: "Logging in...",
+          success: {
+            render: "Login successful!",
+            onClose: () => navigate("/home")
+          },
+          error: "Login failed. Please check your credentials."
+        }
+      );
     } catch (error: any) {
-      setError("Please Enter a Valid Email and Password");
+      // Error is already handled by toast.promise
     } finally {
       setLoading(false);
     }
   };
 
-  const handleResetPassword = () => {
-    setError("");
-    setSuccess("");
+  const handleResetPassword = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-    if (!email && !newPassword && !retypePassword) {
-      return setError("Please fill in all fields");
+      if (!email) return setError("Please enter your email");
+      if (!validateEmail(email)) return setError("Please enter a valid email");
+      if (!newPassword) return setError("Please enter a new password");
+
+      // Use the new password validation
+      if (!validatePassword(newPassword)) {
+        return setError("Password must contain: 8+ characters, 1 uppercase, 1 lowercase, 1 number, 1 special character");
+      }
+
+      if (!retypePassword) return setError("Please retype your password");
+      if (newPassword !== retypePassword) {
+        return setError("New password and retype new password not matched");
+      }
+
+      await authService.forgotPassword(email, newPassword);
+      toast.success("Password reset successfully!");
+
+      setTimeout(() => {
+        setIsForgotPassword(false);
+        setEmail("");
+        setNewPassword("");
+        setRetypePassword("");
+      }, 2000);
+    } catch (error: any) {
+      setError("Failed to reset password. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    if (!email) return setError("Please enter your email");
-    if (!validateEmail(email)) return setError("Please enter a valid email");
-    if (!newPassword) return setError("Please enter a new password");
-
-    // Use the new password validation
-    if (!validatePassword(newPassword)) {
-      return setError("Password must contain: 8+ characters, 1 uppercase, 1 lowercase, 1 number, 1 special character");
-    }
-
-    if (!retypePassword) return setError("Please retype your password");
-    if (newPassword !== retypePassword) {
-      return setError("New password and retype new password not matched");
-    }
-
-    setSuccess("Password reset successfully! Redirecting to login...");
-
-    setTimeout(() => {
-      setIsForgotPassword(false);
-      setEmail("");
-      setNewPassword("");
-      setRetypePassword("");
-      setSuccess("");
-    }, 2000);
   };
 
   const clearErrors = () => {
     if (error) setError("");
-    if (success) setSuccess("");
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen w-screen bg-gradient-to-br from-green-700 to-blue-500 fixed inset-0 pt-16">
+    <>
+      {/* Toast notifications */}
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        className="z-[9999]"
+        theme="dark"
+        toastClassName="!bg-black !text-white text-center rounded-lg shadow-lg"
+      />
+
+      <div className="flex justify-center items-center min-h-screen w-screen bg-gradient-to-br from-green-700 to-blue-500 fixed inset-0 pt-16">
       <div className="bg-white p-8 rounded-xl shadow-lg w-[450px] h-auto min-h-[500px] max-w-[90vw] flex flex-col gap-5 justify-center">
         <h2 className="text-2xl font-bold text-center text-green-700">
           {isForgotPassword ? "Reset Password" : "Login"}
@@ -204,9 +233,6 @@ navigate("/home");
         {/* Error Message */}
         {error && <span className="text-red-500 text-sm">{error}</span>}
 
-        {/* Success Message */}
-        {success && <span className="text-green-600 text-sm">{success}</span>}
-
         {/* Action Button */}
         <button
           onClick={isForgotPassword ? handleResetPassword : handleLogin}
@@ -234,7 +260,6 @@ navigate("/home");
               onClick={() => {
                 setIsForgotPassword(false);
                 setError("");
-                setSuccess("");
                 setNewPassword("");
                 setRetypePassword("");
               }}
@@ -246,6 +271,7 @@ navigate("/home");
         )}
       </div>
     </div>
+    </>
   );
 };
 
