@@ -59,9 +59,15 @@ const Register: React.FC = () => {
       console.log("Registration successful:", response);
       toast.success("🎉 Registration successful!");
       setTimeout(() => navigate("/login"), 2000); // redirect after 2s
-    } catch (err) {
-      setError("Registration failed. Please try again.");
-      toast.error("Registration failed. Please try again.");
+    } catch (err: any) {
+      if (err.response?.data?.detail === "Email already registered") {
+        setError("Email already registered. Please use a different email.");
+        toast.error("Email already registered. Please use a different email.");
+      } else {
+        setError("Registration failed. Please try again.");
+        toast.error("Registration failed. Please try again.");
+      }
+      console.error("Registration error:", err);
     }
   };
 
