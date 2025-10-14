@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatKey } from '../../utils/utils';
+import { formatKey, normalizeValue } from '../../utils/utils';
 import AppendixLink from './AppendixLink';
 
 interface KeyValueTableProps {
@@ -12,14 +12,17 @@ const renderValue = (value: any) => {
     return value.map((item, index) => (
       <span key={index}>
         {index > 0 && ', '}
-        {renderLink(String(item))}
+        {renderLink(normalizeValue(item))}
       </span>
     ));
   }
-  return renderLink(String(value));
+  return renderLink(normalizeValue(value));
 };
 
 const renderLink = (text: string) => {
+  if (text === "No data available") {
+    return <span className="text-gray-500 italic">{text}</span>;
+  }
   const urlRegex = /^https?:\/\/[^\s]+$/i;
   if (urlRegex.test(text.trim())) {
     return (
@@ -39,7 +42,7 @@ const renderLink = (text: string) => {
 const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, className = '' }) => {
 
   const filteredData = Object.entries(data || {}).filter(
-    ([_, value]) => value && value.toString().toLowerCase() !== 'n/a' && (typeof value !== 'object' || Array.isArray(value))
+    ([_, value]) => typeof value !== 'object' || Array.isArray(value)
   );
 
   if (filteredData.length === 0) return null;

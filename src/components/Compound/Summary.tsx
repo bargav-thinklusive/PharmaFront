@@ -1,4 +1,5 @@
 import React from 'react'
+import { normalizeValue } from '../../utils/utils';
 
 interface SummaryProps {
   drug: any;
@@ -16,8 +17,8 @@ const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
         >
           {sectionId}. Title and Summary
         </h1>
-        <div className='text-xl font-semibold text-black mb-2'>
-          {drug.marketInformation?.brandName || "N/A"}
+        <div className={`text-xl font-semibold text-black mb-2 ${drug.marketInformation?.brandName && normalizeValue(drug.marketInformation.brandName) === "No data available" ? "text-gray-500 italic" : ""}`}>
+          {drug.marketInformation?.brandName ? normalizeValue(drug.marketInformation.brandName) : "N/A"}
         </div>
       </div>
 
@@ -27,7 +28,7 @@ const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
             <tr className='align-top border-b border-blue-100'>
               <td className='w-56 p-3 text-black font-semibold'>CID</td>
               <td className="p-3">
-                <span className="text-base font-semibold text-black">{drug.cid || "N/A"}</span>
+                <span className={`text-base font-semibold text-black ${drug.cid && normalizeValue(drug.cid) === "No data available" ? "text-gray-500 italic" : ""}`}>{drug.cid ? normalizeValue(drug.cid) : "N/A"}</span>
               </td>
             </tr>
             <tr className='align-top border-b border-blue-100'>
@@ -45,8 +46,8 @@ const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
             <tr className='align-top border-b border-blue-100'>
               <td className='w-56 p-3 text-black font-semibold'>Chemical Formula</td>
               <td className="p-3">
-                <span className="text-base text-black">
-                  {drug.drugSubstance?.physicalAndChemicalProperties?.elementalFormula || "N/A"}
+                <span className={`text-base text-black ${drug.drugSubstance?.physicalAndChemicalProperties?.elementalFormula && normalizeValue(drug.drugSubstance.physicalAndChemicalProperties.elementalFormula) === "No data available" ? "text-gray-500 italic" : ""}`}>
+                  {drug.drugSubstance?.physicalAndChemicalProperties?.elementalFormula ? normalizeValue(drug.drugSubstance.physicalAndChemicalProperties.elementalFormula) : "N/A"}
                 </span>
               </td>
             </tr>
@@ -55,8 +56,8 @@ const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
               <td className="p-3">
                 <span className="text-base text-black">
                   {[
-                    drug.marketInformation?.brandName,
-                    drug.drugSubstance?.physicalAndChemicalProperties?.structureName
+                    drug.marketInformation?.brandName ? normalizeValue(drug.marketInformation.brandName) : "",
+                    drug.drugSubstance?.physicalAndChemicalProperties?.structureName ? normalizeValue(drug.drugSubstance.physicalAndChemicalProperties.structureName) : ""
                   ].filter(Boolean).join(", ") || "N/A"}
                 </span>
               </td>
@@ -64,16 +65,16 @@ const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
             <tr className='align-top border-b border-blue-100'>
               <td className='w-56 p-3 text-black font-semibold'>Molecular Weight</td>
               <td className="p-3">
-                <span className="text-base text-black">
-                  {drug.drugSubstance?.physicalAndChemicalProperties?.molecularWeight || "N/A"}
+                <span className={`text-base text-black ${drug.drugSubstance?.physicalAndChemicalProperties?.molecularWeight && normalizeValue(drug.drugSubstance.physicalAndChemicalProperties.molecularWeight) === "No data available" ? "text-gray-500 italic" : ""}`}>
+                  {drug.drugSubstance?.physicalAndChemicalProperties?.molecularWeight ? normalizeValue(drug.drugSubstance.physicalAndChemicalProperties.molecularWeight) : "N/A"}
                 </span>
               </td>
             </tr>
             <tr className='align-top border-b border-blue-100'>
               <td className='w-56 p-3 text-black font-semibold'>Structure Name</td>
               <td className="p-3">
-                <span className="text-base text-black">
-                  {drug.drugSubstance?.physicalAndChemicalProperties?.structureName || "N/A"}
+                <span className={`text-base text-black ${drug.drugSubstance?.physicalAndChemicalProperties?.structureName && normalizeValue(drug.drugSubstance.physicalAndChemicalProperties.structureName) === "No data available" ? "text-gray-500 italic" : ""}`}>
+                  {drug.drugSubstance?.physicalAndChemicalProperties?.structureName ? normalizeValue(drug.drugSubstance.physicalAndChemicalProperties.structureName) : "N/A"}
                 </span>
               </td>
             </tr>
@@ -83,14 +84,14 @@ const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
                 <div className="flex gap-8">
                   <div>
                     <div className="text-xs font-semibold text-black">Approved:</div>
-                    <div className="text-xs text-black">
-                      {drug.marketInformation?.approvedDate || "N/A"}
+                    <div className={`text-xs text-black ${drug.marketInformation?.approvedDate && normalizeValue(drug.marketInformation.approvedDate) === "No data available" ? "text-gray-500 italic" : ""}`}>
+                      {drug.marketInformation?.approvedDate ? normalizeValue(drug.marketInformation.approvedDate) : "N/A"}
                     </div>
                   </div>
                   <div>
                     <div className="text-xs font-semibold text-black">Generic Approved:</div>
-                    <div className="text-xs text-black">
-                      {drug.marketInformation?.genericApprovedDate || "N/A"}
+                    <div className={`text-xs text-black ${drug.marketInformation?.genericApprovedDate && normalizeValue(drug.marketInformation.genericApprovedDate) === "No data available" ? "text-gray-500 italic" : ""}`}>
+                      {drug.marketInformation?.genericApprovedDate ? normalizeValue(drug.marketInformation.genericApprovedDate) : "N/A"}
                     </div>
                   </div>
                 </div>

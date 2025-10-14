@@ -1,6 +1,6 @@
 import React from 'react';
 import { IoIosLink } from 'react-icons/io';
-import { formatKey } from '../../utils/utils';
+import { formatKey, normalizeValue } from '../../utils/utils';
 
 interface AppendicesSectionProps {
   appendices: any;
@@ -80,17 +80,14 @@ const Appendix2: React.FC<{ appendix2: any }> = ({ appendix2 }) => (
     </div>
     <div className="ml-10">
       {Object.entries(appendix2.specifications).map(
-        ([key, value], index) => {
-          if (value === undefined || value === "N/A" || (typeof value === "string" && value.trim() === "")) return null;
-          return (
-            <div key={index} className="mb-2">
-              <h3 id={`section-5-2-${index + 1}`} className="font-semibold border-blue-400 border-b-4 pb-1 mt-4">
-                5.2.{index + 1} {formatKey(key)}
-              </h3>
-              <p>{String(value)}</p>
-            </div>
-          );
-        }
+        ([key, value], index) => (
+          <div key={index} className="mb-2">
+            <h3 id={`section-5-2-${index + 1}`} className="font-semibold border-blue-400 border-b-4 pb-1 mt-4">
+              5.2.{index + 1} {formatKey(key)}
+            </h3>
+            <p className={normalizeValue(value) === "No data available" ? "text-gray-500 italic" : ""}>{normalizeValue(value)}</p>
+          </div>
+        )
       )}
     </div>
   </div>
@@ -112,8 +109,8 @@ const Appendix3: React.FC<{ appendix3: any }> = ({ appendix3 }) => (
         <tbody>
           {appendix3.inactiveIngredients.map((ingredient: any, index: number) => (
             <tr key={index}>
-              <td className="border border-gray-400 px-4 py-2">{ingredient.ingredientName}</td>
-              <td className="border border-gray-400 px-4 py-2">{ingredient.strength}</td>
+              <td className={`border border-gray-400 px-4 py-2 ${normalizeValue(ingredient.ingredientName) === "No data available" ? "text-gray-500 italic" : ""}`}>{normalizeValue(ingredient.ingredientName)}</td>
+              <td className={`border border-gray-400 px-4 py-2 ${normalizeValue(ingredient.strength) === "No data available" ? "text-gray-500 italic" : ""}`}>{normalizeValue(ingredient.strength)}</td>
             </tr>
           ))}
         </tbody>
@@ -154,7 +151,7 @@ const Appendix5: React.FC<{ appendix5: any }> = ({ appendix5 }) => (
                 ))}
               </ul>
             ) : (
-              <p>{String(value)}</p>
+              <p className={normalizeValue(value) === "No data available" ? "text-gray-500 italic" : ""}>{normalizeValue(value)}</p>
             )}
           </div>
         ))}

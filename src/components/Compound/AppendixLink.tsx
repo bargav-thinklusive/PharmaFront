@@ -5,6 +5,9 @@ interface AppendixLinkProps {
 }
 
 const AppendixLink: React.FC<AppendixLinkProps> = ({ text }) => {
+  if (text === "No data available") {
+    return <span className="text-gray-500 italic">{text}</span>;
+  }
   const parts = text.split(/(Appendix \d+)/gi);
   return <>{parts.map((part, index) => {
     if (/^Appendix \d+$/i.test(part)) {

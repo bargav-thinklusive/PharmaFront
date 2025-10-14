@@ -48,8 +48,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
       subsections: [
         { key: 'physicalAndChemicalProperties', title: 'Physical And Chemical Properties' },
         { key: 'processDevelopment', title: 'Process Development' },
-        { key: 'analyticalDevelopment', title: 'Analytical Development' },
-        { key: 'manufacturingSites', title: 'Manufacturing Sites' }
+        { key: 'analyticalDevelopment', title: 'Analytical Development' }
       ]
     },
     {
@@ -168,9 +167,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
         // Exact match only
         const isActiveSubsection = activeSection === subsectionId;
 
-        if (!hasContent(subsectionData)) return null;
-
-        let childExpandable = isPlainObject(subsectionData) &&
+        let childExpandable = subsectionData && isPlainObject(subsectionData) &&
           Object.entries(subsectionData).some(([k, v]) => !/^\d+$/.test(k) && hasContent(v));
 
         let visibleGrandChildren = childExpandable
@@ -186,6 +183,14 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
         if (subsection.key === 'physicalAndChemicalProperties') {
           visibleGrandChildren = [];
           childExpandable = false;
+        }
+        // For Analytical Development, show all sub-subsections even if empty
+        if (subsection.key === 'analyticalDevelopment') {
+          const allGrandChildren = subsectionData && isPlainObject(subsectionData)
+            ? Object.entries(subsectionData).filter(([k]) => !/^\d+$/.test(k))
+            : [];
+          visibleGrandChildren = allGrandChildren;
+          childExpandable = allGrandChildren.length > 0;
         }
 
         return (
@@ -219,12 +224,12 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
               )}
             </div>
 
-            {childExpandable && openSections[`${section.key}.${subsection.key}`] &&
-             visibleGrandChildren.length > 0 && (
+            {childExpandable && openSections[`${section.key}.${subsection.key}`] && (
               <div className="ml-4 mt-1">
-                {visibleGrandChildren.map(([gcKey], j) => {
+                {visibleGrandChildren.map(([gcKey, _], j) => {
                   const subSubsectionId = `section-${section.id}-${i + 1}-${j + 1}`;
                   const isActiveSubSubsection = activeSection === subSubsectionId;
+                  //const hasData = hasContent(gcValue);
 
                   return (
                     <div
@@ -254,16 +259,15 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
       const appendixKeys = ['appendix1', 'appendix2', 'appendix3', 'appendix4', 'appendix5'];
       return appendixKeys.map((appendixKey, i) => {
         const appendixData = sectionData[appendixKey];
-        if (!hasContent(appendixData)) return null;
 
         const subsectionId = `section-${section.id}-${i + 1}`;
         const isActiveSubsection = activeSection === subsectionId;
 
         // Check if this appendix has sub-subsections
-        const hasChildren = appendixKey === 'appendix1' ||
+        const hasChildren = appendixData && (appendixKey === 'appendix1' ||
           (appendixKey === 'appendix2' && appendixData.specifications) ||
           (appendixKey === 'appendix3' && appendixData.inactiveIngredients) ||
-          (appendixKey === 'appendix5' && appendixData.designations);
+          (appendixKey === 'appendix5' && appendixData.designations));
 
         return (
           <div key={appendixKey} className="mb-1">
@@ -278,7 +282,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
               }`}
             >
               <span className={isActiveSubsection ? 'text-white' : 'text-gray-800'}>
-                {section.id}.{i + 1} {appendixData.name || `Appendix ${i + 1}`}
+                {section.id}.{i + 1} {appendixData?.name || `Appendix ${i + 1}`}
               </span>
               {hasChildren && (
                 <span
@@ -296,7 +300,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
               )}
             </div>
 
-            {hasChildren && openSections[`${section.key}.${appendixKey}`] && (
+            {hasChildren && openSections[`${section.key}.${appendixKey}`] && appendixData && (
               <div className="ml-4 mt-1">
                 {appendixKey === 'appendix1' && appendixData.modularSynthesis && (
                   <div className="mb-1">
@@ -336,7 +340,6 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                 )}
                 {appendixKey === 'appendix2' && appendixData.specifications && (
                   Object.keys(appendixData.specifications).map((specKey, j) => {
-                    if (!hasContent(appendixData.specifications[specKey])) return null;
                     return (
                       <div key={specKey} className="mb-1">
                         <div
@@ -377,7 +380,6 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                 )}
                 {appendixKey === 'appendix5' && appendixData.designations && (
                   Object.keys(appendixData.designations).map((designationKey, j) => {
-                    if (!hasContent(appendixData.designations[designationKey])) return null;
                     return (
                       <div key={designationKey} className="mb-1">
                         <div
@@ -406,14 +408,14 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
     } else {
       if (!isPlainObject(sectionData)) return null;
 
-      const visibleChildren = Object.entries(sectionData).filter(
-        ([k, v]) => !/^\d+$/.test(k) && hasContent(v)
-      );
+      const allChildren = Object.entries(sectionData).filter(([k]) => !/^\d+$/.test(k));
+      //const visibleChildren = allChildren.filter(([k, v]) => hasContent(v));
 
-      return visibleChildren.map(([subKey], i) => {
+      return allChildren.map(([subKey, _], i) => {
         const subsectionId = `section-${section.id}-${i + 1}`;
         // Exact match only
         const isActiveSubsection = activeSection === subsectionId;
+        //const hasData = hasContent(subValue);
 
         return (
           <div
