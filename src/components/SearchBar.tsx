@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { drugData } from "../sampleData/data";
 import { RxCross2 } from "react-icons/rx";
+import debounce from "lodash/debounce";
 
 interface SearchBarProps {
   compact?: boolean;
@@ -24,8 +25,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
     setShowSuggestions(false);
   }, [location.pathname]);
 
-  // Compute suggestions
-  useEffect(() => {
+  // Compute suggestions with debouncing
+  const computeSuggestions = useCallback(() => {
     if (!search.trim()) {
       setSuggestions([]);
       return;
@@ -97,6 +98,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
     //setSuggestions(matches.slice(0, 50)); // limit to 50 results
     setSuggestions(matches);
   }, [search, category]);
+
+  const debouncedComputeSuggestions = useCallback(
+    debounce(computeSuggestions, 300),
+    [computeSuggestions]
+  );
+
+  useEffect(() => {
+    debouncedComputeSuggestions();
+  }, [debouncedComputeSuggestions]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
