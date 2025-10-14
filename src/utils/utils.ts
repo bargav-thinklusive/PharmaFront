@@ -13,3 +13,11 @@ export const toTitleCase = (str: unknown): string => {
     .trim();
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
+
+export const normalizeValue = (value: any): string => {
+  const str = String(value).trim().toLowerCase();
+  if (str === "" || str === "n/a" || str === "not data") {
+    return "No data available";
+  }
+  return String(value);
+};

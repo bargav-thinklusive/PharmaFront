@@ -1,4 +1,5 @@
 import React from 'react';
+import { normalizeValue } from '../../utils/utils';
 
 interface ReferencesProps {
   references: any[];
@@ -12,16 +13,16 @@ const References: React.FC<ReferencesProps> = ({ references }) => {
       </h1>
       {(references || []).map((ref: any, refIndex: number) => (
         <div key={refIndex} className="mb-2">
-          <h2 id={`section-6-${refIndex + 1}`} className="font-semibold">
-            {refIndex + 1}. {ref.title}
+          <h2 id={`section-6-${refIndex + 1}`} className={`font-semibold ${normalizeValue(ref.title) === "No data available" ? "text-gray-500 italic" : ""}`}>
+            {refIndex + 1}. {normalizeValue(ref.title)}
           </h2>
           <a
             href={ref.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 underline hover:text-blue-800 break-words"
+            className={`text-blue-600 underline hover:text-blue-800 break-words ${normalizeValue(ref.url) === "No data available" ? "text-gray-500 italic no-underline" : ""}`}
           >
-            {ref.url}
+            {normalizeValue(ref.url)}
           </a>
         </div>
       ))}

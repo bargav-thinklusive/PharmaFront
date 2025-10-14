@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatKey } from '../../utils/utils';
+import { formatKey, normalizeValue } from '../../utils/utils';
 import AppendixLink from './AppendixLink';
 
 interface DrugProductProps {
@@ -21,9 +21,9 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
         {strengths.map((v: any, i: number) => (
           <tr key={i}>
             <td className="border border-gray-400 px-2">{i + 1}</td>
-            <td className="border border-gray-400 px-2">{v.type}</td>
-            <td className="border border-gray-400 px-2">{v.strength}</td>
-            <td className="border border-gray-400 px-2">{v.description}</td>
+            <td className="border border-gray-400 px-2">{normalizeValue(v.type)}</td>
+            <td className="border border-gray-400 px-2">{normalizeValue(v.strength)}</td>
+            <td className="border border-gray-400 px-2">{normalizeValue(v.description)}</td>
           </tr>
         ))}
       </tbody>
@@ -46,17 +46,17 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
           <tbody>
             {Object.entries(rest).map(([strengthKey, obj]: any, i) => (
               <tr key={i}>
-                <td className="border border-gray-400 px-2">{strengthKey}</td>
-                <td className="border border-gray-400 px-2">{obj.description}</td>
-                <td className="border border-gray-400 px-2">{obj.packaging}</td>
-                <td className="border border-gray-400 px-2">{obj.type}</td>
+                <td className="border border-gray-400 px-2">{normalizeValue(strengthKey)}</td>
+                <td className="border border-gray-400 px-2">{normalizeValue(obj.description)}</td>
+                <td className="border border-gray-400 px-2">{normalizeValue(obj.packaging)}</td>
+                <td className="border border-gray-400 px-2">{normalizeValue(obj.type)}</td>
               </tr>
             ))}
           </tbody>
         </table>
         {storageTemperature && (
           <p>
-            <strong>Storage Temperature:</strong> {storageTemperature}
+            <strong>Storage Temperature:</strong> {normalizeValue(storageTemperature)}
           </p>
         )}
       </>
@@ -67,7 +67,7 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
     <div>
       {Object.entries(value).map(([k, v], i) => (
         <p key={i}>
-          <strong>{formatKey(k)}:</strong> <AppendixLink text={String(v)} />
+          <strong>{formatKey(k)}:</strong> <AppendixLink text={normalizeValue(v)} />
         </p>
       ))}
     </div>
@@ -75,7 +75,7 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
 
   const renderArrayData = (value: any[]) => (
     <div>
-      {value.map((v: any, i) => <p key={i}>{i + 1}. <AppendixLink text={v} /></p>)}
+      {value.map((v: any, i) => <p key={i}>{i + 1}. <AppendixLink text={normalizeValue(v)} /></p>)}
     </div>
   );
 
@@ -120,7 +120,7 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
         <h2 id={sectionId} className="text-lg font-bold border-blue-400 border-b-3 pb-1 mb-1">
           4.{sectionCounter}. {formatKey(key)}
         </h2>
-        {Array.isArray(value) ? renderArrayData(value) : <p><AppendixLink text={String(value)} /></p>}
+        {Array.isArray(value) ? renderArrayData(value) : <p><AppendixLink text={normalizeValue(value)} /></p>}
       </div>
     );
   };
@@ -133,7 +133,6 @@ const DrugProduct: React.FC<DrugProductProps> = ({ drugProduct }) => {
       {(() => {
         let sectionCounter = 0;
         return Object.entries(drugProduct?.information || {})
-          .filter(([_, value]) => value && value.toString().toLowerCase() !== "n/a")
           .map(([key, value]) => {
             sectionCounter++;
             return renderSection(key, value, sectionCounter);

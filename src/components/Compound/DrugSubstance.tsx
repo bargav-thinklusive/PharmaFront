@@ -1,7 +1,7 @@
 import React from 'react';
 import KeyValueTable from './KeyValueTable';
 import ManufacturingSites from './ManufacturingSites';
-import { formatKey } from '../../utils/utils';
+import { formatKey, normalizeValue } from '../../utils/utils';
 import AppendixLink from './AppendixLink';
 
 interface DrugSubstanceProps {
@@ -40,13 +40,12 @@ const AnalyticalDevelopment: React.FC<{ data: any }> = ({ data }) => (
       3.3. Analytical Development
     </h2>
     {Object.entries(data || {})
-      .filter(([_, value]) => value && value.toString().toLowerCase() !== "n/a")
       .map(([key, value], idx) => (
         <div key={key} className="mb-4 ml-10">
           <h3 id={`section-3-3-${idx + 1}`} className="font-bold border-blue-400 border-b-2 pb-1">
             3.3.{idx + 1} {formatKey(key)}
           </h3>
-          <p><AppendixLink text={String(value)} /></p>
+          <p><AppendixLink text={normalizeValue(value)} /></p>
         </div>
       ))}
   </div>
