@@ -18,7 +18,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const { drugsData, drugsLoading } = useUser();
+  const { drugsData } = useUser();
 
   // Hide suggestions when route changes
   useEffect(() => {

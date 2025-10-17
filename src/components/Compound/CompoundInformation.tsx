@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { drugData } from '../../sampleData/data';
+import { useUser } from '../../context/UserContext';
 import Summary from './Summary';
 import Table from './Table';
 import MarketInformation from './MarketInformation';
@@ -13,8 +13,9 @@ import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 const CompoundInformation: React.FC = () => {
     const { cid } = useParams();
     const { activeSection, handleNavigate } = useIntersectionObserver();
+    const { drugsData } = useUser();
 
-    const drug = drugData.find(d => d.cid === cid);
+    const drug = drugsData.find((d: any) => d.cid === cid);
 
     if (!drug) {
         return (

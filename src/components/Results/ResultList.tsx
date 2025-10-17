@@ -127,7 +127,6 @@
 import React, { useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
-import { drugData } from '../../sampleData/data';
 import { AgGridReact } from 'ag-grid-react';
 import { columns } from './columns';
 import type { GridApi, GridReadyEvent } from 'ag-grid-community';
@@ -151,8 +150,8 @@ const ResultList: React.FC = () => {
   const gridRef = useRef<AgGridReact<any>>(null);
   const { drugsData } = useUser();
 
-  // Use API data if available, otherwise fallback to sample data
-  let categoryArr: any[] = drugsData.length > 0 ? drugsData : drugData;
+  // Use API data only
+  let categoryArr: any[] = drugsData;
 
 
   // Remove duplicates by cid
