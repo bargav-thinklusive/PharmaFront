@@ -439,8 +439,8 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
   };
 
   return (
-    <div >
-      <h3 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">
+    <div className="px-2 sm:px-0">
+      <h3 className="font-bold text-gray-800 mb-3 text-sm sm:text-base uppercase tracking-wide">
         TABLE OF CONTENTS
       </h3>
 

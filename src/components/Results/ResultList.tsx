@@ -199,36 +199,42 @@ const ResultList: React.FC = () => {
 
 
   return (
-    <div className="w-full min-h-[60vh] flex flex-col items-center bg-white/80 py-8">
-      <div className="w-full max-w-5xl ">
+    <div className="w-full min-h-[60vh] flex flex-col items-center bg-white/80 py-4 sm:py-8 px-4 sm:px-0">
+      <div className="w-full max-w-5xl">
 
         {/* Filters, sort, etc. can be added here */}
-        <div className="flex justify-between items-center gap-8 border-b pb-2 mb-4">
-          <span className="font-bold text-blue-900 text-lg">{results.length} results</span>
-          <button onClick={onClickExport} className='bg-blue-500 text-white p-1 rounded'>Export </button>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-8 border-b pb-2 mb-4">
+          <span className="font-bold text-blue-900 text-base sm:text-lg">{results.length} results</span>
+          <button onClick={onClickExport} className='bg-blue-500 text-white px-3 py-2 rounded text-sm sm:text-base w-full sm:w-auto'>Export</button>
         </div>
 
         <div className="test-container">
           <div
             className="ag-theme-quartz"
-            style={{ height: "calc(100vh - 165px)" }}
+            style={{
+              height: window.innerWidth < 640 ? "calc(100vh - 200px)" : "calc(100vh - 165px)",
+              fontSize: window.innerWidth < 640 ? '14px' : '16px'
+            }}
           >
             <AgGridReact
               ref={gridRef}
               rowData={results}
               columnDefs={columns}
               onGridReady={onGridReady}
-              sideBar={{
+              sideBar={window.innerWidth >= 640 ? {
                 toolPanels: ["columns"],
-              }}
+              } : false}
               pagination={true}
-              paginationPageSize={pageSize}
+              paginationPageSize={window.innerWidth < 640 ? 10 : pageSize}
               reactiveCustomComponents={true}
               loadingOverlayComponent={() => <div>Loading...</div>}
               defaultColDef={{
-                filter: true, 
+                filter: true,
+                resizable: window.innerWidth >= 640,
               }}
               rowSelection="single"
+              suppressMovableColumns={window.innerWidth < 640}
+              suppressColumnVirtualisation={window.innerWidth < 640}
             />
           </div>
         </div>

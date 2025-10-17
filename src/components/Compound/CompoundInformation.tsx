@@ -25,11 +25,11 @@ const CompoundInformation: React.FC = () => {
     }
 
     return (
-        <div className="w-full min-h-[60vh] flex flex-col items-center bg-white/80 py-8 text-black">
-            <div className='w-full max-w-7xl flex flex-row gap-4'>
-                <div className='flex-1 flex flex-col gap-6 min-w-0 mr-80'>
+        <div className="w-full min-h-[60vh] flex flex-col items-center bg-white/80 py-4 sm:py-8 text-black px-4 sm:px-0">
+            <div className='w-full max-w-7xl flex flex-col lg:flex-row gap-4'>
+                <div className='flex-1 flex flex-col gap-6 min-w-0 lg:mr-80'>
                     {/* Title and Summary - Section 1 */}
-                    <div className='mb-10' id="section-1">
+                    <div className='mb-6 sm:mb-10' id="section-1">
                         <Summary drug={drug} sectionId={1} />
                     </div>
 
@@ -40,8 +40,17 @@ const CompoundInformation: React.FC = () => {
                     <References references={drug.references} />
                 </div>
 
-                {/* Fixed TOC */}
-                <div className="fixed right-0 top-30 w-80 h-[calc(100vh-12rem)] overflow-y-auto bg-white border border-gray-300 rounded-lg p-4 shadow-lg" style={{ zIndex: 50 }}>
+                {/* Fixed TOC - Hidden on mobile, shown on large screens */}
+                <div className="hidden lg:block fixed right-0 top-30 w-80 h-[calc(100vh-12rem)] overflow-y-auto bg-white border border-gray-300 rounded-lg p-4 shadow-lg" style={{ zIndex: 50 }}>
+                    <Table
+                        drug={drug}
+                        activeSection={activeSection}
+                        onNavigate={handleNavigate}
+                    />
+                </div>
+
+                {/* Mobile TOC - Collapsible */}
+                <div className="lg:hidden w-full bg-white border border-gray-300 rounded-lg p-4 shadow-lg mb-4">
                     <Table
                         drug={drug}
                         activeSection={activeSection}

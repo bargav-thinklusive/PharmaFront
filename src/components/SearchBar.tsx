@@ -18,7 +18,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const { drugsData, drugsLoading } = useUser();
+  const { drugsData } = useUser();
 
   // Hide suggestions when route changes
   useEffect(() => {
@@ -160,14 +160,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <div
-      className={`w-full flex flex-col items-center ${compact ? 'mb-0' : 'mb-8'} relative`}
+      className={`w-full flex flex-col items-center ${compact ? 'mb-0' : 'mb-8'} relative px-4 sm:px-0`}
       ref={wrapperRef}
     >
       <form className="w-full flex justify-center" onSubmit={handleSubmit}>
-        <div className="flex w-full max-w-2xl bg-white rounded shadow overflow-hidden">
+        <div className="flex flex-col sm:flex-row w-full max-w-2xl bg-white rounded shadow overflow-hidden">
           <div className="flex-1 relative">
             <input
-              className="w-full px-6 py-4 text-lg border-0 focus:ring-0 focus:outline-none text-black caret-blue-700 bg-white placeholder-gray-400 pr-12"
+              className="w-full px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-lg border-0 focus:ring-0 focus:outline-none text-black caret-blue-700 bg-white placeholder-gray-400 pr-12"
               type="text"
               placeholder="Search..."
               value={search}
@@ -184,9 +184,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
               </button>
             )}
           </div>
-          <div className="relative">
+          <div className="relative border-t sm:border-t-0 sm:border-l border-gray-200">
             <select
-              className="px-6 py-4 text-lg bg-gray-100 border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium border-l appearance-none pr-10"
+              className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-lg bg-gray-100 border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium appearance-none pr-10"
               value={category}
               onChange={handleCategoryChange}
             >
@@ -205,8 +205,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
       {/* Suggestions dropdown with scroll */}
       {showSuggestions && search.trim() && (
-        <div className="absolute top-full mt-1 w-full max-w-2xl bg-white border border-gray-200 rounded shadow-lg z-[1001]">
-          <ul className="max-h-[50vh] overflow-y-auto text-black">
+        <div className="absolute top-full mt-1 w-full max-w-2xl bg-white border border-gray-200 rounded shadow-lg z-[1001] mx-4 sm:mx-0">
+          <ul className="max-h-[40vh] sm:max-h-[50vh] overflow-y-auto text-black">
             {suggestions.length > 0 ? (
               suggestions.map((item, index) => {
                 const displayText =
@@ -217,7 +217,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 return (
                   <li
                     key={item.cid + "-" + index + "-" + String(displayText)}
-                    className="px-4 py-2 cursor-pointer hover:bg-blue-100 text-black hover:text-black"
+                    className="px-3 sm:px-4 py-3 sm:py-2 cursor-pointer hover:bg-blue-100 text-black hover:text-black text-base sm:text-sm"
                     onClick={() => handleSelect(item)}
                   >
                     {displayText}
@@ -225,7 +225,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 );
               })
             ) : (
-              <li className="px-4 py-3 text-gray-500 text-center">
+              <li className="px-4 py-3 text-gray-500 text-center text-base sm:text-sm">
                 No items found for "{search}" in{" "}
                 {category === "all"
                   ? "any category"

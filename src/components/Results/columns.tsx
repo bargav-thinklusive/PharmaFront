@@ -39,6 +39,8 @@ const BrandNameCellRenderer = (params: any) => {
 };
 
 
+const isMobile = window.innerWidth < 640;
+
 export const columns: any = [
   {
     headerName: "CID",
@@ -47,7 +49,8 @@ export const columns: any = [
     sortable: true,
     filter: true,
     valueFormatter: valueFormatter,
-
+    width: isMobile ? 80 : undefined,
+    hide: false,
   },
   {
     headerName: "Brand Name",
@@ -56,6 +59,8 @@ export const columns: any = [
     sortable: true,
     filter: true,
     cellRenderer: BrandNameCellRenderer,
+    width: isMobile ? 120 : undefined,
+    hide: false,
   },
   {
     headerName: "Generic Name",
@@ -63,7 +68,9 @@ export const columns: any = [
     field: "marketInformation.genericName",
     sortable: true,
     filter: true,
-    valueFormatter: valueFormatter
+    valueFormatter: valueFormatter,
+    width: isMobile ? 120 : undefined,
+    hide: isMobile, // Hide on mobile to save space
   },
   {
     headerName: "Chemical Name",
@@ -71,7 +78,9 @@ export const columns: any = [
     field: "drugSubstance.physicalAndChemicalProperties.chemicalName",
     sortable: true,
     filter: true,
-    valueFormatter: valueFormatter
+    valueFormatter: valueFormatter,
+    width: isMobile ? 150 : undefined,
+    hide: isMobile, // Hide on mobile to save space
   },
   {
     headerName: "Structure Name",
@@ -80,10 +89,10 @@ export const columns: any = [
     wrapText: true,
     autoHeight: true,
     filter: true,
-    width: 350,
+    width: isMobile ? 200 : 350,
     cellStyle: { lineHeight: '2' },
     valueFormatter: valueFormatter,
-
+    hide: isMobile, // Hide on mobile to save space
   },
   {
     headerName: "Element Formula",
@@ -91,7 +100,9 @@ export const columns: any = [
     field: "drugSubstance.physicalAndChemicalProperties.elementalFormula",
     sortable: true,
     filter: true,
-    valueFormatter: valueFormatter
+    valueFormatter: valueFormatter,
+    width: isMobile ? 120 : undefined,
+    hide: isMobile, // Hide on mobile to save space
   },
   {
     headerName: "Molecular Weight",
@@ -99,7 +110,9 @@ export const columns: any = [
     field: "drugSubstance.physicalAndChemicalProperties.molecularWeight",
     sortable: true,
     filter: true,
-    valueFormatter: valueFormatter
+    valueFormatter: valueFormatter,
+    width: isMobile ? 100 : undefined,
+    hide: false,
   },
   {
     headerName: "Approved Date",
@@ -107,7 +120,9 @@ export const columns: any = [
     field: "marketInformation.approvedDate",
     sortable: true,
     filter: true,
-    valueFormatter: valueFormatter
+    valueFormatter: valueFormatter,
+    width: isMobile ? 120 : undefined,
+    hide: isMobile, // Hide on mobile to save space
   },
 
 ]

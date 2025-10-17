@@ -24,3 +24,65 @@ html, body {
   padding: 0;
   /* font-family: 'Roboto',sans-serif; */
 }
+
+/* Mobile-specific styles */
+@media (max-width: 640px) {
+  /* Improve touch targets */
+  button, .cursor-pointer, [role="button"], input[type="submit"], input[type="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Better touch feedback */
+  button:active, .cursor-pointer:active, [role="button"]:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+
+  /* Better scrolling on mobile */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Improve text readability on mobile */
+  body {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* Better form inputs on mobile */
+  input, select, textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  /* Improve table scrolling */
+  .ag-theme-quartz {
+    --ag-grid-size: 6px;
+    --ag-list-item-height: 40px;
+  }
+
+  .ag-theme-quartz .ag-header-cell-text {
+    font-size: 14px;
+  }
+
+  .ag-theme-quartz .ag-cell {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .ag-theme-quartz .ag-header-cell-text {
+    font-size: 15px;
+  }
+
+  .ag-theme-quartz .ag-cell {
+    font-size: 15px;
+  }
+}
