@@ -10491,7 +10491,7 @@ export const drugData=[{
     "indication": "ALK- or ROS1-positive non‑small cell lung cancer (NSCLC), as well as certain forms of ALK-positive anaplastic large cell lymphoma (ALCL) and inflammatory myofibroblastic tumors (IMT)",
     "approvedFor": "Pfizer Inc.",
     "approvedCountries": "Globally approved in more than 90 countries. Approved in the US and EU.",
-    "approvedDate": "2011",
+    "approvedDate": 2011,
     "genericName": "Generic not available yet",
     "genericApprovedDate": "N/A",
     "potentialGenericAvailability": "Nov, 2029 (based on patent expiration, this can change based on legal challenges and licensing agreements.)",

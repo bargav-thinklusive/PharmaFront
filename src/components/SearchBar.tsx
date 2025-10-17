@@ -3,11 +3,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { drugData } from "../sampleData/data";
 import { RxCross2 } from "react-icons/rx";
 import debounce from "lodash/debounce";
+import useGet from "../hooks/useGet";
+import DrugService from "../services/DrugService";
 
 interface SearchBarProps {
   compact?: boolean;
 }
-
+const drugService=new DrugService()
 const SearchBar: React.FC<SearchBarProps> = ({
   compact = false,
 }) => {
@@ -19,6 +21,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const {fetchData,loading,data}=useGet()
+
+  const getDrug=async()=>{
+     await fetchData(drugService.getDrugs())
+    
+  }
+
+  useEffect(()=>{
+    getDrug()
+  },[])
 
   // Hide suggestions when route changes
   useEffect(() => {
@@ -36,7 +48,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
     const matches: any[] = [];
     const seen = new Set<string>();
 
-    drugData.forEach((item) => {
+    // Use API data if available, otherwise fallback to sample data
+    const dataSource = data.length > 0 ? data : drugData;
+
+    dataSource.forEach((item:any) => {
       if (category === "all") {
         const fields = [
           { text: item?.marketInformation?.brandName || "", type: "brandName" },
@@ -97,7 +112,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
     //setSuggestions(matches.slice(0, 50)); // limit to 50 results
     setSuggestions(matches);
-  }, [search, category]);
+  }, [search, category, data]);
 
   const debouncedComputeSuggestions = useCallback(
     debounce(computeSuggestions, 300),

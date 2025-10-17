@@ -2,16 +2,16 @@ import { capitalizeFirstLetter } from "../../utils/utils";
 import { useNavigate, useParams } from "react-router-dom";
 
 
-const valueFormatter = (params: { value?: string | null }): string => {
-  if (params.value && params.value.includes("@")) {
-    return params.value;
-  }
+const valueFormatter = (params: { value?: string | number | null }): string => {
+  if (params.value == null) return "-"; // handle null/undefined
 
   if (typeof params.value === "string") {
-    return capitalizeFirstLetter(params.value) || "-";
-  } else {
-    return params.value || "-";
+    if (params.value.includes("@")) return params.value;
+    return capitalizeFirstLetter(params.value);
   }
+
+  // For numbers or other types
+  return String(params.value);
 };
 
 const BrandNameCellRenderer = (params: any) => {

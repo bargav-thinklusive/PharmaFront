@@ -41,7 +41,7 @@ const CompoundInformation: React.FC = () => {
                 </div>
 
                 {/* Fixed TOC */}
-                <div className="fixed right-0 top-20 w-80 h-[calc(100vh-12rem)] overflow-y-auto bg-white border border-gray-300 rounded-lg p-4 shadow-lg" style={{ zIndex: 50 }}>
+                <div className="fixed right-0 top-30 w-80 h-[calc(100vh-12rem)] overflow-y-auto bg-white border border-gray-300 rounded-lg p-4 shadow-lg" style={{ zIndex: 50 }}>
                     <Table
                         drug={drug}
                         activeSection={activeSection}
