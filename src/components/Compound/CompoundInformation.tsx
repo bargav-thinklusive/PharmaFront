@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { drugData } from '../../sampleData/data';
+import { useUser } from '../../context/UserContext';
 import Summary from './Summary';
 import Table from './Table';
 import MarketInformation from './MarketInformation';
@@ -13,8 +13,9 @@ import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 const CompoundInformation: React.FC = () => {
     const { cid } = useParams();
     const { activeSection, handleNavigate } = useIntersectionObserver();
+    const { drugsData } = useUser();
 
-    const drug = drugData.find(d => d.cid === cid);
+    const drug = drugsData.find((d: any) => d.cid === cid);
 
     if (!drug) {
         return (
@@ -41,7 +42,7 @@ const CompoundInformation: React.FC = () => {
                 </div>
 
                 {/* Fixed TOC */}
-                <div className="fixed right-0 top-20 w-80 h-[calc(100vh-12rem)] overflow-y-auto bg-white border border-gray-300 rounded-lg p-4 shadow-lg" style={{ zIndex: 50 }}>
+                <div className="fixed right-0 top-30 w-80 h-[calc(100vh-12rem)] overflow-y-auto bg-white border border-gray-300 rounded-lg p-4 shadow-lg" style={{ zIndex: 50 }}>
                     <Table
                         drug={drug}
                         activeSection={activeSection}

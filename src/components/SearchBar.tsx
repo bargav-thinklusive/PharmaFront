@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { drugData } from "../sampleData/data";
 import { RxCross2 } from "react-icons/rx";
+import debounce from "lodash/debounce";
+import { useUser } from "../context/UserContext";
 
 interface SearchBarProps {
   compact?: boolean;
 }
-
 const SearchBar: React.FC<SearchBarProps> = ({
   compact = false,
 }) => {
@@ -18,14 +18,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const { drugsData } = useUser();
 
   // Hide suggestions when route changes
   useEffect(() => {
     setShowSuggestions(false);
   }, [location.pathname]);
 
-  // Compute suggestions
-  useEffect(() => {
+  // Compute suggestions with debouncing
+  const computeSuggestions = useCallback(() => {
     if (!search.trim()) {
       setSuggestions([]);
       return;
@@ -35,7 +36,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
     const matches: any[] = [];
     const seen = new Set<string>();
 
-    drugData.forEach((item) => {
+    // Use API data if available, otherwise fallback to sample data
+    const dataSource = drugsData.length > 0 ? drugsData.data :[]
+
+    dataSource.forEach((item:any) => {
       if (category === "all") {
         const fields = [
           { text: item?.marketInformation?.brandName || "", type: "brandName" },
@@ -96,7 +100,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
     //setSuggestions(matches.slice(0, 50)); // limit to 50 results
     setSuggestions(matches);
-  }, [search, category]);
+  }, [search, category, drugsData]);
+
+  const debouncedComputeSuggestions = useCallback(
+    debounce(computeSuggestions, 300),
+    [computeSuggestions]
+  );
+
+  useEffect(() => {
+    debouncedComputeSuggestions();
+  }, [debouncedComputeSuggestions]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
