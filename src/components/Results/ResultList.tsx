@@ -126,6 +126,7 @@
 
 import React, { useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import { useUser } from '../../context/UserContext';
 import { drugData } from '../../sampleData/data';
 import { AgGridReact } from 'ag-grid-react';
 import { columns } from './columns';
@@ -148,10 +149,10 @@ const pageSize = 20; // Number of rows per page
 const ResultList: React.FC = () => {
   const { searchtext } = useParams();
   const gridRef = useRef<AgGridReact<any>>(null);
+  const { drugsData } = useUser();
 
-
-  // Use drugData as the data source
-  let categoryArr: any[] = drugData;
+  // Use API data if available, otherwise fallback to sample data
+  let categoryArr: any[] = drugsData.length > 0 ? drugsData : drugData;
 
 
   // Remove duplicates by cid
