@@ -51,79 +51,79 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
   };
 
   return (
-    <header className={`flex items-center bg-[#36b669] text-white px-6 py-3 fixed top-0 left-0 w-full z-[1000] ${showSearchBar ? 'justify-between' : 'justify-between'}`}>
+    <header className={`flex flex-col sm:flex-row items-center bg-[#36b669] text-white px-4 sm:px-6 py-3 fixed top-0 left-0 w-full z-[1000] ${showSearchBar ? 'justify-between' : 'justify-between'}`}>
       {/* Logo Section */}
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 mb-2 sm:mb-0">
         {showMinimalHeader ? (
           <div className="flex items-center gap-2">
-            <img src={CompanyLogo} alt="Logo"  className="h-10" />
-            <span className="font-bold text-xl">CMCINTEL</span>
+            <img src={CompanyLogo} alt="Logo"  className="h-8 sm:h-10" />
+            <span className="font-bold text-lg sm:text-xl">CMCINTEL</span>
           </div>
         ) : (
           <Link
             to="/home"
             className="flex items-center gap-2 text-white no-underline"
           >
-            <img src={CompanyLogo} alt="Logo" className="h-10" />
-            <span className="font-bold text-xl">CMCINTEL</span>
+            <img src={CompanyLogo} alt="Logo" className="h-8 sm:h-10" />
+            <span className="font-bold text-lg sm:text-xl">CMCINTEL</span>
           </Link>
         )}
       </div>
 
       {/* Center Search Bar */}
       {showSearchBar && (
-        <div className="flex-1 max-w-2xl mx-8">
+        <div className="flex-1 max-w-2xl mx-0 sm:mx-8 w-full sm:w-auto mb-2 sm:mb-0">
           <SearchBar compact={true} />
         </div>
       )}
 
       {/* Navigation Section */}
-      <nav className="flex gap-4 items-center flex-shrink-0">
+      <nav className="flex gap-2 sm:gap-4 items-center flex-shrink-0 flex-wrap justify-center sm:justify-end">
         {showMinimalHeader ? (
           <>
             <Link
               to="/about"
               state={{ fromLogin: true }}
-              className="text-white no-underline"
+              className="text-white no-underline text-sm sm:text-base"
             >
               About
             </Link>
             <Link
               to="/contacts"
               state={{ fromLogin: true }}
-              className="text-white no-underline"
+              className="text-white no-underline text-sm sm:text-base"
             >
               Contacts
             </Link>
           </>
         ) : (
           <>
-            <Link to="/home" className="text-white no-underline">
+            <Link to="/home" className="text-white no-underline text-sm sm:text-base">
               Home
             </Link>
-            <Link to="/about" className="text-white no-underline">
+            <Link to="/about" className="text-white no-underline text-sm sm:text-base">
               About
             </Link>
-            <Link to="/contacts" className="text-white no-underline">
+            <Link to="/contacts" className="text-white no-underline text-sm sm:text-base">
               Contacts
             </Link>
 
             {/* User Dropdown */}
             <div
               ref={dropdownRef}
-              className="ml-8 relative"
+              className="relative ml-2 sm:ml-8"
             >
               <span
-                className="cursor-pointer font-bold"
+                className="cursor-pointer font-bold text-sm sm:text-base"
                 onClick={() => setDropdownOpen((p) => !p)}
               >
                 👤 User
               </span>
               {dropdownOpen && (
-                <div className="absolute top-full right-0 bg-white border border-gray-300 rounded-md shadow-md mt-2 min-w-[100px] overflow-hidden">
+                <div className="absolute top-full right-0 bg-white border border-gray-300 rounded-md shadow-md mt-2 min-w-[100px] overflow-hidden z-[1001]">
                   <Link
                     to="/profile"
-                    className="block px-4 py-2 border-b border-gray-300 text-black hover:bg-[#3678f4ff] hover:text-white transition-colors duration-200"
+                    className="block px-4 py-2 border-b border-gray-300 text-black hover:bg-[#3678f4ff] hover:text-white transition-colors duration-200 text-sm sm:text-base"
                     onClick={() => setDropdownOpen(false)}
                   >
                     Profile
@@ -131,7 +131,7 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
 
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-black hover:bg-[#3678f4ff] hover:text-white transition-colors duration-200 cursor-pointer"
+                    className="w-full text-left px-4 py-2 text-black hover:bg-[#3678f4ff] hover:text-white transition-colors duration-200 cursor-pointer text-sm sm:text-base"
                   >
                     Logout
                   </button>
