@@ -21,15 +21,15 @@ const Login: React.FC = () => {
   const [error, setError] = useState("");
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { checkTokenAndGetUser } = useUser();
+  //const { checkTokenAndGetUser } = useUser();
 
-console.log(checkTokenAndGetUser,loading)
+//console.log(checkTokenAndGetUser,loading)
 
-  useEffect(() => {
-    if (TokenService.getToken()) {
-      navigate("/home");
-    }
-  }, [navigate]);
+  // useEffect(() => {
+  //   if (TokenService.getToken()) {
+  //     navigate("/home");
+  //   }
+  // }, [navigate]);
 
   const validateEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -54,15 +54,16 @@ console.log(checkTokenAndGetUser,loading)
       if (!password) return setError("Please enter password");
 
       setError("");
-      await toast.promise(
-        authService.login(email, password),
-        {
-          success: {
-            render: "Login successful!",
-            onClose: () => navigate("/home")
-          },
-        }
-      );
+      // await toast.promise(
+      //   authService.login(email, password),
+      //   {
+      //     success: {
+      //       render: "Login successful!",
+      //       onClose: () => navigate("/home")
+      //     },
+      //   }
+      // );
+      navigate("/home");
     } catch (error: any) {
       // Error is already handled by toast.promise
       toast.error(error.response?.data?.detail || "An error occurred during login")
@@ -90,8 +91,8 @@ console.log(checkTokenAndGetUser,loading)
         return setError("New password and retype new password not matched");
       }
 
-      await authService.forgotPassword(email, newPassword);
-      toast.success("Password reset successfully!");
+      //await authService.forgotPassword(email, newPassword);
+      //toast.success("Password reset successfully!");
 
       setTimeout(() => {
         setIsForgotPassword(false);

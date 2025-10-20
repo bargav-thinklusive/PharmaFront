@@ -2,8 +2,24 @@ import { capitalizeFirstLetter } from "../../utils/utils";
 import { useNavigate, useParams } from "react-router-dom";
 
 
-const valueFormatter = (params: { value?: string | number | null }): string => {
+const valueFormatter = (params: { value?: string | number | null | object }): string => {
   if (params.value == null) return "-"; // handle null/undefined
+
+  if (typeof params.value === "object") {
+    // Handle object values like chemicalName which is an object with keys
+    if (params.value && typeof params.value === 'object') {
+      const obj = params.value as Record<string, any>;
+      const entries = Object.entries(obj);
+      if (entries.length > 0) {
+        // Format as "Key: Value" pairs, one per line
+        const formattedValues = entries
+          .filter(([key, value]) => typeof value === 'string' && value.trim())
+          .map(([key, value]) => `${key}:${value}`);
+        return formattedValues.length > 0 ? formattedValues.join('\n') : "-";
+      }
+    }
+    return "-";
+  }
 
   if (typeof params.value === "string") {
     if (params.value.includes("@")) return params.value;
@@ -46,6 +62,7 @@ export const columns: any = [
     field: "cid",
     sortable: true,
     filter: true,
+    width: 100,
     valueFormatter: valueFormatter,
 
   },
@@ -63,6 +80,9 @@ export const columns: any = [
     field: "marketInformation.genericName",
     sortable: true,
     filter: true,
+    wrapText: true,
+    autoHeight: true,
+    cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' },
     valueFormatter: valueFormatter
   },
   {
@@ -71,6 +91,9 @@ export const columns: any = [
     field: "drugSubstance.physicalAndChemicalProperties.chemicalName",
     sortable: true,
     filter: true,
+    wrapText: true,
+    autoHeight: true,
+    cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' },
     valueFormatter: valueFormatter
   },
   {
@@ -91,6 +114,9 @@ export const columns: any = [
     field: "drugSubstance.physicalAndChemicalProperties.elementalFormula",
     sortable: true,
     filter: true,
+    wrapText: true,
+    autoHeight: true,
+    cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' },
     valueFormatter: valueFormatter
   },
   {
@@ -99,6 +125,9 @@ export const columns: any = [
     field: "drugSubstance.physicalAndChemicalProperties.molecularWeight",
     sortable: true,
     filter: true,
+    wrapText: true,
+    autoHeight: true,
+    cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' },
     valueFormatter: valueFormatter
   },
   {
@@ -109,5 +138,13 @@ export const columns: any = [
     filter: true,
     valueFormatter: valueFormatter
   },
+  {
+    headerName: "Approved Countries",
+    headerClass: "table-header",
+    field: "marketInformation.approvedFor",
+    sortable: true,
+    filter: true,
+    valueFormatter: valueFormatter
+  }
 
 ]

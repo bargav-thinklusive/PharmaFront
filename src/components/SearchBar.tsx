@@ -37,63 +37,71 @@ const SearchBar: React.FC<SearchBarProps> = ({
     const matches: any[] = [];
     const seen = new Set<string>();
 
-    // Use API data if available, otherwise fallback to sample data
-    const dataSource = drugsData.length > 0 ? drugsData.data :[]
+    // Use sample data directly
+    const dataSource = drugData
 
     drugData?.forEach((item:any) => {
       if (category === "all") {
-        const fields = [
-          { text: item?.marketInformation?.brandName || "", type: "brandName" },
-          { text: item?.marketInformation?.genericName || "", type: "genericName" },
-          {
-            text:
-              item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName ||
-              "",
-            type: "chemicalName",
-          },
-          {
-            text:
-              item?.drugSubstance?.physicalAndChemicalProperties?.structureName ||
-              "",
-            type: "structureName",
-          },
-          { text: item?.cid || "", type: "cid" },
-          //{ text: item?.marketInformation?.indication || "", type: "indication" },
-        ];
-
-        fields.forEach((field) => {
-          if (field.text && field.text.toLowerCase().includes(q)) {
-            const key = `${item.cid}-${field.text}`;
-            if (!seen.has(key)) {
-              seen.add(key);
-              matches.push({
-                ...item,
-                matchedField: field.type,
-                matchedText: field.text,
-              });
-            }
+        // Check brandName
+        if (item?.marketInformation?.brandName && typeof item.marketInformation.brandName === 'string' && item.marketInformation.brandName.toLowerCase().includes(q)) {
+          const key = `${item.cid}-brandName-${item.marketInformation.brandName}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            matches.push({ ...item, matchedText: item.marketInformation.brandName });
           }
-        });
+        }
+        // Check genericName
+        if (item?.marketInformation?.genericName && typeof item.marketInformation.genericName === 'string' && item.marketInformation.genericName.toLowerCase().includes(q)) {
+          const key = `${item.cid}-genericName-${item.marketInformation.genericName}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            matches.push({ ...item, matchedText: item.marketInformation.genericName });
+          }
+        }
+        // Check chemicalName
+        if (item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName && typeof item.drugSubstance.physicalAndChemicalProperties.chemicalName === 'string' && item.drugSubstance.physicalAndChemicalProperties.chemicalName.toLowerCase().includes(q)) {
+          const key = `${item.cid}-chemicalName-${item.drugSubstance.physicalAndChemicalProperties.chemicalName}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            matches.push({ ...item, matchedText: item.drugSubstance.physicalAndChemicalProperties.chemicalName });
+          }
+        }
+        // Check structureName
+        if (item?.drugSubstance?.physicalAndChemicalProperties?.structureName && typeof item.drugSubstance.physicalAndChemicalProperties.structureName === 'string' && item.drugSubstance.physicalAndChemicalProperties.structureName.toLowerCase().includes(q)) {
+          const key = `${item.cid}-structureName-${item.drugSubstance.physicalAndChemicalProperties.structureName}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            matches.push({ ...item, matchedText: item.drugSubstance.physicalAndChemicalProperties.structureName });
+          }
+        }
+        // Check cid
+        if (item?.cid && typeof item.cid === 'string' && item.cid.toLowerCase().includes(q)) {
+          const key = `${item.cid}-cid-${item.cid}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            matches.push({ ...item, matchedText: item.cid });
+          }
+        }
       } else if (category === "brandName") {
         const text = item?.marketInformation?.brandName || "";
-        if (text && text.toLowerCase().includes(q)) {
+        if (text && typeof text === 'string' && text.toLowerCase().includes(q)) {
           matches.push({ ...item, matchedText: text });
         }
       } else if (category === "genericName") {
         const text = item?.marketInformation?.genericName || "";
-        if (text && text.toLowerCase().includes(q)) {
+        if (text && typeof text === 'string' && text.toLowerCase().includes(q)) {
           matches.push({ ...item, matchedText: text });
         }
       } else if (category === "chemicalName") {
         const text =
           item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName || "";
-        if (text && text.toLowerCase().includes(q)) {
+        if (text && typeof text === 'string' && text.toLowerCase().includes(q)) {
           matches.push({ ...item, matchedText: text });
         }
       } else if (category === "structureName") {
         const text =
           item?.drugSubstance?.physicalAndChemicalProperties?.structureName || "";
-        if (text && text.toLowerCase().includes(q)) {
+        if (text && typeof text === 'string' && text.toLowerCase().includes(q)) {
           matches.push({ ...item, matchedText: text });
         }
       }
