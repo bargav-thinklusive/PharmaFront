@@ -1,12 +1,10 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import SearchBar from '../SearchBar';
-import { useState, useEffect } from 'react';
 import { drugData } from '../../sampleData/data';
 
 
 const ResultList: React.FC = () => {
-  const { ccategory, searchtext, cid } = useParams();
+  const { ccategory, searchtext } = useParams();
   const navigate = useNavigate();
 
 
@@ -38,19 +36,10 @@ const ResultList: React.FC = () => {
     return getAllSearchableStrings(item).some(str => str.toLowerCase().includes(search));
   });
 
-  // Keep the search text in the search bar
-  const [searchValue, setSearchValue] = useState(searchtext || '');
-  useEffect(() => {
-    setSearchValue(searchtext || '');
-  }, [searchtext]);
 
   return (
     <div className="w-full min-h-[60vh] flex flex-col items-center bg-white/80 py-8">
       <div className="w-full max-w-5xl ">
-        {/* SearchBar with value controlled by searchValue */}
-          {searchtext && !cid && (
-            <SearchBar value={searchValue} setValue={setSearchValue} initialCategory={ccategory} disableCategorySelect={true} />
-          )}
         {/* Filters, sort, etc. can be added here */}
         <div className="flex items-center gap-8 border-b pb-2 mb-4">
           <span className="font-bold text-blue-900 text-lg">{results.length} results</span>

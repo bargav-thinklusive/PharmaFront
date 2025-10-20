@@ -1,9 +1,9 @@
 import React from 'react';
 import UniversalDataRenderer from '../Universal/UniversalDataRenderer';
-
 interface AppendicesSectionProps {
   appendices: any;
 }
+
 
 const AppendicesSection: React.FC<AppendicesSectionProps> = ({ appendices }) => {
   return (

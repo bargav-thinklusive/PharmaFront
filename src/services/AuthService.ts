@@ -22,8 +22,20 @@ class AuthService {
     }
   }
 
-  logout() {
-    TokenService.deleteToken();  
+  async forgotPassword(email: string, newPassword: string) {
+    const payload={email,new_password:newPassword}
+    try {
+      const resp = await axios.post(`${this.baseUrl}/forgot-password`, payload);
+      return resp.data;
+    } catch (error) {
+      console.error("Something went wrong while resetting password", error);
+      throw error;
+    }
+  }
+
+  static logout() {
+    TokenService.deleteToken();
+    localStorage.removeItem('user');
     return true;
   }
 

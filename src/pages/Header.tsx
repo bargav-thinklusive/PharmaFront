@@ -1,6 +1,9 @@
+
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import CompanyLogo from "../assets/cmcintel.png"
+import CompanyLogo from "../assets/cmcintel.png";
+import SearchBar from "../components/SearchBar";
+import AuthService from "../services/AuthService";
 
 interface HeaderProps {
   isLoginPage?: boolean; // optional prop to indicate if on login page
@@ -38,107 +41,86 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
   // minimal header condition
   const showMinimalHeader = isLoginPage || (isAboutOrContacts && fromLogin);
 
+  // show search bar condition (not on home page and not on login/minimal pages)
+  const showSearchBar = !isLoginPage && location.pathname !== "/home" && !showMinimalHeader;
+
   const handleLogout = () => {
-    localStorage.removeItem("user"); // adjust if you use auth context
+    AuthService.logout(); // This deletes token and localStorage user
     setDropdownOpen(false);
     navigate("/login");
   };
 
   return (
-    <header
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        background: "#36b669",
-        color: "white",
-        padding: "0.75rem 1.5rem",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        zIndex: 1000,
-      }}
-    >
-      {/* Logo (not clickable in minimal mode) */}
-      {showMinimalHeader ? (
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <img src={CompanyLogo} alt="Logo" style={{ height: "40px" }} />
-          <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>CMCINTEL</span>
+    <header className={`flex items-center bg-[#36b669] text-white px-6 py-3 fixed top-0 left-0 w-full z-[1000] ${showSearchBar ? 'justify-between' : 'justify-between'}`}>
+      {/* Logo Section */}
+      <div className="flex-shrink-0">
+        {showMinimalHeader ? (
+          <div className="flex items-center gap-2">
+            <img src={CompanyLogo} alt="Logo"  className="h-10" />
+            <span className="font-bold text-xl">CMCINTEL</span>
+          </div>
+        ) : (
+          <Link
+            to="/home"
+            className="flex items-center gap-2 text-white no-underline"
+          >
+            <img src={CompanyLogo} alt="Logo" className="h-10" />
+            <span className="font-bold text-xl">CMCINTEL</span>
+          </Link>
+        )}
+      </div>
+
+      {/* Center Search Bar */}
+      {showSearchBar && (
+        <div className="flex-1 max-w-2xl mx-8">
+          <SearchBar compact={true} />
         </div>
-      ) : (
-        <Link
-          to="/home"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            color: "white",
-            textDecoration: "none",
-          }}
-        >
-          <img src={CompanyLogo} alt="Logo" style={{ height: "40px" }} />
-          <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>CMCINTEL</span>
-        </Link>
       )}
 
-      {/* Navigation */}
-      <nav style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+      {/* Navigation Section */}
+      <nav className="flex gap-4 items-center flex-shrink-0">
         {showMinimalHeader ? (
           <>
             <Link
               to="/about"
               state={{ fromLogin: true }}
-              style={{ color: "white", textDecoration: "none" }}
+              className="text-white no-underline"
             >
               About
             </Link>
             <Link
               to="/contacts"
               state={{ fromLogin: true }}
-              style={{ color: "white", textDecoration: "none" }}
+              className="text-white no-underline"
             >
               Contacts
             </Link>
           </>
         ) : (
           <>
-            <Link to="/home" style={{ color: "white", textDecoration: "none" }}>
+            <Link to="/home" className="text-white no-underline">
               Home
             </Link>
-            <Link to="/about" style={{ color: "white", textDecoration: "none" }}>
+            <Link to="/about" className="text-white no-underline">
               About
             </Link>
-            <Link to="/contacts" style={{ color: "white", textDecoration: "none" }}>
+            <Link to="/contacts" className="text-white no-underline">
               Contacts
             </Link>
 
             {/* User Dropdown */}
             <div
               ref={dropdownRef}
-              style={{ marginLeft: "2rem", position: "relative" }}
+              className="ml-8 relative"
             >
               <span
-                style={{ cursor: "pointer", fontWeight: "bold" }}
+                className="cursor-pointer font-bold"
                 onClick={() => setDropdownOpen((p) => !p)}
               >
                 👤 User
               </span>
               {dropdownOpen && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "100%",
-                    right: 0,
-                    background: "white",
-                    border: "1px solid #ccc",
-                    borderRadius: "6px",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                    marginTop: "0.5rem",
-                    minWidth: "100px",
-                    overflow: "hidden",
-                  }}
-                >
+                <div className="absolute top-full right-0 bg-white border border-gray-300 rounded-md shadow-md mt-2 min-w-[100px] overflow-hidden">
                   <Link
                     to="/profile"
                     className="block px-4 py-2 border-b border-gray-300 text-black hover:bg-[#3678f4ff] hover:text-white transition-colors duration-200"
@@ -165,5 +147,3 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
 };
 
 export default Header;
-
-

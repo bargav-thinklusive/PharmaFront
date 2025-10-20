@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import usePost from "../hooks/usePost";
 import LoginService from "../services/LoginService";
 import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import TokenService from "../services/shared/TokenService";
 
 const login = new LoginService();
 
@@ -16,6 +17,12 @@ const Register: React.FC = () => {
   const [error, setError] = useState("");
   const { postData, loading } = usePost();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (TokenService.getToken()) {
+      navigate("/home");
+    }
+  }, [navigate]);
 
   const validateEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -52,9 +59,15 @@ const Register: React.FC = () => {
       console.log("Registration successful:", response);
       toast.success("🎉 Registration successful!");
       setTimeout(() => navigate("/login"), 2000); // redirect after 2s
-    } catch (err) {
-      setError("Registration failed. Please try again.");
-      toast.error("Registration failed. Please try again.");
+    } catch (err: any) {
+      if (err.response?.data?.detail === "Email already registered") {
+        setError("Email already registered. Please use a different email.");
+        toast.error("Email already registered. Please use a different email.");
+      } else {
+        setError("Registration failed. Please try again.");
+        toast.error("Registration failed. Please try again.");
+      }
+      console.error("Registration error:", err);
     }
   };
 
@@ -76,10 +89,10 @@ const Register: React.FC = () => {
       />
 
 
-      <div className="fixed inset-0 flex justify-center items-center bg-gradient-to-br from-green-700 to-blue-500 overflow-hidden">
+      <div className="flex justify-center items-center min-h-screen w-screen bg-gradient-to-br from-green-700 to-blue-500 fixed inset-0 pt-16">
         <form
           onSubmit={handleSubmit}
-          className="bg-white p-8 rounded-xl shadow-lg w-[400px] max-w-[90vw] flex flex-col gap-4"
+          className="bg-white p-8 rounded-xl shadow-lg w-[450px] h-auto min-h-[500px] max-w-[90vw] flex flex-col gap-5 justify-center"
         >
           <h2 className="text-2xl font-bold text-center text-green-700">Register</h2>
 

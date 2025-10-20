@@ -5,6 +5,7 @@ interface DrugSubstanceProps {
   drugSubstance: any;
 }
 
+
 const DrugSubstance: React.FC<DrugSubstanceProps> = ({ drugSubstance }) => {
   return (
     <UniversalDataRenderer
