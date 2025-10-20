@@ -57,16 +57,15 @@ console.log(checkTokenAndGetUser,loading)
       await toast.promise(
         authService.login(email, password),
         {
-          pending: "Logging in...",
           success: {
             render: "Login successful!",
             onClose: () => navigate("/home")
           },
-          error: "Login failed. Please check your credentials."
         }
       );
     } catch (error: any) {
       // Error is already handled by toast.promise
+      toast.error(error.response?.data?.detail || "An error occurred during login")
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,5 @@
 import React from "react";
+import { useUser } from "../../context/UserContext";
 import { drugData } from "../../sampleData/data";
 
 interface AppendicesProps {
@@ -34,12 +35,13 @@ const renderValue = (value: any) => {
 };
 
 const Appendices: React.FC<AppendicesProps> = ({ data }) => {
+  const { drugsData } = useUser();
   const drugs = data || drugData;
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Appendices</h1>
-      {drugs.map((drug, drugIndex) => (
+      {drugs.map((drug: any, drugIndex: number) => (
         <div key={drugIndex} className="mb-10">
           <h2 className="text-xl font-bold mb-4">
             {drug.marketInformation?.brandName}

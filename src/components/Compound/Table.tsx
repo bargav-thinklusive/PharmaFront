@@ -441,7 +441,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
   return (
     <div >
       <h3 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">
-        CONTENTS
+        TABLE OF CONTENTS
       </h3>
 
       {sectionStructure.map((section) => {

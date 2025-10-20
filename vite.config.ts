@@ -10,9 +10,7 @@ export default defineConfig({
     port: 3004,
     allowedHosts: true,
     cors: true,
-    hmr: {
-      overlay: true,
-    },
+    hmr: false,
   },
   base: "/"
 })
