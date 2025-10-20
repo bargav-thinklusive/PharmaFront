@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { RxCross2 } from "react-icons/rx";
 import debounce from "lodash/debounce";
 import { useUser } from "../context/UserContext";
+import { drugData } from "../sampleData/data";
 
 interface SearchBarProps {
   compact?: boolean;
@@ -39,7 +40,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     // Use API data if available, otherwise fallback to sample data
     const dataSource = drugsData.length > 0 ? drugsData.data :[]
 
-    dataSource.forEach((item:any) => {
+    drugData?.forEach((item:any) => {
       if (category === "all") {
         const fields = [
           { text: item?.marketInformation?.brandName || "", type: "brandName" },

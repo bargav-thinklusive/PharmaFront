@@ -7,11 +7,9 @@ class DrugService {
 
   constructor() {
     this.baseUrl = REACT_API_URL;
-    console.log("DrugService Base URL:", this.baseUrl);
   }
 
   getDrugById = (drug_id: string) => {
-    console.log("DrugService Base URL:", this.baseUrl);
     return `${this.baseUrl}/drug/${drug_id}`;
   };
   // Create operation

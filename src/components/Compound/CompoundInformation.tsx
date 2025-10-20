@@ -9,13 +9,14 @@ import DrugProduct from './DrugProduct';
 import AppendicesSection from './AppendicesSection';
 import References from './References';
 import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
+import { drugData } from '../../sampleData/data';
 
 const CompoundInformation: React.FC = () => {
     const { cid } = useParams();
     const { activeSection, handleNavigate } = useIntersectionObserver();
     const { drugsData } = useUser();
 
-    const drug = drugsData.find((d: any) => d.cid === cid);
+    const drug = drugData.find((d: any) => d.cid === cid);
 
     if (!drug) {
         return (

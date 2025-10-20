@@ -1,5 +1,6 @@
 import React from "react";
 import { useUser } from "../../context/UserContext";
+import { drugData } from "../../sampleData/data";
 
 interface AppendicesProps {
   data?: any[];
@@ -35,7 +36,7 @@ const renderValue = (value: any) => {
 
 const Appendices: React.FC<AppendicesProps> = ({ data }) => {
   const { drugsData } = useUser();
-  const drugs = data || drugsData;
+  const drugs = data || drugData;
 
   return (
     <div>

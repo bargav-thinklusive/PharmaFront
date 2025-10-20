@@ -136,6 +136,9 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import '../../components/AgGridHeaderStyle/AgGridHeaderStyle.css';
 import './ResultList.css';
 import { ColumnsToolPanelModule, ExcelExportModule } from 'ag-grid-enterprise';
+import { drugData } from '../../sampleData/data';
+import { BiBell } from 'react-icons/bi';
+import { MdHistory } from 'react-icons/md';
 
 
 // Register AG Grid modules
@@ -151,7 +154,7 @@ const ResultList: React.FC = () => {
   const { drugsData } = useUser();
 
   // Use API data only
-  let categoryArr: any[] = drugsData;
+  let categoryArr: any[] = drugData;
 
 
   // Remove duplicates by cid
@@ -204,7 +207,11 @@ const ResultList: React.FC = () => {
         {/* Filters, sort, etc. can be added here */}
         <div className="flex justify-between items-center gap-8 border-b pb-2 mb-4">
           <span className="font-bold text-blue-900 text-lg">{results.length} results</span>
-          <button onClick={onClickExport} className='bg-blue-500 text-white p-1 rounded'>Export </button>
+          <div className='flex justify-between items-center gap-2'>
+            <button><BiBell size={25} /></button>
+            <button><MdHistory size={25} /></button>
+            <button onClick={onClickExport} className='bg-blue-500 text-white p-1 rounded'>Export </button>
+          </div>
         </div>
 
         <div className="test-container">
