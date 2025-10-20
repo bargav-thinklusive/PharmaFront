@@ -10881,7 +10881,415 @@ export const drugData=[{
     }
   ]
 },
-
+[{
+  "cid": "D002",
+  "marketInformation": {
+    "brandName": "Exblifep (cefepime and enmetazobactam)",
+    "indication": "complicated urinary tract infections (cUTI) including pyelonephritis, caused by susceptible strains of Escherichia coli, Klebsiella pneumoniae, Pseudomonas aeruginosa, Proteus mirabilis, and Enterobacter cloacae complex.",
+    "approvedFor": "Allecra Therapeutics",
+    "approvedCountries": "United States, European Union, United Kingdom, Switzerland, Norway, Gulf Cooperation Council (GCC) Countries: Bahrain, Kuwait, Oman, Qatar, Saudi Arabia, and the United Arab Emirates, South Africa",
+    "approvedDate": "22 Feb 2024",
+    "genericName": "Cefepime and enmetazobactam",
+    "genericApprovedDate": "N/A",
+    "potentialGenericAvailability": "Not available",
+    "specialStatus": "Exblifep (cefepime and enmetazobactam) has been granted several special statuses by the U.S. Food and Drug Administration (FDA) to incentivize the development of new anti-infective drugs. These statuses, which were granted to Exblifep's manufacturer, Allecra Therapeutics, include: Qualified Infectious Disease Product (QIDP) status: This designation is given to antibacterial or antifungal drugs that treat serious or life-threatening infections. QIDP is intended to combat the growing threat of antimicrobial resistance. Fast Track designation: This process is designed to expedite the review of drugs that treat serious conditions and fill an unmet medical need. These designations provided Allecra with significant incentives: Priority Review: QIDP status makes the drug eligible for a faster-than-normal review process by the FDA. Market Exclusivity Extension: Under the Generating Antibiotic Incentives Now (GAIN) Act, which created the QIDP designation, Exblifep was awarded an additional five years of market exclusivity.",
+    "patentExclusivityInfo": "Exblifep has patent exclusivity information that includes an estimated generic launch date in November 2034, a 5-year market exclusivity extension through the GAIN Act, and several US patents filed in 2024 that have not yet expired. Its patent challenges can begin in 2033.",
+    "References": ""
+  },
+  "drugSubstance": {
+    "physicalAndChemicalProperties": {
+      "chemicalName": {
+        "Cefepime": "1-[[(6R,7R)-7-[[(2Z)-2-(2-amino-4-thiazolyl)-2-(methoxyimino)acetyl]amino]-2-carboxy-8-oxo-5-thia-1-azabicyclo[4.2.0]oct-2-en-3-yl]methyl]-1-methyl-pyrrolidinium, monochloride, monohydrate.",
+        "Enmetazobactam": "(2S,3S,5R)-3-methyl-3-[(3-methyltriazol-3-ium-1-yl)methyl]-4,4,7-trioxo-4λ6-thia-1-azabicyclo[3.2.0]heptane-2-carboxylate."
+      },
+      "chemicalStructure": {
+        "Cefepime": "[structure image]",
+        "Enmetazobactam": "[structure image]"
+      },
+      "potencyClassification": "",
+      "elementalFormula": {
+        "Cefepime": "C19H24N6O5S2",
+        "Enmetazobactam": "C11H14N4O5S"
+      },
+      "bcsClass": {
+        "Cefepime": "BCS Class III",
+        "Enmetazobactam": "Not available"
+      },
+      "molecularWeight": {
+        "Cefepime": "480.6 g/mol",
+        "Enmetazobactam": "314.32 g/mol"
+      },
+      "averageIsotopicMass": {
+        "Cefepime": "480.12496023 Da (monoisotopic mass)",
+        "Enmetazobactam": "314.06849073 Da"
+      },
+      "structureName": "",
+      "solubility": {
+        "Cefepime": {
+          "cefepimeHydrochloride": {
+            "description": "The form of cefepime used for injectable medication is a hydrochloride salt, which is formulated for high solubility in water.",
+            "water": "It is highly and easily soluble in water. The hydrochloride salt is added to the formulation specifically to enhance its aqueous solubility.",
+            "aqueousSolutions": "Cefepime hydrochloride is readily soluble in various aqueous solutions, including IV solutions and phosphate-buffered saline (PBS). A solubility of approximately 10 mg/ml in PBS (pH 7.2) has been reported.",
+            "methanol": "Cefepime dihydrochloride hydrate is reported as soluble in methanol.",
+            "ethanol": "It is only slightly soluble in ethanol."
+          },
+          "pureCefepime": {
+            "description": "The base compound, which is a zwitterion (containing both positive and negative charges), is less soluble in water than its hydrochloride salt.",
+            "water": "Pure cefepime is considered only slightly soluble or sparingly soluble in water. PubChem reports a solubility of 0.0173 mg/ml in water.",
+            "dmso": "It is soluble in organic solvents like dimethyl sulfoxide (DMSO). For example, cefepime hydrochloride hydrate has a solubility of about 0.2 mg/ml in DMSO"
+          }
+        },
+        "Enmetazobactam": {
+          "dmso": "Enmetazobactam is known to be soluble in DMSO, a common solvent in scientific research.",
+          "ethanol": "soluble in Ethanol",
+          "water": "It is sparingly soluble in pure water, meaning its solubility is less than 1 mg/mL.",
+          "formulationWithSBECD": "Formulations combining enmetazobactam with sulfobutylether-β-cyclodextrin (SBE-β-CD) in saline can achieve higher concentrations, such as ≥ 2.08 mg/mL.",
+          "solventCombinations": "When preparing the drug for use in animal studies, protocols combine DMSO stock solution with 20% SBE-β-CD in Saline to create a higher concentration solution.",
+          "concentrationAndTemperature": "Solubility can increase with higher concentration or elevated temperatures, as seen with its solubility in water at 40°C compared to 25°C."
+        }
+      },
+      "pka": {
+        "Cefepime": {
+          "strongestAcidic": "2.82 (predicted) Chemaxon",
+          "strongestBasic": "3.62 (predicted)"
+        },
+        "Enmetazobactam": {
+          "strongestAcidic": "2.09 (predicted) (Chemaxon)",
+          "strongestBasic": "2.83 (predicted)"
+        }
+      },
+      "logp": {
+        "Cefepime": {
+          "alogps": "-0.37 (predicted)",
+          "chemaxon": "-4.2 (predicted)"
+        },
+        "Enmetazobactam": {
+          "chemaxon": "-4.6 (predicted)"
+        }
+      },
+      "References": ""
+    },
+    "processDevelopment": {
+      "availableDmfVendors": {
+        "Cefepime": "https://www.pharmacompass.com/manufacturers-suppliers-exporters/cefepime",
+        "Enmetazobactam": "Orchid Pharma is the primary supplier of enmetazobactam API, as it received DCGI approval to manufacture and market the API. It also partners with other companies, such as Cipla, for commercialization and launch. Out-licensing: Orchid Pharma out-licensed the drug to Allecra Therapeutics for global development as combination of cefepime and enmetazobactam (Exblifep) and commercialization, while retaining the Indian market and royalties."
+      },
+      "vendorReference": "",
+      "potencyClassification": {
+        "CefepimeHydrochloride": "One material safety data sheet (MSDS) sets a specific OEL for cefepime hydrochloride at 500 g/m3. Other SDS documents note that official agencies like OSHA or ACGIH have not established an OEL for cefepime, so the OEL would be based on the manufacturer's internal guidance.",
+        "Enmetazobactam": "No information found"
+      },
+      "manufacturingSites": {
+        "Cefepime": "Orchid pharma, Kopran R.L, Sterile India, Nectar life sciences, Actiza Pharmacutical, SETV Global, NCPC Hebei Huamin pharmaceutical Co, Ltd, Qilu pharmaceutical, Sinoway industrial Co; Ltd, Hangzhou Viwa, Guangzhou Pi&Pi Biotech, Shenzhen SalubrisACS Dobfar, Sandoz, Corden pharma, Berr chem, API Corp, Antibioticos do Brasila",
+        "Enmetazobactam": "Orchid Pharma"
+      },
+      "manufacturingRoute": {
+        "route1": {
+          "name": "Route using 7-ACA and N-methylpyrrolidine",
+          "description": "This pathway involves three main steps, as outlined in a Google Patent filing.",
+          "synthesisDetails": "Synthesis details based on patent CN107201391B. A representative synthetic route found in patent literature, which is likely similar to an industrial process like Orchid's, is as follows:",
+          "steps": [
+            {
+              "step": "Step 1",
+              "description": "Starts with a cephalosporin derivative like GCLE. The C-7 amino group is protected by a phenylacetyl group. The C-3 acetoxymethyl group is converted to a chloromethyl group using trifluoroacetic acid."
+            },
+            {
+              "step": "Step 2",
+              "description": "The C-3 chloromethyl group undergoes nucleophilic substitution with N-methylpyrrolidine to form 7-phenylacetamido-3-[(1-methylpyrrolidinio)methyl]-3-cephem-4-carboxylic acid (3-NMP-DGCLE)."
+            },
+            {
+              "step": "Step 3",
+              "description": "The C-7 amino group is deprotected (cleaved) using an enzyme like immobilized penicillin acylase, yielding the key intermediate 7-amino-3-[(1-methylpyrrolidinio)methyl]-3-cephem-4-carboxylic acid (7-ACP)."
+            },
+            {
+              "step": "Step 4",
+              "description": "The C-7 amino group of 7-ACP is acylated with the AE-active ester to produce cefepime. The final product is then converted into dihydrochloride salt."
+            }
+          ],
+          "note": "Specific process variations, including solvents, catalysts, and conditions, are often proprietary to manufacturers like Orchid Pharma, optimized for cost, yield, and purity.",
+          "reference": [
+            "https://patents.google.com/patent/CN101735251A/en",
+            "https://patents.google.com/patent/CN102408440A/en"
+          ]
+        },
+        "route2": {
+          "name": "Route using GCLE (7-phenylacetamido-3-chloromethyl-3-cephem-4-carboxylic acid)",
+          "description": "An alternative pathway described in patent literature uses GCLE as an early-stage intermediate.",
+          "steps": [
+            {
+              "step": "1",
+              "description": "Starting material: GCLE."
+            },
+            {
+              "step": "2",
+              "description": "Intermediates: 3-NMP-DGCLE: GCLE reacts with N-methylpyrrolidine to form 7-phenylacetamido-3-[(1-methyltetrahydropyrrole)methyl]-3-cephem-4-carboxylic acid. 7-ACP: Enzymatic deacylation of 3-NMP-DGCLE is performed to remove the phenylacetamido group and form 7-amino-3-[(1-methyltetrahydropyrrole)methyl]-3-ceph-4-carboxylic acid hydrochloride (7-ACP)."
+            },
+            {
+              "step": "3",
+              "description": "Final step: The 7-ACP is reacted with an AE-active ester in an acylation step to produce cefepime."
+            }
+          ]
+        }
+      },
+      "polymorphStudies": "",
+      "regulatoryStartingMaterials": {
+        "startingMaterials": [
+          {
+            "name": "7-aminocephalosporanic acid (7-ACA)",
+            "description": "This is the core cephalosporin building block."
+          },
+          {
+            "name": "𝑁-Methylpyrrolidine",
+            "description": "Used to add the characteristic side chain at the C-3 position of the cephalosporin nucleus."
+          },
+          {
+            "name": "(Z)-2-(2-aminothiazol-4-yl)-2-(methoxyimino)acetic acid active ester (AE-active ester)",
+            "description": "This provides the C-7 side chain."
+          }
+        ],
+        "keyIntermediates": [
+          {
+            "name": "3-Chloromethyl derivative",
+            "description": "The acetoxymethyl group of 7-ACA is first converted to a 3-chloromethyl group. This is often achieved using reagents like iodotrimethylsilane (TMSI) or other halogenating agents."
+          },
+          {
+            "name": "7-phenylacetamido-3-(chloromethyl)-3-cephem-4-carboxylic acid (GCLE or DGCLE)",
+            "description": "A precursor where the C-7 amino group is protected with a phenylacetyl group and the C-3 position has a chloromethyl group."
+          },
+          {
+            "name": "7-amino-3-[(1-methyl-1-pyrrolidine)methyl]-3-cephem-4-carboxylic acid (7-ACP)",
+            "description": "This is a crucial late-stage intermediate. It is formed by reacting the 3-chloromethyl derivative with 𝑁-methylpyrrolidine, followed by deacylation of the C-7 amino group using an enzyme like penicillin acylase."
+          }
+        ]
+      },
+      "rsmAndIntermediateSpecifications": "",
+      "drugSubstanceSpecifications": "Appendix 2: DS Specification",
+      "forcedDegradationStudies": "",
+      "impurityQualification": "",
+      "genotoxicImpuritiesAssessment": "",
+      "nitrosaminesAssessment": "",
+      "fateOfImpurities": "",
+      "cppsAndCqaStudies": "",
+      "otherInformation": "",
+      "References": ""
+    },
+    "analyticalDevelopment": {
+      "rsmMethods": "",
+      "ipcTestMethods": "",
+      "finalApiMethods": "",
+      "residualSolventRiskAssessment": "",
+      "rsmSynthesis": "",
+      "stabilityOfDrugSubstance": "",
+      "drugSubstanceSites": "",
+      "dsImpurities": "",
+      "dsImpurityMethods": "",
+      "References": ""
+    }
+  },
+  "drugProduct": {
+    "information": {
+      "dosageForms": "Intravenous use — supplied as a sterile powder for reconstitution in single-dose vials containing 2 g cefepime + 0.5 g enmetazobactam (2.5 g/vial). EMEA wording: powder for concentrate for solution for infusion; strength 2 g/0.5 g per vial",
+      "strengths": [
+        {
+          "strength": "2.5 grams per vial",
+          "composition": "2 grams cefepime and 0.5 grams enmetazobactam",
+          "description": "powder for reconstitution in single-dose vials",
+          "type": "powder for reconstitution"
+        },
+        {
+          "strength": "1.25 grams",
+          "composition": "1 gram cefepime and 0.25 grams enmetazobactam",
+          "description": "Reduced dose for patients with renal impairment",
+          "type": "powder for reconstitution"
+        },
+        {
+          "strength": "0.625 grams",
+          "composition": "0.5 grams cefepime and 0.125 grams enmetazobactam",
+          "description": "Maintenance dose for severe renal impairment or hemodialysis",
+          "type": "powder for reconstitution"
+        }
+      ],
+      "dosingTable": {
+        "description": "The recommended dosage of EXBLIFEP in patients 18 years of age and older with varying degrees of renal function is described in Table 1. For patients with changing renal function, monitor serum creatinine concentrations and eGFR at least daily and adjust the dosage of EXBLIFEP accordingly.",
+        "notes": [
+          "a As calculated using the Modification of Diet in Renal Disease (MDRD) formula",
+          "b The total duration of treatment is for 7 to 14 days.",
+          "c In patients requiring intermittent hemodialysis, complete the hemodialysis session before the start of EXBLIFEP dosing. Whenever possible, administer cefepime and enmetazobactam at the same time each day."
+        ],
+        "regimenByRenalFunction": [
+          {
+            "eGFR_mL_per_min": "Greater than or equal to 130",
+            "dose": "EXBLIFEP 2.5 grams (2 grams cefepime and 0.5 grams enmetazobactam)",
+            "dosingInterval": "Every 8 hours",
+            "infusionTime": "4 hours"
+          },
+          {
+            "eGFR_mL_per_min": "90 to 129",
+            "dose": "EXBLIFEP 2.5 grams (2 grams cefepime and 0.5 grams enmetazobactam)",
+            "dosingInterval": "Every 8 hours",
+            "infusionTime": "2 hours"
+          },
+          {
+            "eGFR_mL_per_min": "60 to 89",
+            "dose": "EXBLIFEP 2.5 grams (2 grams cefepime and 0.5 grams enmetazobactam)",
+            "dosingInterval": "Every 8 hours",
+            "infusionTime": "2 hours"
+          },
+          {
+            "eGFR_mL_per_min": "30 to 59",
+            "dose": "EXBLIFEP 1.25 grams (1 gram cefepime and 0.25 grams enmetazobactam)",
+            "dosingInterval": "Every 8 hours",
+            "infusionTime": "2 hours"
+          },
+          {
+            "eGFR_mL_per_min": "15 to 29",
+            "dose": "EXBLIFEP 1.25 grams (1gram cefepime and 0.25 grams enmetazobactam)",
+            "dosingInterval": "Every 12 hours",
+            "infusionTime": "2 hours"
+          },
+          {
+            "eGFR_mL_per_min": "less than 15 or receiving intermittent hemodialysis",
+            "dose": "Loading dose of EXBLIFEP 1.25 grams (1 gram cefepime and 0.25 grams enmetazobactam) on the first day of treatment, followed by EXBLIFEP 0.625 grams (0.5 grams cefepime and 0.125 grams enmetazobactam)",
+            "dosingInterval": "Every 24 hours",
+            "infusionTime": "2 hours"
+          }
+        ]
+      },
+      "targetPopulation": "Adults (≥18 years). Pediatric use has not been established",
+      "maximumDailyDose": "7.5 g/day total delivered as 2g of cefepime and 0.5g of enmetazobactam every 8 hours 7 days up to 14 days",
+      "storageAndShippingConditions": "Store EXBLIFEP vials refrigerated at 2°C to 8°C (36°F to 46°F); excursions are permitted to 15°C to 25°C (59°F to 77°F) [see USP, Controlled Room Temperature (CRT)]. Keep the vials in the outer carton to protect from light.",
+      "developmentProgramDesignation": "",
+      "dpFormulation": "",
+      "unmetClinicalNeed": "",
+      "manufacturingProcess": "",
+      "excipientsgGrade": "",
+      "impurities": "",
+      "specification": "",
+      "testMethods": "",
+      "residualSolventsRiskAssessment": "",
+      "nitrosamineRiskAssessment": "",
+      "stabilityStudies": "",
+      "dissolutionStudies": "",
+      "baBeStudies": "",
+      "foodStudyReports": "",
+      "currentLabel": "",
+      "dpEmbossingDebossingInfo": "",
+      "currentExpirationDating": "",
+      "foodInteractions": "",
+      "drugDrugInteractions": "",
+      "packagingAndStorageConditions": {
+        "description": "clear glass vials sealed with a rubber stopper (not made with natural rubber latex) and an aluminum overseal. Each vial is supplied in cartons of 10 vials (NDC 83289-101-02)",
+        "packaging": "cartons of 10 vials",
+        "ndc": "NDC 83289-101-02",
+        "type": "vials",
+        "storageTemperature": "Store EXBLIFEP vials refrigerated at 2°C to 8°C (36°F to 46°F); excursions are permitted to 15°C to 25°C (59°F to 77°F) [see USP, Controlled Room Temperature (CRT)]. Keep the vials in the outer carton to protect from light."
+      },
+      "labeling": "",
+      "developmentProgramDesignationDetails": "Appendix 6: Development program designation",
+      "References": ""
+    }
+  },
+  "appendices": {
+    "appendix1": {
+      "name": "API Synthetic route",
+      "reference": "",
+      "description": "See manufacturing route in processDevelopment section",
+      "modularSynthesis": {},
+      "processDocumentation": "",
+      "synthesisSteps": [],
+      "currentManufacturers": ""
+    },
+    "appendix2": {
+      "name": "DS Specification",
+      "specifications": {
+        "description": "https://www.ema.europa.eu/en/documents/assessment-report/xalkori-epar-public-assessment-report_en.pdf",
+        "assay": "",
+        "relatedSubstances": "",
+        "chiral": "",
+        "polymorph": "",
+        "idByHplc": "",
+        "idByFtir": "",
+        "particleSizeDistribution": "",
+        "residueOnIgnition": "",
+        "heavyMetals": "",
+        "palladium": ""
+      }
+    },
+    "appendix3": {
+      "name": "Formulation Composition",
+      "note": "All excipients used in the formulation are compendial and are conventional for solid oral dosage forms.",
+      "inactiveIngredients": [
+        { "ingredientName": "SHELLAC (UNII: 46N107B71O)", "strength": "" },
+        { "ingredientName": "PROPYLENE GLYCOL (UNII: 6DC9Q167V3)", "strength": "" },
+        { "ingredientName": "AMMONIA (UNII: 5138Q19F1X)", "strength": "" },
+        { "ingredientName": "POTASSIUM HYDROXIDE (UNII: WZH3C48M4T)", "strength": "" },
+        { "ingredientName": "FERROSOFERRIC OXIDE (UNII: XM0M87F357)", "strength": "" },
+        { "ingredientName": "SODIUM STARCH GLYCOLATE TYPE A (UNII: H8AV0SQX4D)", "strength": "" }
+      ]
+    },
+    "appendix4": {
+      "name": "Preparation of Exblifep",
+      "description": "EXBLIFEP is supplied as a dry powder in a single-dose vial that must be reconstituted and further diluted prior to intravenous infusion as outlined below. EXBLIFEP does not contain preservatives. Aseptic technique must be used for reconstitution and dilution.",
+      "preparationSteps": [
+        {
+          "step": "1",
+          "instruction": "Reconstitute the powder in the EXBLIFEP vial, with 10 mL of 0.9% Sodium Chloride Injection, or 5% Dextrose Injection, or 2.5% Dextrose and 0.45% Sodium Chloride Injection, from a 250 mL infusion bag."
+        },
+        {
+          "step": "2",
+          "instruction": "Mix gently to dissolve. The reconstituted EXBLIFEP solution will have a resultant concentration of 0.2 grams/mL (cefepime 0.16 grams/mL and enmetazobactam 0.04 grams/mL). The final volume is approximately 13 mL. The reconstituted solution is not for direct injection."
+        },
+        {
+          "step": "3",
+          "instruction": "The reconstituted solution must immediately be diluted further in the 250 mL infusion bag used in Step 1. The same injection solution should be used for both reconstitution and dilution (e.g., if reconstitution in Step 1 is performed with 5% dextrose, the dilution in Step 3 should be performed with a 250 mL infusion bag of 5% dextrose). To dilute the reconstituted solution, withdraw the full or partial reconstituted vial contents and add it back into the infusion bag in accordance with Table 2 below."
+        },
+        {
+          "step": "4",
+          "instruction": "Store the prepared diluted solution refrigerated at 2°C to 8°C (36°F to 46°F) for up to 4 hours prior to administration. The intravenous infusion administration of the diluted solution must be completed within 6 hours of dilution."
+        },
+        {
+          "step": "5",
+          "instruction": "Visually inspect the diluted EXBLIFEP solution. Parenteral drug products should be inspected visually for particulate matter and discoloration prior to administration, whenever solution and container permit. The color of the EXBLIFEP infusion solution for administration is clear to yellowish. Discard unused portion after use."
+        }
+      ],
+      "preparationTable": {
+        "title": "Table 2: Preparation of EXBLIFEP Doses",
+        "doses": [
+          {
+            "dose": "2.5 grams (2 grams cefepime and 0.5 grams enmetazobactam)",
+            "numberOfVials": "1 vial",
+            "volumeToWithdraw": "Entire contents (approximately 13 mL)",
+            "infusionBagVolume": "250 mL"
+          },
+          {
+            "dose": "1.25 grams (1 gram cefepime and 0.25 grams enmetazobactam)",
+            "numberOfVials": "1 vial",
+            "volumeToWithdraw": "Partial contents (6.5 mL)",
+            "infusionBagVolume": "250 mL"
+          },
+          {
+            "dose": "0.625 grams (0.5 grams cefepime and 0.125 grams enmetazobactam)",
+            "numberOfVials": "1 vial",
+            "volumeToWithdraw": "Partial contents (3.3 mL)",
+            "infusionBagVolume": "250 mL"
+          }
+        ]
+      },
+      "labels": []
+    },
+    "appendix5": {
+      "name": "Labeling Information",
+      "description": "",
+      "labels": []
+    },
+    "appendix6": {
+      "name": "Development program designation",
+      "description": "",
+      "designations": {}
+    }
+  },
+  "references": []
+}]
 ]
 
 

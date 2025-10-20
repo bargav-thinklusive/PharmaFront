@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { drugData } from "../sampleData/data";
+import { useUser } from "../context/UserContext";
 import { RxCross2 } from "react-icons/rx";
 
 interface SearchBarProps {
@@ -18,6 +18,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const { drugsData } = useUser();
 
   // Hide suggestions when route changes
   useEffect(() => {
@@ -35,7 +36,22 @@ const SearchBar: React.FC<SearchBarProps> = ({
     const matches: any[] = [];
     const seen = new Set<string>();
 
-    drugData.forEach((item) => {
+    // Filter out non-object items and ensure we have valid drug objects
+    const validDrugsData = (drugsData || []).filter((item: any) => {
+      const isValid = item &&
+        typeof item === 'object' &&
+        !Array.isArray(item) &&
+        item.cid &&
+        item.marketInformation;
+
+      if (!isValid) {
+        console.log('Filtering out invalid item:', item);
+      }
+
+      return isValid;
+    });
+
+    validDrugsData.forEach((item: any) => {
       if (category === "all") {
         const fields = [
           { text: item?.marketInformation?.brandName || "", type: "brandName" },
@@ -96,7 +112,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
     //setSuggestions(matches.slice(0, 50)); // limit to 50 results
     setSuggestions(matches);
-  }, [search, category]);
+  }, [search, category, drugsData?.length]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
