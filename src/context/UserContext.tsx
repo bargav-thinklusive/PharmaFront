@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, type ReactNode } from "react";
 //import { useNavigate } from "react-router";
 import UserService from "../services/UserService";
+import DrugService from "../services/DrugService";
 import TokenService from "../services/shared/TokenService";
 //import { LOGIN_URL } from "../urlConfig";
 import useGet from "../hooks/useGet";
@@ -12,29 +13,36 @@ const UserContext = createContext<any | undefined>(undefined)
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   //const navigate = useNavigate();
-  const { fetchData, data: user, loading } = useGet();
+  // const { fetchData: fetchUser, data: user, loading: userLoading } = useGet();
+  // const { fetchData: fetchDrugs, data: drugsData, loading: drugsLoading } = useGet();
 
-  const checkTokenAndGetUser=async()=>{
-    const id=tokenService.decodeToken()?.id
-    if(id){
-      const userService=new UserService()
-      const user=await fetchData(userService.getUserById(id))
-      return user
-    }else{
-      //navigate(LOGIN_URL)
-    }
-  }
+  // const checkTokenAndGetUser=async()=>{
+  //   const id=tokenService.decodeToken()?.id
+  //   if(id){
+  //     const userService=new UserService()
+  //     const user=await fetchUser(userService.getUserById(id))
+  //     return user
+  //   }else{
+  //     //navigate(LOGIN_URL)
+  //   }
+  // }
 
-  useEffect(()=>{
-    checkTokenAndGetUser()
-  },[])
+  // const getDrugs=async()=>{
+  //   const drugService=new DrugService()
+  //   await fetchDrugs(drugService.getDrugs())
+  // }
+
+  // useEffect(()=>{
+  //   checkTokenAndGetUser()
+  //   getDrugs()
+  // },[])
 
   // if(loading || !user){
   //   return <div>Loading...</div>
   // }
 
   return (
-    <UserContext.Provider value={{user,loading,checkTokenAndGetUser}}>
+    <UserContext.Provider value={{}}>
       {children}
     </UserContext.Provider>
   )
