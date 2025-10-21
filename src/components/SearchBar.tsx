@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { drugData } from "../sampleData/data";
 import { RxCross2 } from "react-icons/rx";
+import debounce from "lodash/debounce";
+import { useUser } from "../context/UserContext";
 
 interface SearchBarProps {
   compact?: boolean;
@@ -18,9 +19,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const { drugsData } = useUser();
 
-  // Hide suggestions when route changes
-  useEffect(() => {
+
+  // Compute suggestions with debouncing
+  const computeSuggestions = useCallback(() => {
     setShowSuggestions(false);
   }, [location.pathname]);
 
@@ -34,8 +37,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
     const q = search.trim().toLowerCase();
     const matches: any[] = [];
     const seen = new Set<string>();
+const dataSource = drugsData.length > 0 ? drugsData :[]
 
-    drugData.forEach((item) => {
+    dataSource?.forEach((item:any) => {
       if (category === "all") {
         const fields = [
           { text: item?.marketInformation?.brandName || "", type: "brandName" },
@@ -96,7 +100,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
     //setSuggestions(matches.slice(0, 50)); // limit to 50 results
     setSuggestions(matches);
-  }, [search, category]);
+ }, [search, category, drugsData]);
+
+  const debouncedComputeSuggestions = useCallback(
+    debounce(computeSuggestions, 300),
+    [computeSuggestions]
+  );
+
+  useEffect(() => {
+    debouncedComputeSuggestions();
+  }, [debouncedComputeSuggestions]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
