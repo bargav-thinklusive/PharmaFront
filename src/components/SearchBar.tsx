@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { RxCross2 } from "react-icons/rx";
-import debounce from "lodash/debounce";
 import { useUser } from "../context/UserContext";
+import { debounce } from "lodash";
 
 interface SearchBarProps {
   compact?: boolean;

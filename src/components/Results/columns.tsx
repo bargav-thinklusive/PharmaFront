@@ -46,6 +46,7 @@ export const columns: any = [
     field: "cid",
     sortable: true,
     filter: true,
+    width:100,
     valueFormatter: valueFormatter,
 
   },
@@ -55,6 +56,8 @@ export const columns: any = [
     field: "marketInformation.brandName",
     sortable: true,
     filter: true,
+    autoHeight: true,
+    cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' },
     cellRenderer: BrandNameCellRenderer,
   },
   {
@@ -63,6 +66,8 @@ export const columns: any = [
     field: "marketInformation.genericName",
     sortable: true,
     filter: true,
+    autoHeight: true,
+    cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' },
     valueFormatter: valueFormatter
   },
   {
@@ -71,6 +76,8 @@ export const columns: any = [
     field: "drugSubstance.physicalAndChemicalProperties.chemicalName",
     sortable: true,
     filter: true,
+    autoHeight: true,
+    cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' },
     valueFormatter: valueFormatter
   },
   {
@@ -91,6 +98,8 @@ export const columns: any = [
     field: "drugSubstance.physicalAndChemicalProperties.elementalFormula",
     sortable: true,
     filter: true,
+    autoHeight: true,
+    cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' },
     valueFormatter: valueFormatter
   },
   {
@@ -99,6 +108,8 @@ export const columns: any = [
     field: "drugSubstance.physicalAndChemicalProperties.molecularWeight",
     sortable: true,
     filter: true,
+    autoHeight: true,
+    cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' },
     valueFormatter: valueFormatter
   },
   {
@@ -109,5 +120,12 @@ export const columns: any = [
     filter: true,
     valueFormatter: valueFormatter
   },
-
+{
+    headerName: "Approved Countries",
+    headerClass: "table-header",
+    field: "marketInformation.approvedCountries",
+    sortable: true,
+    filter: true,
+    valueFormatter: valueFormatter
+}
 ]
