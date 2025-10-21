@@ -5,11 +5,13 @@ import AuthService from "../services/AuthService";
 import TokenService from "../services/shared/TokenService";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useUser } from "../context/UserContext";
 
 const authService = new AuthService();
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { refetchDrugs } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -59,7 +61,11 @@ const Login: React.FC = () => {
           pending: "Logging in...",
           success: {
             render: "Login successful!",
-            onClose: () => navigate("/home")
+            onClose: async () => {
+              // Fetch drugs immediately after successful login
+              await refetchDrugs();
+              navigate("/home");
+            }
           },
           error: "Login failed. Please check your credentials."
         }

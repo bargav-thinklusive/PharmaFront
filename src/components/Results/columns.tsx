@@ -121,9 +121,9 @@ export const columns: any = [
     valueFormatter: valueFormatter
   },
 {
-    headerName: "Approved Countries",
+    headerName: "Approved Company",
     headerClass: "table-header",
-    field: "marketInformation.approvedCountries",
+    field: "marketInformation.approvedFor",
     sortable: true,
     filter: true,
     valueFormatter: valueFormatter

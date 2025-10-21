@@ -277,7 +277,7 @@ const DynamicSection: React.FC<DynamicSectionProps> = ({ data, sectionType, titl
           <tbody>
             {filteredData.map(([key, value]) => (
               <tr key={key} className="border-b border-blue-100">
-                <td className="w-56 p-3 text-black font-semibold">
+                <td className="w-56 p-3 text-black font-semibold border-r border-sky-300">
                   {formatKey(key)}
                 </td>
                 <td className="py-2 px-4 whitespace-pre-wrap">
@@ -299,7 +299,7 @@ const DynamicSection: React.FC<DynamicSectionProps> = ({ data, sectionType, titl
         <table className="w-full text-sm text-black">
           <thead className="bg-sky-50">
             <tr>
-              <th className="p-3 text-left font-semibold border-b border-sky-200">Ingredient Name</th>
+              <th className="p-3 text-left font-semibold border-b border-sky-200 border-r border-sky-300">Ingredient Name</th>
               <th className="p-3 text-left font-semibold border-b border-sky-200">Strength</th>
             </tr>
           </thead>
@@ -341,9 +341,9 @@ const DynamicSection: React.FC<DynamicSectionProps> = ({ data, sectionType, titl
         <table className="w-full text-sm text-black">
           <thead className="bg-sky-50">
             <tr>
-              <th className="p-3 text-left font-semibold border-b border-sky-200">Dose</th>
-              <th className="p-3 text-left font-semibold border-b border-sky-200">Number of Vials</th>
-              <th className="p-3 text-left font-semibold border-b border-sky-200">Volume to Withdraw</th>
+              <th className="p-3 text-left font-semibold border-b border-sky-200 border-r border-sky-300">Dose</th>
+              <th className="p-3 text-left font-semibold border-b border-sky-200 border-r border-sky-300">Number of Vials</th>
+              <th className="p-3 text-left font-semibold border-b border-sky-200 border-r border-sky-300">Volume to Withdraw</th>
               <th className="p-3 text-left font-semibold border-b border-sky-200">Infusion Bag Volume</th>
             </tr>
           </thead>
@@ -470,7 +470,7 @@ const DynamicSection: React.FC<DynamicSectionProps> = ({ data, sectionType, titl
                 <tbody>
                   {simpleData.map(([key, value]) => (
                     <tr key={key} className="border-b border-blue-100">
-                      <td className="w-56 p-3 text-black font-semibold">
+                      <td className="w-56 p-3 text-black font-semibold border-r border-sky-300">
                         {formatKey(key)}
                       </td>
                       <td className="py-2 px-4 whitespace-pre-wrap">
