@@ -89,10 +89,10 @@ const Register: React.FC = () => {
       />
 
 
-      <div className="flex justify-center items-center min-h-screen w-screen bg-gradient-to-br from-green-700 to-blue-500 fixed inset-0 pt-16">
+      <div className="flex justify-center items-center min-h-screen w-screen bg-gradient-to-br from-green-700 to-blue-500 fixed inset-0 pt-16 px-4">
         <form
           onSubmit={handleSubmit}
-          className="bg-white p-8 rounded-xl shadow-lg w-[450px] h-auto min-h-[500px] max-w-[90vw] flex flex-col gap-5 justify-center"
+          className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-[450px] h-auto min-h-[500px] flex flex-col gap-5 justify-center"
         >
           <h2 className="text-2xl font-bold text-center text-green-700">Register</h2>
 

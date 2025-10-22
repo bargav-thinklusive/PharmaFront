@@ -48,15 +48,15 @@ const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, className = '' }) =
   if (filteredData.length === 0) return null;
 
   return (
-    <div className={`border-2 border-sky-400 rounded bg-white max-w-3xl ${className}`}>
-      <table className="w-full text-sm text-black">
+    <div className={`border-2 border-sky-400 rounded bg-white w-full overflow-x-auto ${className}`}>
+      <table className="w-full text-xs text-black min-w-[600px]">
         <tbody>
           {filteredData.map(([key, value]) => (
             <tr key={key} className="border-b border-blue-100">
-              <td className="w-56 p-3 text-black font-semibold">
+              <td className="w-40 p-2 text-black font-semibold break-words">
                 {formatKey(key)}
               </td>
-              <td className="py-2 px-4 whitespace-pre-wrap">
+              <td className="py-2 px-3 whitespace-pre-wrap break-words text-xs">
                 {renderValue(value)}
               </td>
             </tr>

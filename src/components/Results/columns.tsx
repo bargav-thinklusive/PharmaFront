@@ -23,7 +23,9 @@ export const columns: any = [
     headerClass: "table-header",
     field: "bookmark",
     cellRenderer: BookmarkCellRenderer,
-    width: 100,
+    width: 80,
+    minWidth: 80,
+    hide: false,
   },
   {
     headerName: "CID",
@@ -32,6 +34,7 @@ export const columns: any = [
     sortable: true,
     filter: true,
     width: 100,
+    minWidth: 80,
     valueFormatter: valueFormatter,
 
   },
@@ -44,6 +47,7 @@ export const columns: any = [
     autoHeight: true,
     cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' },
     cellRenderer: BrandNameCellRenderer,
+    minWidth: 150,
   },
   {
     headerName: "Generic Name",
@@ -53,7 +57,8 @@ export const columns: any = [
     filter: true,
     autoHeight: true,
     cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' },
-    valueFormatter: valueFormatter
+    valueFormatter: valueFormatter,
+    minWidth: 150,
   },
   {
     headerName: "Chemical Name",
@@ -63,7 +68,8 @@ export const columns: any = [
     filter: true,
     autoHeight: true,
     cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' },
-    valueFormatter: valueFormatter
+    valueFormatter: valueFormatter,
+    minWidth: 150,
   },
   {
     headerName: "Structure Name",
@@ -72,7 +78,8 @@ export const columns: any = [
     wrapText: true,
     autoHeight: true,
     filter: true,
-    width: 350,
+    width: 300,
+    minWidth: 200,
     cellStyle: { lineHeight: '2' },
     valueFormatter: valueFormatter,
 
@@ -85,7 +92,8 @@ export const columns: any = [
     filter: true,
     autoHeight: true,
     cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' },
-    valueFormatter: valueFormatter
+    valueFormatter: valueFormatter,
+    minWidth: 120,
   },
   {
     headerName: "Molecular Weight",
@@ -95,7 +103,8 @@ export const columns: any = [
     filter: true,
     autoHeight: true,
     cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' },
-    valueFormatter: valueFormatter
+    valueFormatter: valueFormatter,
+    minWidth: 120,
   },
   {
     headerName: "Approved Date",
@@ -103,7 +112,8 @@ export const columns: any = [
     field: "marketInformation.approvedDate",
     sortable: true,
     filter: true,
-    valueFormatter: valueFormatter
+    valueFormatter: valueFormatter,
+    minWidth: 120,
   },
   {
     headerName: "Approved Company",
@@ -111,6 +121,7 @@ export const columns: any = [
     field: "marketInformation.approvedFor",
     sortable: true,
     filter: true,
-    valueFormatter: valueFormatter
+    valueFormatter: valueFormatter,
+    minWidth: 150,
   }
 ]

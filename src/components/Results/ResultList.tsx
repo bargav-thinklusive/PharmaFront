@@ -76,23 +76,23 @@ const handleSearchHistory = () => {
   navigate(`/search-history/${searchtext}`);
 }
   return (
-    <div className="w-full min-h-[60vh] flex flex-col items-center bg-white/80 py-8">
-      <div className="w-full max-w-5xl ">
+    <div className="w-full min-h-[60vh] flex flex-col items-center bg-white/80 py-8 px-4">
+      <div className="w-full max-w-5xl">
 
         {/* Filters, sort, etc. can be added here */}
-        <div className="flex justify-between items-center gap-8 border-b pb-2 mb-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-8 border-b pb-2 mb-4">
           <span className="font-bold text-blue-900 text-lg">{results.length} results</span>
           <div className='flex justify-between items-center gap-2'>
-            <button ><BiBell size={25} /></button>
-            <button onClick={handleSearchHistory}><MdHistory size={25} /></button>
-            <button onClick={onClickExport} className='bg-blue-500 text-white p-1 rounded'>Export </button>
+            <button className="p-2"><BiBell size={25} /></button>
+            <button onClick={handleSearchHistory} className="p-2"><MdHistory size={25} /></button>
+            <button onClick={onClickExport} className='bg-blue-500 text-white px-3 py-1 rounded text-sm'>Export</button>
           </div>
         </div>
 
         <div className="test-container">
           <div
             className="ag-theme-quartz"
-            style={{ height: "calc(100vh - 165px)" }}
+            style={{ height: "calc(100vh - 200px)", minHeight: "400px" }}
           >
             <AgGridReact
               ref={gridRef}
@@ -106,9 +106,12 @@ const handleSearchHistory = () => {
               paginationPageSize={pageSize}
               loadingOverlayComponent={() => <div>Loading...</div>}
               defaultColDef={{
-                filter: true, 
+                filter: true,
+                resizable: true,
+                sortable: true,
               }}
               rowSelection="single"
+              domLayout="autoHeight"
             />
           </div>
         </div>

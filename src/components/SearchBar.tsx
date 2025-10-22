@@ -164,10 +164,10 @@ const dataSource = drugsData.length > 0 ? drugsData :[]
       ref={wrapperRef}
     >
       <form className="w-full flex justify-center" onSubmit={handleSubmit}>
-        <div className="flex w-full max-w-2xl bg-white rounded shadow overflow-hidden">
+        <div className="flex flex-col sm:flex-row w-full max-w-2xl bg-white rounded shadow overflow-hidden">
           <div className="flex-1 relative">
             <input
-              className="w-full px-6 py-4 text-lg border-0 focus:ring-0 focus:outline-none text-black caret-blue-700 bg-white placeholder-gray-400 pr-12"
+              className="w-full px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-lg border-0 focus:ring-0 focus:outline-none text-black caret-blue-700 bg-white placeholder-gray-400 pr-12"
               type="text"
               placeholder="Search..."
               value={search}
@@ -186,7 +186,7 @@ const dataSource = drugsData.length > 0 ? drugsData :[]
           </div>
           <div className="relative">
             <select
-              className="px-6 py-4 text-lg bg-gray-100 border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium border-l appearance-none pr-10"
+              className="px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-lg bg-gray-100 border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium border-t sm:border-t-0 sm:border-l appearance-none pr-10 w-full sm:w-auto"
               value={category}
               onChange={handleCategoryChange}
             >
@@ -205,8 +205,8 @@ const dataSource = drugsData.length > 0 ? drugsData :[]
 
       {/* Suggestions dropdown with scroll */}
       {showSuggestions && search.trim() && (
-        <div className="absolute top-full mt-1 w-full max-w-2xl bg-white border border-gray-200 rounded shadow-lg z-[1001]">
-          <ul className="max-h-[50vh] overflow-y-auto text-black">
+        <div className="absolute top-full mt-1 w-full max-w-2xl bg-white border border-gray-200 rounded shadow-lg z-[1001] left-0 right-0 mx-auto">
+          <ul className="max-h-[40vh] sm:max-h-[50vh] overflow-y-auto text-black">
             {suggestions.length > 0 ? (
               suggestions.map((item, index) => {
                 const displayText =
@@ -217,7 +217,7 @@ const dataSource = drugsData.length > 0 ? drugsData :[]
                 return (
                   <li
                     key={item.cid + "-" + index + "-" + String(displayText)}
-                    className="px-4 py-2 cursor-pointer hover:bg-blue-100 text-black hover:text-black"
+                    className="px-3 sm:px-4 py-2 cursor-pointer hover:bg-blue-100 text-black hover:text-black text-sm sm:text-base"
                     onClick={() => handleSelect(item)}
                   >
                     {displayText}
@@ -225,7 +225,7 @@ const dataSource = drugsData.length > 0 ? drugsData :[]
                 );
               })
             ) : (
-              <li className="px-4 py-3 text-gray-500 text-center">
+              <li className="px-4 py-3 text-gray-500 text-center text-sm sm:text-base">
                 No items found for "{search}" in{" "}
                 {category === "all"
                   ? "any category"

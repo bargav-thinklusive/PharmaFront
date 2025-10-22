@@ -205,7 +205,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                 isActiveSubsection ? 'bg-blue-500 text-white' : ''
               }`}
             >
-              <span className={isActiveSubsection ? 'text-white' : 'text-gray-800'}>
+              <span className={`break-words ${isActiveSubsection ? 'text-white' : 'text-gray-800'}`}>
                 {section.id}.{i + 1} {subsection.title}
               </span>
               {childExpandable && (
@@ -243,7 +243,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                         isActiveSubSubsection ? 'bg-blue-500 text-white' : ''
                       }`}
                     >
-                      <span className={isActiveSubSubsection ? 'text-white' : 'text-gray-800'}>
+                      <span className={`break-words ${isActiveSubSubsection ? 'text-white' : 'text-gray-800'}`}>
                         {section.id}.{i + 1}.{j + 1} {toTitleCase(gcKey)}
                       </span>
                     </div>
@@ -281,7 +281,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                 isActiveSubsection ? 'bg-blue-500 text-white' : ''
               }`}
             >
-              <span className={isActiveSubsection ? 'text-white' : 'text-gray-800'}>
+              <span className={`break-words ${isActiveSubsection ? 'text-white' : 'text-gray-800'}`}>
                 {section.id}.{i + 1} {appendixData?.name || `Appendix ${i + 1}`}
               </span>
               {hasChildren && (
@@ -314,7 +314,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                         activeSection === `section-${section.id}-${i + 1}-1` ? 'bg-blue-500 text-white' : ''
                       }`}
                     >
-                      <span className={activeSection === `section-${section.id}-${i + 1}-1` ? 'text-white' : 'text-gray-800'}>
+                      <span className={`break-words ${activeSection === `section-${section.id}-${i + 1}-1` ? 'text-white' : 'text-gray-800'}`}>
                         {section.id}.{i + 1}.1 Modular Synthesis
                       </span>
                     </div>
@@ -330,7 +330,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                             activeSection === `section-${section.id}-${i + 1}-2` ? 'bg-blue-500 text-white' : ''
                           }`}
                         >
-                          <span className={activeSection === `section-${section.id}-${i + 1}-2` ? 'text-white' : 'text-gray-800'}>
+                          <span className={`break-words ${activeSection === `section-${section.id}-${i + 1}-2` ? 'text-white' : 'text-gray-800'}`}>
                             {section.id}.{i + 1}.2 Synthesis Steps
                           </span>
                         </div>
@@ -352,7 +352,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                             activeSection === `section-${section.id}-${i + 1}-${j + 1}` ? 'bg-blue-500 text-white' : ''
                           }`}
                         >
-                          <span className={activeSection === `section-${section.id}-${i + 1}-${j + 1}` ? 'text-white' : 'text-gray-800'}>
+                          <span className={`break-words ${activeSection === `section-${section.id}-${i + 1}-${j + 1}` ? 'text-white' : 'text-gray-800'}`}>
                             {section.id}.{i + 1}.{j + 1} {toTitleCase(specKey)}
                           </span>
                         </div>
@@ -372,7 +372,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                         activeSection === `section-${section.id}-${i + 1}-1` ? 'bg-blue-500 text-white' : ''
                       }`}
                     >
-                      <span className={activeSection === `section-${section.id}-${i + 1}-1` ? 'text-white' : 'text-gray-800'}>
+                      <span className={`break-words ${activeSection === `section-${section.id}-${i + 1}-1` ? 'text-white' : 'text-gray-800'}`}>
                         {section.id}.{i + 1}.1 Inactive Ingredients
                       </span>
                     </div>
@@ -392,7 +392,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                             activeSection === `section-${section.id}-${i + 1}-${j + 1}` ? 'bg-blue-500 text-white' : ''
                           }`}
                         >
-                          <span className={activeSection === `section-${section.id}-${i + 1}-${j + 1}` ? 'text-white' : 'text-gray-800'}>
+                          <span className={`break-words ${activeSection === `section-${section.id}-${i + 1}-${j + 1}` ? 'text-white' : 'text-gray-800'}`}>
                             {section.id}.{i + 1}.{j + 1} {toTitleCase(designationKey)}
                           </span>
                         </div>
@@ -429,7 +429,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
               isActiveSubsection ? 'bg-blue-500 text-white' : ''
             }`}
           >
-            <span className={isActiveSubsection ? 'text-white' : 'text-gray-800'}>
+            <span className={`break-words ${isActiveSubsection ? 'text-white' : 'text-gray-800'}`}>
               {section.id}.{i + 1} {toTitleCase(subKey)}
             </span>
           </div>
@@ -439,8 +439,8 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
   };
 
   return (
-    <div >
-      <h3 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">
+    <div className="w-full">
+      <h3 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide break-words">
         TABLE OF CONTENTS
       </h3>
 
@@ -466,7 +466,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
               role="button"
               tabIndex={0}
             >
-              <span className={isActiveSection ? 'text-white' : 'text-gray-800'}>
+              <span className={`break-words ${isActiveSection ? 'text-white' : 'text-gray-800'}`}>
                 {section.id}. {section.title}
               </span>
               {expandable && (

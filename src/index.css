@@ -11,7 +11,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
- margin: 0;
+  margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
@@ -23,4 +23,20 @@ html, body {
   margin: 0;
   padding: 0;
   /* font-family: 'Roboto',sans-serif; */
+}
+
+/* Mobile-specific styles */
+@media (max-width: 640px) {
+  .ag-theme-quartz {
+    font-size: 12px;
+  }
+
+  .ag-theme-quartz .ag-header-cell-text {
+    font-size: 11px;
+  }
+
+  .ag-theme-quartz .ag-cell {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
 }
