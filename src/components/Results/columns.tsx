@@ -1,5 +1,6 @@
 import { capitalizeFirstLetter } from "../../utils/utils";
-import { useNavigate, useParams } from "react-router-dom";
+import BookmarkCellRenderer from "./BookmarkCellRenderer";
+import BrandNameCellRenderer from "./BrandNameCellRenderer";
 
 
 const valueFormatter = (params: { value?: string | number | null }): string => {
@@ -14,39 +15,23 @@ const valueFormatter = (params: { value?: string | number | null }): string => {
   return String(params.value);
 };
 
-const BrandNameCellRenderer = (params: any) => {
-  const navigate = useNavigate();
-  const { ccategory, searchtext } = useParams();
-
-  const handleClick = () => {
-    if (ccategory && params.data?.cid) {
-      navigate(`/${ccategory}/${searchtext}/${params.data.cid}`);
-    }
-  };
-
-  return (
-    <span
-      onClick={handleClick}
-      style={{
-        color: "#1677ff",
-        textDecoration: "underline",
-        cursor: "pointer",
-      }}
-    >
-      {params.value || "-"}
-    </span>
-  );
-};
 
 
 export const columns: any = [
+  {
+    headerName: "Bookmark",
+    headerClass: "table-header",
+    field: "bookmark",
+    cellRenderer: BookmarkCellRenderer,
+    width: 100,
+  },
   {
     headerName: "CID",
     headerClass: "table-header",
     field: "cid",
     sortable: true,
     filter: true,
-    width:100,
+    width: 100,
     valueFormatter: valueFormatter,
 
   },
@@ -120,12 +105,12 @@ export const columns: any = [
     filter: true,
     valueFormatter: valueFormatter
   },
-{
+  {
     headerName: "Approved Company",
     headerClass: "table-header",
     field: "marketInformation.approvedFor",
     sortable: true,
     filter: true,
     valueFormatter: valueFormatter
-}
+  }
 ]

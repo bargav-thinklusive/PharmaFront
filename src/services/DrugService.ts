@@ -46,6 +46,10 @@ class DrugService {
 
   // // Delete operation
   deleteDrug = (id:string) => `${this.baseUrl}/drug/${id}`;
+
+  // Search History operations
+  createSearchHistory = () => `${this.baseUrl}/searchhistory`;
+  deleteSearchHistory = (id: string) => `${this.baseUrl}/searchhistory/${id}`;
 }
 
 export default DrugService;
