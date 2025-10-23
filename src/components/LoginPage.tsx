@@ -134,7 +134,7 @@ const Login: React.FC = () => {
       />
 
       <div className="flex justify-center items-center min-h-screen w-screen bg-gradient-to-br from-green-700 to-blue-500 fixed inset-0 pt-16 px-4">
-      <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-[450px] h-auto min-h-[500px] flex flex-col gap-5 justify-center">
+      <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-[350px] sm:max-w-[400px] h-auto min-h-[400px] sm:min-h-[450px] flex flex-col gap-5 justify-center">
         <h2 className="text-2xl font-bold text-center text-green-700">
           {isForgotPassword ? "Reset Password" : "Login"}
         </h2>

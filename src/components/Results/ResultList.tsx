@@ -80,7 +80,7 @@ const handleSearchHistory = () => {
       <div className="w-full max-w-5xl">
 
         {/* Filters, sort, etc. can be added here */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-8 border-b pb-2 mb-4">
+        <div className="flex justify-between items-center gap-4 border-b pb-2 mb-4">
           <span className="font-bold text-blue-900 text-lg">{results.length} results</span>
           <div className='flex justify-between items-center gap-2'>
             <button className="p-2"><BiBell size={25} /></button>
@@ -92,7 +92,7 @@ const handleSearchHistory = () => {
         <div className="test-container">
           <div
             className="ag-theme-quartz"
-            style={{ height: "calc(100vh - 200px)", minHeight: "400px" }}
+            style={{ height: "calc(100vh - 165px)" }}
           >
             <AgGridReact
               ref={gridRef}
@@ -111,7 +111,7 @@ const handleSearchHistory = () => {
                 sortable: true,
               }}
               rowSelection="single"
-              domLayout="autoHeight"
+              //domLayout="autoHeight"
             />
           </div>
         </div>

@@ -7,7 +7,7 @@ const Submit: React.FC = () => {
 			<div className="px-4 pt-8 pb-2">
 				<h1 className="text-3xl font-semibold text-gray-800">Submissions</h1>
 				<p className="text-gray-700 text-base mt-1">
-					Submit your data to ChemBank, the world's largest chemical database, for global Open Access.
+					Submit your data to CMCINTEL, the world's largest chemical database, for global Open Access.
 				</p>
 			</div>
 			<div className="flex-1 flex items-center justify-center">

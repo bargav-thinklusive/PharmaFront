@@ -63,25 +63,25 @@ console.log("Header User:", user);
     <header className={`bg-[#36b669] text-white px-4 sm:px-6 py-3 fixed top-0 left-0 w-full z-[1000]`}>
       {/* Mobile Layout */}
       <div className="flex flex-col sm:hidden">
-        {/* Top Row: Logo, Title, Burger */}
+        {/* Top Row: Logo, Search Bar, Burger */}
         <div className="flex flex-row items-center justify-between">
           {/* Logo Section */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center flex-shrink-0">
             {showMinimalHeader ? (
-              <div className="flex items-center gap-2">
-                <img src={CompanyLogo} alt="Logo"  className="h-8" />
-                <span className="font-bold text-lg">CMCINTEL</span>
-              </div>
+              <img src={CompanyLogo} alt="Logo" className="h-8" />
             ) : (
-              <Link
-                to="/home"
-                className="flex items-center gap-2 text-white no-underline"
-              >
+              <Link to="/home" className="text-white no-underline">
                 <img src={CompanyLogo} alt="Logo" className="h-8" />
-                <span className="font-bold text-lg">CMCINTEL</span>
               </Link>
             )}
           </div>
+
+          {/* Search Bar in the middle */}
+          {showSearchBar && (
+            <div className="flex-1 mx-2">
+              <SearchBar compact={true} />
+            </div>
+          )}
 
           {/* Navigation Section */}
           <nav className="flex items-center flex-shrink-0 text-sm">
@@ -105,25 +105,16 @@ console.log("Header User:", user);
             ) : (
               <>
                 {/* Mobile Menu Button */}
-                <div className="sm:hidden">
-                  <button
-                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    className="text-white p-2 hover:bg-[#2d5a4f] rounded transition-colors duration-200"
-                  >
-                    {mobileMenuOpen ? <HiX size={24} /> : <HiMenu size={24} />}
-                  </button>
-                </div>
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="text-white p-2 hover:bg-[#2d5a4f] rounded transition-colors duration-200"
+                >
+                  {mobileMenuOpen ? <HiX size={24} /> : <HiMenu size={24} />}
+                </button>
               </>
             )}
           </nav>
         </div>
-
-        {/* Bottom Row: Search Bar (only when not on home) */}
-        {showSearchBar && (
-          <div className="mt-2">
-            <SearchBar compact={true} />
-          </div>
-        )}
       </div>
 
       {/* Desktop Layout */}

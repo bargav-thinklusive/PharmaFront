@@ -164,10 +164,10 @@ const dataSource = drugsData.length > 0 ? drugsData :[]
       ref={wrapperRef}
     >
       <form className="w-full flex justify-center" onSubmit={handleSubmit}>
-        <div className="flex flex-col sm:flex-row w-full max-w-2xl bg-white rounded shadow overflow-hidden">
+        <div className="flex flex-row w-full max-w-2xl bg-white rounded shadow overflow-hidden">
           <div className="flex-1 relative">
             <input
-              className="w-full px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-lg border-0 focus:ring-0 focus:outline-none text-black caret-blue-700 bg-white placeholder-gray-400 pr-12"
+              className="w-full px-4 py-3 text-base border-0 focus:ring-0 focus:outline-none text-black caret-blue-700 bg-white placeholder-gray-400 pr-12"
               type="text"
               placeholder="Search..."
               value={search}
@@ -185,21 +185,22 @@ const dataSource = drugsData.length > 0 ? drugsData :[]
             )}
           </div>
           <div className="relative">
-            <select
-              className="px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-lg bg-gray-100 border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium border-t sm:border-t-0 sm:border-l appearance-none pr-10 w-full sm:w-auto"
-              value={category}
-              onChange={handleCategoryChange}
-            >
-              <option value="all">All</option>
-              <option value="brandName">Brand</option>
-              <option value="genericName">Generic</option>
-              <option value="chemicalName">Chemical</option>
-              <option value="structureName">Structure</option>
-            </select>
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600">
-              ▼
-            </span>
-          </div>
+  <select
+    className="px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-lg bg-gray-100 border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium border-t sm:border-t-0 sm:border-l appearance-none pr-10 w-full sm:w-auto" 
+    value={category}
+    onChange={handleCategoryChange}
+  >
+    <option value="all">All</option>
+    <option value="brandName">Brand</option>
+    <option value="genericName">Generic</option>
+    <option value="chemicalName">Chemical</option>
+    <option value="structureName">Structure</option>
+  </select>
+  {/* Arrow */}
+  <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600">
+    ▼
+  </span>
+</div>
         </div>
       </form>
 

@@ -25,9 +25,9 @@ const CompoundInformation: React.FC = () => {
     }
 
     return (
-        <div className="w-full min-h-[60vh] bg-white/80 py-2 px-2 text-black">
-            <div className='w-full max-w-7xl mx-auto flex flex-col lg:flex-row gap-2'>
-                <div className='flex-1 flex flex-col gap-4 min-w-0 lg:mr-72'>
+        <div className="w-full min-h-[60vh] bg-white/80 py-2 pl-6 pr-2 text-black">
+            <div className='w-full max-w-7xl mx-auto flex flex-col md:flex-row gap-2'>
+                <div className='flex-1 flex flex-col gap-4 min-w-0 md:mr-80'>
                     {/* Title and Summary - Section 1 */}
                     <div className='mb-10' id="section-1">
                         <Summary drug={drug} sectionId={1} />
@@ -41,7 +41,7 @@ const CompoundInformation: React.FC = () => {
                 </div>
 
                 {/* Fixed TOC - Hidden on mobile, shown on large screens */}
-                <div className="hidden lg:block fixed right-4 top-20 w-72 h-[calc(100vh-12rem)] overflow-y-auto bg-white border border-gray-300 rounded-lg p-4 shadow-lg" style={{ zIndex: 50 }}>
+                <div className="hidden md:block fixed right-4 top-20 w-72 h-[calc(100vh-12rem)] overflow-y-auto bg-white border border-gray-300 rounded-lg p-4 shadow-lg" style={{ zIndex: 50 }}>
                     <Table
                         drug={drug}
                         activeSection={activeSection}
