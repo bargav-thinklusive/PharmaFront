@@ -61,7 +61,7 @@ const dataSource = drugsData.length > 0 ? drugsData :[]
         ];
 
         fields.forEach((field) => {
-          if (field.text && field.text.toLowerCase().includes(q)) {
+          if (field.text && typeof field.text === 'string' && field.text.toLowerCase().includes(q)) {
             const key = `${item.cid}-${field.text}`;
             if (!seen.has(key)) {
               seen.add(key);

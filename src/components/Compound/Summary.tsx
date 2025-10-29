@@ -7,6 +7,7 @@ interface SummaryProps {
 }
 
 const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
+  console.log('Rendering Summary for drug:', drug);
   return (
     <div className='w-full bg-white/90'>
       <div className='max-w-3xl pt-6'>
@@ -34,11 +35,12 @@ const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
             <tr className='align-top border-b border-blue-100'>
               <td className='w-56 p-3 text-black font-semibold'>Structure</td>
               <td className='p-3'>
+                
                 {drug.drugSubstance?.physicalAndChemicalProperties?.chemicalStructure ? (
                   <img
                     src={drug.drugSubstance.physicalAndChemicalProperties.chemicalStructure}
                     alt={drug.marketInformation?.brandName || "structure"}
-                    className="w-32 h-32 object-contain border my-2 cursor-pointer hover:shadow-lg"
+                    className="w-52 h-52 object-contain border my-2 cursor-pointer hover:shadow-lg"
                   />
                 ) : "N/A"}
               </td>

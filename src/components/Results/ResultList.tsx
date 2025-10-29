@@ -31,10 +31,10 @@ const ResultList: React.FC = () => {
   let categoryArr: any[] = drugsData;
 
 
-  // Remove duplicates by cid
+  // Remove duplicates by cid and version
   const uniqueCategoryArr = Array.isArray(categoryArr)
     ? categoryArr.filter((item, idx, arr) =>
-      arr.findIndex((i) => i.cid === item.cid) === idx
+      arr.findIndex((i) => i.cid === item.cid && i.version === item.version) === idx
     )
     : [];
 
@@ -43,8 +43,31 @@ const ResultList: React.FC = () => {
     const arr: string[] = [];
     if (item?.marketInformation?.brandName) arr.push(item.marketInformation.brandName);
     if (item?.marketInformation?.genericName) arr.push(item.marketInformation.genericName);
-    if (item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName) arr.push(item.drugSubstance.physicalAndChemicalProperties.chemicalName);
-    if (item?.drugSubstance?.physicalAndChemicalProperties?.structureName) arr.push(item.drugSubstance.physicalAndChemicalProperties.structureName);
+
+    // Handle nested chemicalName object
+    const chemicalName = item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName;
+    if (chemicalName) {
+      if (typeof chemicalName === 'string') {
+        arr.push(chemicalName);
+      } else if (typeof chemicalName === 'object') {
+        Object.values(chemicalName).forEach((val: any) => {
+          if (typeof val === 'string' && val.trim()) arr.push(val);
+        });
+      }
+    }
+
+    // Handle nested structureName object
+    const structureName = item?.drugSubstance?.physicalAndChemicalProperties?.structureName;
+    if (structureName) {
+      if (typeof structureName === 'string') {
+        arr.push(structureName);
+      } else if (typeof structureName === 'object') {
+        Object.values(structureName).forEach((val: any) => {
+          if (typeof val === 'string' && val.trim()) arr.push(val);
+        });
+      }
+    }
+
     if (item?.cid) arr.push(item.cid);
     return arr;
   }
@@ -54,7 +77,7 @@ const ResultList: React.FC = () => {
   if (searchtext && searchtext.trim()) {
     results = uniqueCategoryArr.filter((item: any) => {
       const search = (searchtext || '').toLowerCase();
-      return getAllSearchableStrings(item).some(str => str.toLowerCase().includes(search));
+      return getAllSearchableStrings(item).some(str => typeof str === 'string' && str.toLowerCase().includes(search));
     });
   } else {
     results = uniqueCategoryArr.slice(0, 10); // Show first 10 items if no search

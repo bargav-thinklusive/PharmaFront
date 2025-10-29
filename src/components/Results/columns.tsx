@@ -3,12 +3,22 @@ import BookmarkCellRenderer from "./BookmarkCellRenderer";
 import BrandNameCellRenderer from "./BrandNameCellRenderer";
 
 
-const valueFormatter = (params: { value?: string | number | null }): string => {
+const valueFormatter = (params: { value?: any }): string => {
   if (params.value == null) return "-"; // handle null/undefined
 
   if (typeof params.value === "string") {
     if (params.value.includes("@")) return params.value;
     return capitalizeFirstLetter(params.value);
+  }
+
+  if (typeof params.value === "object") {
+    // Handle nested objects like chemicalName: {Cefepime: "", Enmetazobactam: ""}
+    // or molecularWeight: {Cefepime: "480.6 g/mol", Enmetazobactam: "314.32 g/mol"}
+    const entries = Object.entries(params.value).filter(([_, val]) => val && typeof val === 'string' && val.trim());
+    if (entries.length > 0) {
+      return entries.map(([key, val]) => `${key}: ${val}`).join('; ');
+    }
+    return "-";
   }
 
   // For numbers or other types
@@ -32,6 +42,16 @@ export const columns: any = [
     sortable: true,
     filter: true,
     width: 100,
+    valueFormatter: valueFormatter,
+
+  },
+  {
+    headerName: "Version",
+    headerClass: "table-header",
+    field: "version",
+    sortable: true,
+    filter: true,
+    width: 80,
     valueFormatter: valueFormatter,
 
   },
