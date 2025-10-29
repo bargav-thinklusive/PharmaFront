@@ -126,7 +126,7 @@ const Appendix4: React.FC<{ appendix4: any }> = ({ appendix4 }) => (
       {appendix4.labels.map((item: any, index: number) => (
         <li key={index}>
           <p>{item.label}</p>
-          <img src={item.image} alt={item.label} className="w-64 h-64 object-contain border my-2 cursor-pointer hover:shadow-lg" />
+          <img src={item.image} alt={item.label} className="w-264 h-64 object-contain  my-2 cursor-pointer hover:shadow-lg" />
         </li>
       ))}
     </ul>
