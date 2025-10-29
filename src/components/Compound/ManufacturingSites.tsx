@@ -10,7 +10,7 @@ interface ManufacturingSitesProps {
 }
 
 const ManufacturingSites: React.FC<ManufacturingSitesProps> = ({ manufacturingSites }) => {
-  if (!manufacturingSites || manufacturingSites.length === 0) return null;
+  if (!manufacturingSites || !Array.isArray(manufacturingSites) || manufacturingSites.length === 0) return null;
 
   return (
     <div className="mb-6 ml-6">

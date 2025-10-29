@@ -25,12 +25,12 @@ const Appendix1: React.FC<{ appendix1: any }> = ({ appendix1 }) => (
       <h3 id="section-5-1-1" className="font-semibold border-blue-400 border-b-4 mt-4">5.1.1 Modular Synthesis</h3>
       <p>{appendix1.modularSynthesis.overview}</p>
       <div className="ml-12">
-        {appendix1.modularSynthesis.steps.map((step: any, index: number) => (
+        {appendix1?.modularSynthesis?.steps?.map((step: any, index: number) => (
           <React.Fragment key={index}>
             <div className="font-semibold border-blue-400 border-b-4 mt-4">
               <strong>5.1.1.{index + 1} {step.name}</strong>
             </div>
-            {step.details.map((detail: string, detailIndex: number) => (
+            {step?.details?.map((detail: string, detailIndex: number) => (
               <p key={detailIndex}>{detail}</p>
             ))}
           </React.Fragment>
@@ -40,14 +40,14 @@ const Appendix1: React.FC<{ appendix1: any }> = ({ appendix1 }) => (
     <div className="ml-10">
       <h3 id="section-5-1-2" className="font-semibold border-blue-400 border-b-4 mt-4">5.1.2 Synthesis Steps</h3>
       <div className="ml-12">
-        {appendix1.synthesisSteps.map((step: any, index: number) => (
+        {appendix1?.synthesisSteps?.map((step: any, index: number) => (
           <div key={index} className="mb-4">
             <div className="font-semibold border-blue-400 border-b-4 pb-1 mt-4">
               5.1.2.{index + 1}. {step.title}
             </div>
             <p>{step.description}</p>
             <div>
-              {step.links && step.links.map((linkString: string, linkIndex: number) => (
+              {step?.links && step.links.map((linkString: string, linkIndex: number) => (
                 linkString.split("https://").filter(Boolean).map((url, i) => (
                   <div key={linkIndex} className="flex items-center justify-start">
                     {linkIndex + 1}.
@@ -79,7 +79,7 @@ const Appendix2: React.FC<{ appendix2: any }> = ({ appendix2 }) => (
       </h2>
     </div>
     <div className="ml-10">
-      {Object.entries(appendix2.specifications).map(
+      {appendix2?.specifications && Object.entries(appendix2.specifications).map(
         ([key, value], index) => (
           <div key={index} className="mb-2">
             <h3 id={`section-5-2-${index + 1}`} className="font-semibold border-blue-400 border-b-4 pb-1 mt-4">
@@ -107,7 +107,7 @@ const Appendix3: React.FC<{ appendix3: any }> = ({ appendix3 }) => (
           </tr>
         </thead>
         <tbody>
-          {appendix3.inactiveIngredients.map((ingredient: any, index: number) => (
+          {appendix3?.inactiveIngredients?.map((ingredient: any, index: number) => (
             <tr key={index}>
               <td className={`border border-gray-400 px-4 py-2 ${normalizeValue(ingredient.ingredientName) === "No data available" ? "text-gray-500 italic" : ""}`}>{normalizeValue(ingredient.ingredientName)}</td>
               <td className={`border border-gray-400 px-4 py-2 ${normalizeValue(ingredient.strength) === "No data available" ? "text-gray-500 italic" : ""}`}>{normalizeValue(ingredient.strength)}</td>
@@ -123,7 +123,7 @@ const Appendix4: React.FC<{ appendix4: any }> = ({ appendix4 }) => (
   <div className="mt-6 ml-6">
     <h2 id="section-5-4" className="font-bold border-blue-400 border-b-4 mt-4">5.4 {appendix4.name}</h2>
     <ul className="list-disc list-inside">
-      {appendix4.labels.map((item: any, index: number) => (
+      {appendix4?.labels?.map((item: any, index: number) => (
         <li key={index}>
           <p>{item.label}</p>
           <img src={item.image} alt={item.label} className="w-264 h-64 object-contain  my-2 cursor-pointer hover:shadow-lg" />
@@ -139,14 +139,14 @@ const Appendix5: React.FC<{ appendix5: any }> = ({ appendix5 }) => (
       <h2 id="section-5-5" className="font-bold border-blue-400 border-b-4 mt-4">5.5 {appendix5.name}</h2>
       <p>{appendix5.description}</p>
       <div className="ml-10 mt-2">
-        {Object.entries(appendix5.designations).map(([key, value], index) => (
+        {appendix5?.designations && Object.entries(appendix5.designations).map(([key, value], index) => (
           <div key={index} className="mb-4">
             <h3 id={`section-5-5-${index + 1}`} className="font-semibold border-blue-400 border-b-4 pb-1 mt-4">
               5.5.{index + 1} {formatKey(key)}
             </h3>
             {Array.isArray(value) ? (
               <ul className="list-disc list-inside">
-                {value.map((item, idx) => (
+                {Array.isArray(value) && value.map((item, idx) => (
                   <li key={idx}>{item}</li>
                 ))}
               </ul>

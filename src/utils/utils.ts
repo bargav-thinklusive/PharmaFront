@@ -15,10 +15,23 @@ export const toTitleCase = (str: unknown): string => {
 };
 
 export const normalizeValue = (value: any): string => {
-  const str = String(value).trim().toLowerCase();
-  if (str === "" || str === "n/a" || str === "not data") {
-    return "No data available";
+  if (value === null || value === undefined) return "No data available";
+  if (typeof value === 'string') {
+    const str = value.trim().toLowerCase();
+    if (str === "" || str === "n/a" || str === "not data") {
+      return "No data available";
+    }
+    return value.trim();
   }
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (Array.isArray(value)) {
+    // For arrays of objects, don't join with commas - let the renderer handle it
+    if (value.length > 0 && typeof value[0] === 'object' && value[0] !== null) {
+      return value.map(item => normalizeValue(item)).join(', ');
+    }
+    return value.map(item => normalizeValue(item)).join(', ');
+  }
+  if (typeof value === 'object') return JSON.stringify(value);
   return String(value);
 };
 
