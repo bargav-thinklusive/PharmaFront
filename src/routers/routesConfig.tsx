@@ -5,7 +5,7 @@ import About from '../pages/About';
 import Contacts from '../pages/Contacts';
 import ResultList from '../components/Results/ResultList';
 import NotFound from "../pages/NotFound";
-import UniversalCompoundRenderer from "../components/Compound/UniversalCompoundRenderer";
+import UniversalCompoundRenderer from "../components/Compound/shared/UniversalCompoundRenderer";
 import SearchHistory from "../components/SearchHistory/SearchHistory";
 
 export const routesConfig=[

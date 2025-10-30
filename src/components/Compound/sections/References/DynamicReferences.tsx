@@ -1,19 +1,21 @@
 import React from 'react';
-import { normalizeValue } from '../../utils/utils';
+import { normalizeValue } from '../../../../utils/utils';
 
-interface ReferencesProps {
+interface DynamicReferencesProps {
   references: any[];
 }
 
-const References: React.FC<ReferencesProps> = ({ references }) => {
+const DynamicReferences: React.FC<DynamicReferencesProps> = ({ references }) => {
+  if (!references || !Array.isArray(references) || references.length === 0) return null;
+
   return (
     <div className="mb-10">
       <h1 id="section-6" className="text-2xl font-bold border-blue-400 border-b-4 pb-1 mb-4">
         6. References
       </h1>
-      {(references || []).map((ref: any, refIndex: number) => (
+      {references.map((ref: any, refIndex: number) => (
         <div key={refIndex} className="mb-2">
-          <h2 id={`section-6-${refIndex + 1}`} className={`font-semibold ${normalizeValue(ref.title) === "No data available" ? "text-gray-500 italic" : ""}`}>
+          <h2 className={`font-semibold ${normalizeValue(ref.title) === "No data available" ? "text-gray-500 italic" : ""}`}>
             {refIndex + 1}. {normalizeValue(ref.title)}
           </h2>
           <a
@@ -30,4 +32,4 @@ const References: React.FC<ReferencesProps> = ({ references }) => {
   );
 };
 
-export default References;
+export default DynamicReferences;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { formatKey, normalizeValue } from '../../utils/utils';
-import AppendixLink from './AppendixLink';
+import AppendixLink from './sections/Appendices/AppendixLink';
 
 interface KeyValueTableProps {
   data: Record<string, any>;
