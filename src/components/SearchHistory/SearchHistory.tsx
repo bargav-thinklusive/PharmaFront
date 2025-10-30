@@ -28,7 +28,7 @@ const SearchHistory: React.FC = () => {
   const { drugsData } = useUser();
 
   // Use API data only
-  let categoryArr: any[] = drugsData;
+  const categoryArr: any[] = drugsData;
 
 
   // Remove duplicates by cid

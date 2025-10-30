@@ -6,7 +6,7 @@ const BrandNameCellRenderer = (params: any) => {
 
   const handleClick = () => {
     if (ccategory && params.data?.cid) {
-      navigate(`/${ccategory}/${searchtext}/${params.data.cid}`);
+      navigate(`/${ccategory}/${searchtext}/${params.data.cid}/${params.data.version}`);
     }
   };
 

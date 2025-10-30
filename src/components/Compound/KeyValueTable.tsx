@@ -12,8 +12,15 @@ const renderValue = (value: any) => {
     return value.map((item, index) => (
       <span key={index}>
         {index > 0 && ', '}
-        {renderLink(normalizeValue(item))}
+        {typeof item === 'object' && item !== null ? JSON.stringify(item) : renderLink(normalizeValue(item))}
       </span>
+    ));
+  }
+  if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+    return Object.entries(value).map(([k, v], idx) => (
+      <div key={idx} className="mb-1">
+        <strong>{formatKey(k)}:</strong> {renderValue(v)}
+      </div>
     ));
   }
   return renderLink(normalizeValue(value));
@@ -41,9 +48,7 @@ const renderLink = (text: string) => {
 
 const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, className = '' }) => {
 
-  const filteredData = Object.entries(data || {}).filter(
-    ([_, value]) => typeof value !== 'object' || Array.isArray(value)
-  );
+  const filteredData = Object.entries(data || {});
 
   if (filteredData.length === 0) return null;
 

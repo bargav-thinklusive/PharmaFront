@@ -322,21 +322,21 @@ export const drugData = [
       "appendix3": {
         "name": "Formulation Composition",
         "note": "All excipients used in the formulation are compendial and conventional for solid oral dosage forms.",
-        "inactiveIngredients": [
-          { "ingredientName": "SILICON DIOXIDE (UNII: ETJ7Z6XBU4)", "strength": "" },
-          { "ingredientName": "MICROCRYSTALLINE CELLULOSE (UNII: OP1R32D61U)", "strength": "" },
-          { "ingredientName": "ANHYDROUS DIBASIC CALCIUM PHOSPHATE (UNII: L11K75P92J)", "strength": "" },
-          { "ingredientName": "MAGNESIUM STEARATE (UNII: 70097M6I30)", "strength": "" },
-          { "ingredientName": "GELATIN, UNSPECIFIED (UNII: 2G86QN327L)", "strength": "" },
-          { "ingredientName": "TITANIUM DIOXIDE (UNII: 15FIX9V2JP)", "strength": "" },
-          { "ingredientName": "FERRIC OXIDE RED (UNII: 1K09F3G675)", "strength": "" },
-          { "ingredientName": "SHELLAC (UNII: 46N107B71O)", "strength": "" },
-          { "ingredientName": "PROPYLENE GLYCOL (UNII: 6DC9Q167V3)", "strength": "" },
-          { "ingredientName": "AMMONIA (UNII: 5138Q19F1X)", "strength": "" },
-          { "ingredientName": "POTASSIUM HYDROXIDE (UNII: WZH3C48M4T)", "strength": "" },
-          { "ingredientName": "FERROSOFERRIC OXIDE (UNII: XM0M87F357)", "strength": "" },
-          { "ingredientName": "SODIUM STARCH GLYCOLATE TYPE A (UNII: H8AV0SQX4D)", "strength": "" }
-        ]
+        "inactiveIngredients": {
+          "SILICON DIOXIDE (UNII: ETJ7Z6XBU4)": "",
+          "MICROCRYSTALLINE CELLULOSE (UNII: OP1R32D61U)": "",
+          "ANHYDROUS DIBASIC CALCIUM PHOSPHATE (UNII: L11K75P92J)": "",
+          "MAGNESIUM STEARATE (UNII: 70097M6I30)": "",
+          "GELATIN, UNSPECIFIED (UNII: 2G86QN327L)": "",
+          "TITANIUM DIOXIDE (UNII: 15FIX9V2JP)": "",
+          "FERRIC OXIDE RED (UNII: 1K09F3G675)": "",
+          "SHELLAC (UNII: 46N107B71O)": "",
+          "PROPYLENE GLYCOL (UNII: 6DC9Q167V3)": "",
+          "AMMONIA (UNII: 5138Q19F1X)": "",
+          "POTASSIUM HYDROXIDE (UNII: WZH3C48M4T)": "",
+          "FERROSOFERRIC OXIDE (UNII: XM0M87F357)": "",
+          "SODIUM STARCH GLYCOLATE TYPE A (UNII: H8AV0SQX4D)": ""
+        }
       },
       "appendix4": {
 
@@ -751,14 +751,14 @@ export const drugData = [
       "appendix3": {
         "name": "Formulation Composition",
         "description": "All excipients used in the formulation are compendial and are conventional for solid oral dosage forms.",
-        "inactiveIngredients": [
-          { "ingredientName": "SHELLAC (UNII: 46N107B71O)", "strength": "" },
-          { "ingredientName": "PROPYLENE GLYCOL (UNII: 6DC9Q167V3)", "strength": "" },
-          { "ingredientName": "AMMONIA (UNII: 5138Q19F1X)", "strength": "" },
-          { "ingredientName": "POTASSIUM HYDROXIDE (UNII: WZH3C48M4T)", "strength": "" },
-          { "ingredientName": "FERROSOFERRIC OXIDE (UNII: XM0M87F357)", "strength": "" },
-          { "ingredientName": "SODIUM STARCH GLYCOLATE TYPE A (UNII: H8AV0SQX4D)", "strength": "" }
-        ]
+        "inactiveIngredients": {
+          "SHELLAC (UNII: 46N107B71O)": "",
+          "PROPYLENE GLYCOL (UNII: 6DC9Q167V3)": "",
+          "AMMONIA (UNII: 5138Q19F1X)": "",
+          "POTASSIUM HYDROXIDE (UNII: WZH3C48M4T)": "",
+          "FERROSOFERRIC OXIDE (UNII: XM0M87F357)": "",
+          "SODIUM STARCH GLYCOLATE TYPE A (UNII: H8AV0SQX4D)": ""
+        }
       },
       "appendix4": {
         "name": "Preparation of Exblifep",
