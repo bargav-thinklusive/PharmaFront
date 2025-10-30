@@ -22,7 +22,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const checkTokenAndGetUser=async()=>{
     const token = tokenService.getToken();
     if(token){
-      const id=tokenService.decodeToken()?.id
+      const id=tokenService.decodeToken()?.sub
       if(id){
         const userService=new UserService()
         await fetchUser(userService.getUserById(id))
