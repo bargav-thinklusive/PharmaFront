@@ -45,11 +45,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
       title: 'Drug Substance',
       hasSubsections: true,
       data: drug?.drugSubstance,
-      subsections: [
-        { key: 'physicalAndChemicalProperties', title: 'Physical And Chemical Properties' },
-        { key: 'processDevelopment', title: 'Process Development' },
-        { key: 'analyticalDevelopment', title: 'Analytical Development' }
-      ]
+      subsections: drug?.drugSubstance ? Object.entries(drug.drugSubstance).filter(([key]) => key !== 'manufacturingSites').map(([key]) => ({ key, title: toTitleCase(key) })) : []
     },
     {
       id: 4,
@@ -98,7 +94,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
 
         if (section.key === 'appendices' && parts.length >= 2) {
           const appendixIdx = parts[1] - 1;
-          const appendixKeys = ['appendix1', 'appendix2', 'appendix3', 'appendix4', 'appendix5'];
+          const appendixKeys = Object.keys(section.data).sort();
           if (appendixKeys[appendixIdx]) {
             const appendixKey = appendixKeys[appendixIdx];
             newOpen[`${section.key}.${appendixKey}`] = true;
@@ -164,28 +160,60 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
       return section.subsections.map((subsection: any, i: number) => {
         const subsectionId = `section-${section.id}-${i + 1}`;
         const subsectionData = sectionData?.[subsection.key];
-        // Exact match only
         const isActiveSubsection = activeSection === subsectionId;
 
-        let childExpandable = subsectionData && isPlainObject(subsectionData) &&
-          Object.entries(subsectionData).some(([k, v]) => !/^\d+$/.test(k) && hasContent(v));
+        let childExpandable = false;
+        let visibleGrandChildren: [string, any][] = [];
 
-        let visibleGrandChildren = childExpandable
-          ? Object.entries(subsectionData).filter(([k, v]) => !/^\d+$/.test(k) && hasContent(v))
-          : [];
-
-        // For Process Development, only show Manufacturing Sites as sub-subsection
-        if (subsection.key === 'processDevelopment') {
-          visibleGrandChildren = visibleGrandChildren.filter(([k]) => k === 'manufacturingSites');
-          childExpandable = visibleGrandChildren.length > 0;
-        }
-        // For Physical and Chemical Properties, remove all sub-subsections
         if (subsection.key === 'physicalAndChemicalProperties') {
-          visibleGrandChildren = [];
-          childExpandable = false;
-        }
-        // For Analytical Development, show all sub-subsections even if empty
-        if (subsection.key === 'analyticalDevelopment') {
+          const properties = Object.entries(subsectionData || {});
+          const solubilityEntry = properties.find(([k]) => k === 'solubility');
+          const solubilityContent = solubilityEntry ? JSON.stringify(solubilityEntry[1]) : '';
+          const isSolubilityLong = solubilityContent.length > 300;
+          if (isSolubilityLong && solubilityEntry) {
+            visibleGrandChildren = [['solubility', solubilityEntry[1]]];
+            childExpandable = true;
+          }
+        } else if (subsection.key === 'processDevelopment') {
+          const processData = Object.entries(subsectionData || {});
+          const manufacturingRouteEntry = processData.find(([k]) => k === 'manufacturingRoute');
+          const routeContent = manufacturingRouteEntry ? JSON.stringify(manufacturingRouteEntry[1]) : '';
+          const isRouteLong = routeContent.length > 500;
+
+          let sitesArray = null;
+          const sites = subsectionData?.manufacturingSites;
+          if (sites) {
+            if (Array.isArray(sites)) {
+              sitesArray = sites;
+            } else if (typeof sites === 'object') {
+              sitesArray = Object.entries(sites).flatMap(([compound, siteData]: any) => {
+                if (Array.isArray(siteData)) {
+                  return siteData.map((item: any) => ({
+                    vendor: String(item.vendor || item.name || compound),
+                    location: String(item.location || ''),
+                    compound: compound
+                  }));
+                } else if (typeof siteData === 'string') {
+                  return [{ vendor: String(siteData), location: '', compound: compound }];
+                } else {
+                  return [{
+                    vendor: String(siteData.vendor || siteData.name || compound),
+                    location: String(siteData.location || ''),
+                    compound: compound
+                  }];
+                }
+              });
+            }
+          }
+
+          if (isRouteLong && manufacturingRouteEntry) {
+            visibleGrandChildren.push(['manufacturingRoute', manufacturingRouteEntry[1]]);
+          }
+          if (sitesArray && sitesArray.length > 0) {
+            visibleGrandChildren.push(['manufacturingSites', sitesArray]);
+          }
+          childExpandable = visibleGrandChildren.length > 0;
+        } else if (subsection.key === 'analyticalDevelopment') {
           const allGrandChildren = subsectionData && isPlainObject(subsectionData)
             ? Object.entries(subsectionData).filter(([k]) => !/^\d+$/.test(k))
             : [];
@@ -229,7 +257,6 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                 {visibleGrandChildren.map(([gcKey, _], j) => {
                   const subSubsectionId = `section-${section.id}-${i + 1}-${j + 1}`;
                   const isActiveSubSubsection = activeSection === subSubsectionId;
-                  //const hasData = hasContent(gcValue);
 
                   return (
                     <div
@@ -256,7 +283,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
       });
     } else if (section.key === 'appendices' && sectionData) {
       // Handle appendices with their specific structure
-      const appendixKeys = ['appendix1', 'appendix2', 'appendix3', 'appendix4', 'appendix5'];
+      const appendixKeys = Object.keys(sectionData).sort();
       return appendixKeys.map((appendixKey, i) => {
         const appendixData = sectionData[appendixKey];
 
@@ -267,7 +294,8 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
         const hasChildren = appendixData && (appendixKey === 'appendix1' ||
           (appendixKey === 'appendix2' && appendixData.specifications) ||
           (appendixKey === 'appendix3' && appendixData.inactiveIngredients) ||
-          (appendixKey === 'appendix5' && appendixData.designations));
+          (appendixKey === 'appendix5' && appendixData.designations) ||
+          (appendixKey === 'appendix6' && appendixData.images));
 
         return (
           <div key={appendixKey} className="mb-1">
@@ -400,6 +428,28 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
                     );
                   })
                 )}
+                {appendixKey === 'appendix6' && appendixData.images && (
+                  appendixData.images.map((image: any, j: number) => {
+                    return (
+                      <div key={j} className="mb-1">
+                        <div
+                          data-section-id={`section-${section.id}-${i + 1}-${j + 1}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            scrollToSection(`section-${section.id}-${i + 1}-${j + 1}`);
+                          }}
+                          className={`flex justify-between items-center py-1 px-2 rounded text-sm cursor-pointer ${
+                            activeSection === `section-${section.id}-${i + 1}-${j + 1}` ? 'bg-blue-500 text-white' : ''
+                          }`}
+                        >
+                          <span className={activeSection === `section-${section.id}-${i + 1}-${j + 1}` ? 'text-white' : 'text-gray-800'}>
+                            {section.id}.{i + 1}.{j + 1} {image.title}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             )}
           </div>
@@ -441,7 +491,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
   return (
     <div >
       <h3 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide">
-        CONTENTS
+        TABLE OF CONTENTS
       </h3>
 
       {sectionStructure.map((section) => {

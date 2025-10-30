@@ -6,35 +6,67 @@ import UserService from "../services/UserService";
 import TokenService from "../services/shared/TokenService";
 //import { LOGIN_URL } from "../urlConfig";
 import useGet from "../hooks/useGet";
+import DrugService from "../services/DrugService";
+import { useNavigate, useLocation } from "react-router";
+import { LOGIN_URL } from "../urlConfig";
+import AuthService from "../services/AuthService";
 
 const tokenService = TokenService;
 const UserContext = createContext<any | undefined>(undefined)
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
-  //const navigate = useNavigate();
-  const { fetchData, data: user, loading } = useGet();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { fetchData: fetchUser, data: user, loading: userLoading } = useGet();
+  const { fetchData: fetchDrugs, data: drugsData, loading: drugsLoading } = useGet();
 
   const checkTokenAndGetUser=async()=>{
-    const id=tokenService.decodeToken()?.id
-    if(id){
-      const userService=new UserService()
-      const user=await fetchData(userService.getUserById(id))
-      return user
+    const token = await tokenService.getValidToken();
+    if(token){
+      const id=tokenService.decodeToken()?.id
+      if(id){
+        const userService=new UserService()
+        await fetchUser(userService.getUserById(id))
+      }
     }else{
-      //navigate(LOGIN_URL)
+      if(location.pathname !== '/login' && location.pathname !== '/register'){
+        navigate(LOGIN_URL)
+      }
     }
   }
 
+  const getDrugs=async()=>{
+    const drugService=new DrugService()
+    await fetchDrugs(drugService.getDrugs())
+  }
+
+  const logout = () => {
+    AuthService.logout();
+    navigate(LOGIN_URL);
+  };
+
+  const validateUser = async () => {
+    return await TokenService.validateUser();
+  };
+
   useEffect(()=>{
-    checkTokenAndGetUser()
+    const init = async () => {
+      const hasToken = !!tokenService.getToken();
+      await checkTokenAndGetUser();
+      if(hasToken){
+        await getDrugs();
+      }
+    };
+    init();
   },[])
 
-  // if(loading || !user){
+  // const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+  // if(!isAuthPage && (userLoading || !user)){
   //   return <div>Loading...</div>
   // }
 
   return (
-    <UserContext.Provider value={{user,loading,checkTokenAndGetUser}}>
+    <UserContext.Provider value={{user, userLoading, checkTokenAndGetUser, drugsData: drugsData?.data || [], drugsLoading, refetchDrugs: getDrugs, logout, validateUser}}>
       {children}
     </UserContext.Provider>
   )

@@ -7,6 +7,22 @@ interface SummaryProps {
 }
 
 const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
+  const renderValue = (value: any) => {
+    if (typeof value === 'string') {
+      return normalizeValue(value);
+    } else if (value && typeof value === 'object') {
+      return (
+        <div>
+          {Object.entries(value).map(([key, val], idx) => (
+            <div key={idx} className="mb-1">
+              <span className="font-medium">{key}:</span> {typeof val === 'string' ? normalizeValue(val) : JSON.stringify(val)}
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return normalizeValue(value);
+  };
   return (
     <div className='w-full bg-white/90'>
       <div className='max-w-3xl pt-6'>
@@ -32,13 +48,20 @@ const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
               </td>
             </tr>
             <tr className='align-top border-b border-blue-100'>
+              <td className='w-56 p-3 text-black font-semibold'>Version</td>
+              <td className="p-3">
+                <span className={`text-base text-black ${drug.version && normalizeValue(drug.version) === "No data available" ? "text-gray-500 italic" : ""}`}>{drug.version ? normalizeValue(drug.version) : "N/A"}</span>
+              </td>
+            </tr>
+            <tr className='align-top border-b border-blue-100'>
               <td className='w-56 p-3 text-black font-semibold'>Structure</td>
               <td className='p-3'>
+                
                 {drug.drugSubstance?.physicalAndChemicalProperties?.chemicalStructure ? (
                   <img
                     src={drug.drugSubstance.physicalAndChemicalProperties.chemicalStructure}
                     alt={drug.marketInformation?.brandName || "structure"}
-                    className="w-32 h-32 object-contain border my-2 cursor-pointer hover:shadow-lg"
+                    className="w-52 h-52 object-contain border my-2 cursor-pointer hover:shadow-lg"
                   />
                 ) : "N/A"}
               </td>
@@ -46,8 +69,8 @@ const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
             <tr className='align-top border-b border-blue-100'>
               <td className='w-56 p-3 text-black font-semibold'>Chemical Formula</td>
               <td className="p-3">
-                <span className={`text-base text-black ${drug.drugSubstance?.physicalAndChemicalProperties?.elementalFormula && normalizeValue(drug.drugSubstance.physicalAndChemicalProperties.elementalFormula) === "No data available" ? "text-gray-500 italic" : ""}`}>
-                  {drug.drugSubstance?.physicalAndChemicalProperties?.elementalFormula ? normalizeValue(drug.drugSubstance.physicalAndChemicalProperties.elementalFormula) : "N/A"}
+                <span className={`text-base text-black ${drug.drugSubstance?.physicalAndChemicalProperties?.elementalFormula && renderValue(drug.drugSubstance.physicalAndChemicalProperties.elementalFormula) === "No data available" ? "text-gray-500 italic" : ""}`}>
+                  {drug.drugSubstance?.physicalAndChemicalProperties?.elementalFormula ? renderValue(drug.drugSubstance.physicalAndChemicalProperties.elementalFormula) : "N/A"}
                 </span>
               </td>
             </tr>
@@ -56,8 +79,8 @@ const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
               <td className="p-3">
                 <span className="text-base text-black">
                   {[
-                    drug.marketInformation?.brandName ? normalizeValue(drug.marketInformation.brandName) : "",
-                    drug.drugSubstance?.physicalAndChemicalProperties?.structureName ? normalizeValue(drug.drugSubstance.physicalAndChemicalProperties.structureName) : ""
+                    drug.marketInformation?.brandName ? renderValue(drug.marketInformation.brandName) : "",
+                    drug.drugSubstance?.physicalAndChemicalProperties?.structureName ? renderValue(drug.drugSubstance.physicalAndChemicalProperties.structureName) : ""
                   ].filter(Boolean).join(", ") || "N/A"}
                 </span>
               </td>
@@ -65,16 +88,16 @@ const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
             <tr className='align-top border-b border-blue-100'>
               <td className='w-56 p-3 text-black font-semibold'>Molecular Weight</td>
               <td className="p-3">
-                <span className={`text-base text-black ${drug.drugSubstance?.physicalAndChemicalProperties?.molecularWeight && normalizeValue(drug.drugSubstance.physicalAndChemicalProperties.molecularWeight) === "No data available" ? "text-gray-500 italic" : ""}`}>
-                  {drug.drugSubstance?.physicalAndChemicalProperties?.molecularWeight ? normalizeValue(drug.drugSubstance.physicalAndChemicalProperties.molecularWeight) : "N/A"}
+                <span className={`text-base text-black ${drug.drugSubstance?.physicalAndChemicalProperties?.molecularWeight && renderValue(drug.drugSubstance.physicalAndChemicalProperties.molecularWeight) === "No data available" ? "text-gray-500 italic" : ""}`}>
+                  {drug.drugSubstance?.physicalAndChemicalProperties?.molecularWeight ? renderValue(drug.drugSubstance.physicalAndChemicalProperties.molecularWeight) : "N/A"}
                 </span>
               </td>
             </tr>
             <tr className='align-top border-b border-blue-100'>
               <td className='w-56 p-3 text-black font-semibold'>Structure Name</td>
               <td className="p-3">
-                <span className={`text-base text-black ${drug.drugSubstance?.physicalAndChemicalProperties?.structureName && normalizeValue(drug.drugSubstance.physicalAndChemicalProperties.structureName) === "No data available" ? "text-gray-500 italic" : ""}`}>
-                  {drug.drugSubstance?.physicalAndChemicalProperties?.structureName ? normalizeValue(drug.drugSubstance.physicalAndChemicalProperties.structureName) : "N/A"}
+                <span className={`text-base text-black ${drug.drugSubstance?.physicalAndChemicalProperties?.structureName && renderValue(drug.drugSubstance.physicalAndChemicalProperties.structureName) === "No data available" ? "text-gray-500 italic" : ""}`}>
+                  {drug.drugSubstance?.physicalAndChemicalProperties?.structureName ? renderValue(drug.drugSubstance.physicalAndChemicalProperties.structureName) : "N/A"}
                 </span>
               </td>
             </tr>

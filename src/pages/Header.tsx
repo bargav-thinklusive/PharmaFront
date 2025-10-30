@@ -1,9 +1,9 @@
 
 import React, { useEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import CompanyLogo from "../assets/cmcintel.png";
 import SearchBar from "../components/SearchBar";
-import AuthService from "../services/AuthService";
+import { useUser } from "../context/UserContext";
 
 interface HeaderProps {
   isLoginPage?: boolean; // optional prop to indicate if on login page
@@ -12,8 +12,8 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
   const location = useLocation();
-  const navigate = useNavigate();
-
+  const {user, logout}=useUser()
+console.log("Header User:", user);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -45,9 +45,8 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
   const showSearchBar = !isLoginPage && location.pathname !== "/home" && !showMinimalHeader;
 
   const handleLogout = () => {
-    AuthService.logout(); // This deletes token and localStorage user
+    logout(); // Use context logout function which handles token deletion and navigation
     setDropdownOpen(false);
-    navigate("/login");
   };
 
   return (

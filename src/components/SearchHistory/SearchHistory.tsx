@@ -1,17 +1,18 @@
 import React, { useCallback, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import { AgGridReact } from 'ag-grid-react';
-import { columns } from './columns';
+
 import type { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { CellStyleModule, ClientSideRowModelModule, ModuleRegistry, NumberFilterModule, RowAutoHeightModule, TextFilterModule, ValidationModule, } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import '../../components/AgGridHeaderStyle/AgGridHeaderStyle.css';
-import './ResultList.css';
+import '../Results/ResultList.css';
 import { ColumnsToolPanelModule, ExcelExportModule, ServerSideRowModelApiModule } from 'ag-grid-enterprise';
 import { BiBell } from 'react-icons/bi';
 import { MdHistory } from 'react-icons/md';
+import { columns } from '../Results/columns';
 
 
 // Register AG Grid modules
@@ -21,8 +22,7 @@ ModuleRegistry.registerModules([ColumnsToolPanelModule, ExcelExportModule, Clien
 
 
 const pageSize = 20; // Number of rows per page
-const ResultList: React.FC = () => {
-  const navigate = useNavigate();
+const SearchHistory: React.FC = () => {
   const { searchtext } = useParams();
   const gridRef = useRef<AgGridReact<any>>(null);
   const { drugsData } = useUser();
@@ -31,10 +31,10 @@ const ResultList: React.FC = () => {
   const categoryArr: any[] = drugsData;
 
 
-  // Remove duplicates by cid and version
+  // Remove duplicates by cid
   const uniqueCategoryArr = Array.isArray(categoryArr)
     ? categoryArr.filter((item, idx, arr) =>
-      arr.findIndex((i) => i.cid === item.cid && i.version === item.version) === idx
+      arr.findIndex((i) => i.cid === item.cid) === idx
     )
     : [];
 
@@ -95,9 +95,7 @@ const ResultList: React.FC = () => {
     }
   }, []);
 
-const handleSearchHistory = () => {
-  navigate(`/search-history/${searchtext}`);
-}
+
   return (
     <div className="w-full min-h-[60vh] flex flex-col items-center bg-white/80 py-8">
       <div className="w-full max-w-5xl ">
@@ -106,8 +104,8 @@ const handleSearchHistory = () => {
         <div className="flex justify-between items-center gap-8 border-b pb-2 mb-4">
           <span className="font-bold text-blue-900 text-lg">{results.length} results</span>
           <div className='flex justify-between items-center gap-2'>
-            <button ><BiBell size={25} /></button>
-            <button onClick={handleSearchHistory}><MdHistory size={25} /></button>
+            <button><BiBell size={25} /></button>
+            <button><MdHistory size={25} /></button>
             <button onClick={onClickExport} className='bg-blue-500 text-white p-1 rounded'>Export </button>
           </div>
         </div>
@@ -140,6 +138,6 @@ const handleSearchHistory = () => {
   );
 };
 
-export default ResultList;
+export default SearchHistory;
 
 //https://www.ag-grid.com/react-data-grid/modules/

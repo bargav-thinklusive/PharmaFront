@@ -45,6 +45,13 @@ class TokenService {
     }
   }
 
+  static isTokenExpired() {
+    const decoded = this.decodeToken();
+    if (!decoded || !decoded.exp) return true;
+    const currentTime = Date.now() / 1000;
+    return decoded.exp < currentTime;
+  }
+
   static async refreshToken() {
     const username = "kumar7754@gmail.com";
     const password = "123456789";
@@ -56,6 +63,29 @@ class TokenService {
     } catch (error) {
       console.error("Error refreshing token:", error);
       throw error;
+    }
+  }
+
+  static async getValidToken() {
+    if (!this.getToken() || this.isTokenExpired()) {
+      await this.refreshToken();
+    }
+    return this.getToken();
+  }
+
+  static async validateUser() {
+    try {
+      const token = await this.getValidToken();
+      if (!token) return false;
+
+      const decoded = this.decodeToken();
+      if (!decoded || !decoded.id) return false;
+
+      // Additional validation can be added here if needed
+      return true;
+    } catch (error) {
+      console.error("User validation failed:", error);
+      return false;
     }
   }
 }
