@@ -11,7 +11,7 @@ const authService = new AuthService();
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { refetchDrugs } = useUser();
+  const { refetchDrugs, validateUser } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -27,10 +27,19 @@ const Login: React.FC = () => {
 
 
   useEffect(() => {
-    if (TokenService.getToken()) {
-      navigate("/home");
-    }
-  }, [navigate]);
+    const checkExistingToken = async () => {
+      if (TokenService.getToken()) {
+        const isValid = await validateUser();
+        if (isValid) {
+          navigate("/home");
+        } else {
+          // Token exists but user is not valid, clear it
+          TokenService.deleteToken();
+        }
+      }
+    };
+    checkExistingToken();
+  }, [navigate, validateUser]);
 
   const validateEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -62,9 +71,15 @@ const Login: React.FC = () => {
           success: {
             render: "Login successful!",
             onClose: async () => {
-              // Fetch drugs immediately after successful login
-              await refetchDrugs();
-              navigate("/home");
+              // Validate user after successful login
+              const isValid = await validateUser();
+              if (isValid) {
+                // Fetch drugs immediately after successful login and validation
+                await refetchDrugs();
+                navigate("/home");
+              } else {
+                setError("User validation failed. Please try again.");
+              }
             }
           },
           error: "Login failed. Please check your credentials."

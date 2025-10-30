@@ -41,7 +41,8 @@ class AuthService {
 
   isAuthenticated() {
     const token = TokenService.getToken();
-    return !!token;
+    if (!token) return false;
+    return !TokenService.isTokenExpired();
   }
 }
 

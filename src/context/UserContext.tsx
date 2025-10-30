@@ -9,6 +9,7 @@ import useGet from "../hooks/useGet";
 import DrugService from "../services/DrugService";
 import { useNavigate, useLocation } from "react-router";
 import { LOGIN_URL } from "../urlConfig";
+import AuthService from "../services/AuthService";
 
 const tokenService = TokenService;
 const UserContext = createContext<any | undefined>(undefined)
@@ -20,7 +21,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const { fetchData: fetchDrugs, data: drugsData, loading: drugsLoading } = useGet();
 
   const checkTokenAndGetUser=async()=>{
-    const token = tokenService.getToken();
+    const token = await tokenService.getValidToken();
     if(token){
       const id=tokenService.decodeToken()?.id
       if(id){
@@ -39,6 +40,15 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     await fetchDrugs(drugService.getDrugs())
   }
 
+  const logout = () => {
+    AuthService.logout();
+    navigate(LOGIN_URL);
+  };
+
+  const validateUser = async () => {
+    return await TokenService.validateUser();
+  };
+
   useEffect(()=>{
     const init = async () => {
       const hasToken = !!tokenService.getToken();
@@ -56,7 +66,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // }
 
   return (
-    <UserContext.Provider value={{user, userLoading, checkTokenAndGetUser, drugsData: drugsData?.data || [], drugsLoading, refetchDrugs: getDrugs}}>
+    <UserContext.Provider value={{user, userLoading, checkTokenAndGetUser, drugsData: drugsData?.data || [], drugsLoading, refetchDrugs: getDrugs, logout, validateUser}}>
       {children}
     </UserContext.Provider>
   )

@@ -71,7 +71,7 @@ const DynamicDrugSubstance: React.FC<DynamicDrugSubstanceProps> = ({ drugSubstan
                   <div className="max-w-3xl">
                     {Object.entries(solubilityEntry[1] as any).map(([key, val], idx) => (
                       <div key={idx} className={`mb-4 ${drug.cid === "D002" && (key === "Cefepime" || key === "Enmetazobactam") ? "border-b-2 border-gray-300 pb-4" : ""}`}>
-                        <h4 className="font-semibold text-blue-600 mb-2">{formatKey(key)}</h4>
+                        <h4 className="font-semibold text-blue-600 mb-2 border-b-2 border-blue-400 pb-2">{formatKey(key)}</h4>
                         {typeof val === 'object' && val !== null ? (
                           <div className="ml-4">
                             {Object.entries(val as any).map(([subKey, subVal], subIdx) => (
