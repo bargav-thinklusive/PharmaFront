@@ -51,9 +51,12 @@ const dataSource = drugsData.length > 0 ? drugsData :[]
             type: "chemicalName",
           },
           {
-            text:
-              item?.drugSubstance?.physicalAndChemicalProperties?.structureName ||
-              "",
+            text: (() => {
+              const structureName = item?.drugSubstance?.physicalAndChemicalProperties?.structureName;
+              if (typeof structureName === 'string') return structureName;
+              if (typeof structureName === 'object') return Object.values(structureName).join(' ');
+              return "";
+            })(),
             type: "structureName",
           },
           { text: item?.cid || "", type: "cid" },
@@ -90,10 +93,17 @@ const dataSource = drugsData.length > 0 ? drugsData :[]
           matches.push({ ...item, matchedText: text });
         }
       } else if (category === "structureName") {
-        const text =
-          item?.drugSubstance?.physicalAndChemicalProperties?.structureName || "";
-        if (text && text.toLowerCase().includes(q)) {
-          matches.push({ ...item, matchedText: text });
+        const structureName = item?.drugSubstance?.physicalAndChemicalProperties?.structureName;
+        if (structureName) {
+          if (typeof structureName === 'string' && structureName.toLowerCase().includes(q)) {
+            matches.push({ ...item, matchedText: structureName });
+          } else if (typeof structureName === 'object') {
+            Object.values(structureName).forEach((val: any) => {
+              if (typeof val === 'string' && val.trim() && val.toLowerCase().includes(q)) {
+                matches.push({ ...item, matchedText: val });
+              }
+            });
+          }
         }
       }
     });

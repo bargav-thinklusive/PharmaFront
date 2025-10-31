@@ -4,7 +4,7 @@ import { useUser } from '../../context/UserContext';
 import { AgGridReact } from 'ag-grid-react';
 
 import type { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { CellStyleModule, ClientSideRowModelModule, ModuleRegistry, NumberFilterModule, RowAutoHeightModule, TextFilterModule, ValidationModule, } from 'ag-grid-community';
+import { CellStyleModule, ClientSideRowModelModule, ModuleRegistry, NumberFilterModule, PaginationModule, RowAutoHeightModule, RowSelectionModule, TextFilterModule, ValidationModule, } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import '../../components/AgGridHeaderStyle/AgGridHeaderStyle.css';
@@ -17,7 +17,7 @@ import { columns } from '../Results/columns';
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([ColumnsToolPanelModule, ExcelExportModule, ClientSideRowModelModule, NumberFilterModule,
-  TextFilterModule, ValidationModule,  RowAutoHeightModule,CellStyleModule,ServerSideRowModelApiModule]);
+  TextFilterModule, ValidationModule,  RowAutoHeightModule,CellStyleModule,ServerSideRowModelApiModule,PaginationModule,RowSelectionModule]);
 
 
 
@@ -37,7 +37,7 @@ const SearchHistory: React.FC = () => {
       arr.findIndex((i) => i.cid === item.cid) === idx
     )
     : [];
-
+    
   // Helper to extract all searchable fields from a record
   function getAllSearchableStrings(item: any): string[] {
     const arr: string[] = [];

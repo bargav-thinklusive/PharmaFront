@@ -96,7 +96,7 @@ const DynamicDrugSubstance: React.FC<DynamicDrugSubstanceProps> = ({ drugSubstan
           const processData = Object.entries(value as any);
           const manufacturingRouteEntry = processData.find(([k]) => k === 'manufacturingRoute');
           const otherEntries = processData.filter(([k]) => k !== 'manufacturingRoute' && k !== 'manufacturingSites');
-
+          const regulatoryEntry = processData.find(([k]) => k === 'regulatoryStartingMaterials');
           // Convert manufacturingSites object to array if needed
           let sitesArray = null;
           const sites = (value as any).manufacturingSites;
@@ -131,8 +131,13 @@ const DynamicDrugSubstance: React.FC<DynamicDrugSubstanceProps> = ({ drugSubstan
           // Check if manufacturing route content is long (> 500 characters)
           const routeContent = manufacturingRouteEntry ? JSON.stringify(manufacturingRouteEntry[1]) : '';
           const isRouteLong = routeContent.length > 500;
+          const isRegulatoryLong=regulatoryEntry ? JSON.stringify(regulatoryEntry[1]).length > 500 : false;
 
-          const tableData = Object.fromEntries(otherEntries);
+          if (isRegulatoryLong && regulatoryEntry) {
+            otherEntries.push(regulatoryEntry);
+          }
+
+          const tableData = Object.fromEntries(otherEntries.filter(([k]) => !(k === 'regulatoryStartingMaterials' && isRegulatoryLong)));
 
           return (
             <div key={key} className="mb-6 ml-6">
@@ -140,9 +145,33 @@ const DynamicDrugSubstance: React.FC<DynamicDrugSubstanceProps> = ({ drugSubstan
                 3.{sectionNum}. Process Development
               </h2>
               <KeyValueTable data={tableData} />
+              {isRegulatoryLong && regulatoryEntry && (
+                <div className="mt-6">
+                  <h3 id={`section-3-${sectionNum}-1`} className="text-lg font-bold border-blue-400 border-b-3 pb-1 mb-4">3.{sectionNum}.1 Regulatory Starting Materials</h3>
+                  <div className="max-w-3xl">
+                    {Object.entries(regulatoryEntry[1] as any).map(([regKey, regVal]: [string, any], idx) => (
+                      <div key={idx} className="mb-4">
+                        <h4 className="font-semibold text-blue-600 border-b-2 border-blue-400 mb-2">{formatKey(regKey)}</h4>
+
+                       {Array.isArray(regVal) ? (
+                         <div className="ml-4">
+                           {regVal.map((item: any, itemIdx: number) => (
+                             <div key={itemIdx} className="mb-4">
+                               <strong>{itemIdx + 1}. {item.name}:</strong> {item.description}
+                             </div>
+                           ))}
+                         </div>
+                       ) : (
+                         renderValue(regVal)
+                       )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               {manufacturingRouteEntry && (
                 <div className="mt-6">
-                  <h3 id={`section-3-${sectionNum}-1`} className="text-lg font-bold border-blue-400 border-b-3 pb-1 mb-4">3.{sectionNum}.1 Manufacturing Route</h3>
+                  <h3 id={`section-3-${sectionNum}-2`} className="text-lg font-bold border-blue-400 border-b-3 pb-1 mb-4">3.{sectionNum}.2 Manufacturing Route</h3>
                   <div className="max-w-3xl">
                     {isRouteLong ? (
                       Object.entries(manufacturingRouteEntry[1] as any).map(([routeKey, routeVal]: [string, any], idx) => (
@@ -182,7 +211,10 @@ const DynamicDrugSubstance: React.FC<DynamicDrugSubstanceProps> = ({ drugSubstan
                 </div>
               )}
               {sitesArray && sitesArray.length > 0 && (
-                <ManufacturingSites manufacturingSites={sitesArray} />
+                <div className="mt-6">
+                  <h3 id={`section-3-${sectionNum}-3`} className="text-lg font-bold border-blue-400 border-b-3 pb-1 mb-4">3.{sectionNum}.3 Manufacturing Sites</h3>
+                  <ManufacturingSites manufacturingSites={sitesArray} />
+                </div>
               )}
             </div>
           );

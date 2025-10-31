@@ -180,6 +180,9 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
           const routeContent = manufacturingRouteEntry ? JSON.stringify(manufacturingRouteEntry[1]) : '';
           const isRouteLong = routeContent.length > 500;
 
+          const regulatoryEntry = processData.find(([k]) => k === 'regulatoryStartingMaterials');
+          const isRegulatoryLong = regulatoryEntry ? JSON.stringify(regulatoryEntry[1]).length > 500 : false;
+
           let sitesArray = null;
           const sites = subsectionData?.manufacturingSites;
           if (sites) {
@@ -206,6 +209,9 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
             }
           }
 
+          if (isRegulatoryLong && regulatoryEntry) {
+            visibleGrandChildren.push(['regulatoryStartingMaterials', regulatoryEntry[1]]);
+          }
           if (isRouteLong && manufacturingRouteEntry) {
             visibleGrandChildren.push(['manufacturingRoute', manufacturingRouteEntry[1]]);
           }
