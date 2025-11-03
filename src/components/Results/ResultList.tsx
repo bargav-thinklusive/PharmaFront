@@ -12,6 +12,7 @@ import './ResultList.css';
 import { ColumnsToolPanelModule, ExcelExportModule, ServerSideRowModelApiModule } from 'ag-grid-enterprise';
 import { BiBell } from 'react-icons/bi';
 import { MdHistory } from 'react-icons/md';
+import Loader from '../Loader';
 
 
 // Register AG Grid modules
@@ -65,6 +66,9 @@ const ResultList: React.FC = () => {
         Object.values(structureName).forEach((val: any) => {
           if (typeof val === 'string' && val.trim()) arr.push(val);
         });
+        // Also add concatenated values for searching the full structure text
+        const concatenated = Object.values(structureName).filter((val: any) => typeof val === 'string' && val.trim()).join(' ');
+        if (concatenated) arr.push(concatenated);
       }
     }
 
@@ -128,7 +132,7 @@ const handleSearchHistory = () => {
               }}
               pagination={true}
               paginationPageSize={pageSize}
-              loadingOverlayComponent={() => <div>Loading...</div>}
+              loadingOverlayComponent={() => <div><Loader /></div>}
               defaultColDef={{
                 filter: true, 
               }}

@@ -7,6 +7,7 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import '../../components/AgGridHeaderStyle/AgGridHeaderStyle.css';
 import { ColumnsToolPanelModule, ExcelExportModule, ServerSideRowModelApiModule } from 'ag-grid-enterprise';
+import Loader from '../Loader';
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([ColumnsToolPanelModule, ExcelExportModule, ClientSideRowModelModule, NumberFilterModule,
@@ -39,7 +40,7 @@ const DrugsList = () => {
             }}
             pagination={true}
             paginationPageSize={pageSize}
-            loadingOverlayComponent={() => <div>Loading...</div>}
+            loadingOverlayComponent={() => <div><Loader /></div>}
             defaultColDef={{
               filter: true,
             }}

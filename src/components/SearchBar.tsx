@@ -45,16 +45,25 @@ const dataSource = drugsData.length > 0 ? drugsData :[]
           { text: item?.marketInformation?.brandName || "", type: "brandName" },
           { text: item?.marketInformation?.genericName || "", type: "genericName" },
           {
-            text:
-              item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName ||
-              "",
+            text: (() => {
+              const chemicalName = item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName;
+              if (typeof chemicalName === 'string') return chemicalName;
+              if (typeof chemicalName === 'object') {
+                const keys = Object.keys(chemicalName).filter((key: any) => typeof key === 'string' && key.trim());
+                return keys.join(' ');
+              }
+              return "";
+            })(),
             type: "chemicalName",
           },
           {
             text: (() => {
               const structureName = item?.drugSubstance?.physicalAndChemicalProperties?.structureName;
               if (typeof structureName === 'string') return structureName;
-              if (typeof structureName === 'object') return Object.values(structureName).join(' ');
+              if (typeof structureName === 'object') {
+                const values = Object.values(structureName).filter((val: any) => typeof val === 'string' && val.trim());
+                return values.join(' ');
+              }
               return "";
             })(),
             type: "structureName",
@@ -103,6 +112,11 @@ const dataSource = drugsData.length > 0 ? drugsData :[]
                 matches.push({ ...item, matchedText: val });
               }
             });
+            // Also check concatenated values
+            const concatenated = Object.values(structureName).filter((val: any) => typeof val === 'string' && val.trim()).join(' ');
+            if (concatenated && concatenated.toLowerCase().includes(q)) {
+              matches.push({ ...item, matchedText: concatenated });
+            }
           }
         }
       }

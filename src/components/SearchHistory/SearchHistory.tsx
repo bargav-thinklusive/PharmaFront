@@ -13,6 +13,7 @@ import { ColumnsToolPanelModule, ExcelExportModule, ServerSideRowModelApiModule 
 import { BiBell } from 'react-icons/bi';
 import { MdHistory } from 'react-icons/md';
 import { columns } from '../Results/columns';
+import Loader from '../Loader';
 
 
 // Register AG Grid modules
@@ -50,9 +51,18 @@ const SearchHistory: React.FC = () => {
       if (typeof chemicalName === 'string') {
         arr.push(chemicalName);
       } else if (typeof chemicalName === 'object') {
+        Object.keys(chemicalName).forEach((key: any) => {
+          if (typeof key === 'string' && key.trim()) arr.push(key);
+        });
         Object.values(chemicalName).forEach((val: any) => {
           if (typeof val === 'string' && val.trim()) arr.push(val);
         });
+        // Add formatted display string for searching
+        const entries = Object.entries(chemicalName).filter(([_, val]) => val && typeof val === 'string' && val.trim());
+        if (entries.length > 0) {
+          const formatted = entries.map(([key, val]) => `${key}: ${val}`).join('; ');
+          arr.push(formatted);
+        }
       }
     }
 
@@ -62,9 +72,21 @@ const SearchHistory: React.FC = () => {
       if (typeof structureName === 'string') {
         arr.push(structureName);
       } else if (typeof structureName === 'object') {
+        Object.keys(structureName).forEach((key: any) => {
+          if (typeof key === 'string' && key.trim()) arr.push(key);
+        });
         Object.values(structureName).forEach((val: any) => {
           if (typeof val === 'string' && val.trim()) arr.push(val);
         });
+        // Also add concatenated values for searching the full structure text
+        const concatenated = Object.values(structureName).filter((val: any) => typeof val === 'string' && val.trim()).join(' ');
+        if (concatenated) arr.push(concatenated);
+        // Add formatted display string for searching
+        const entries = Object.entries(structureName).filter(([_, val]) => val && typeof val === 'string' && val.trim());
+        if (entries.length > 0) {
+          const formatted = entries.map(([key, val]) => `${key}: ${val}`).join('; ');
+          arr.push(formatted);
+        }
       }
     }
 
@@ -125,7 +147,7 @@ const SearchHistory: React.FC = () => {
               }}
               pagination={true}
               paginationPageSize={pageSize}
-              loadingOverlayComponent={() => <div>Loading...</div>}
+              loadingOverlayComponent={() => <div><Loader /></div>}
               defaultColDef={{
                 filter: true, 
               }}
@@ -140,4 +162,3 @@ const SearchHistory: React.FC = () => {
 
 export default SearchHistory;
 
-//https://www.ag-grid.com/react-data-grid/modules/
