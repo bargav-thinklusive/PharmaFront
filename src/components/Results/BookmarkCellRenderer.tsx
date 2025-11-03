@@ -13,7 +13,9 @@ const BookmarkCellRenderer = (params: any) => {
   const handleBookmarkChange = async (checked: boolean) => {
     try {
       if (checked) {
-        await postData(drugService.createSearchHistory(), { cid: params.data.cid });
+        const {_id,...payload}=params.data; 
+
+        await postData(drugService.createSearchHistory(), payload);
         toast.success("Added to search history");
       } else {
         await deleteData(drugService.deleteSearchHistory(params.data.cid));

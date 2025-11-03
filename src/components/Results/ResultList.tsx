@@ -37,7 +37,7 @@ const ResultList: React.FC = () => {
       arr.findIndex((i) => i.cid === item.cid && i.version === item.version) === idx
     )
     : [];
-console.log("Unique Category Array:", uniqueCategoryArr);
+
   // Helper to extract all searchable fields from a record
   function getAllSearchableStrings(item: any): string[] {
     const arr: string[] = [];
@@ -96,8 +96,9 @@ console.log("Unique Category Array:", uniqueCategoryArr);
   }, []);
 
 const handleSearchHistory = () => {
-  navigate(`/search-history/${searchtext}`);
+  navigate(`/search-history`);
 }
+
   return (
     <div className="w-full min-h-[60vh] flex flex-col items-center bg-white/80 py-8">
       <div className="w-full max-w-5xl ">
