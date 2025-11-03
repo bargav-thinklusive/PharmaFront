@@ -2,15 +2,16 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import AuthService from "../services/AuthService";
-import { useUser } from "../context/UserContext";
 import TokenService from "../services/shared/TokenService";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useUser } from "../context/UserContext";
 
 const authService = new AuthService();
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { refetchDrugs } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -21,9 +22,9 @@ const Login: React.FC = () => {
   const [error, setError] = useState("");
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { checkTokenAndGetUser } = useUser();
 
-console.log(checkTokenAndGetUser,loading)
+
+
 
   useEffect(() => {
     if (TokenService.getToken()) {
@@ -60,7 +61,11 @@ console.log(checkTokenAndGetUser,loading)
           pending: "Logging in...",
           success: {
             render: "Login successful!",
-            onClose: () => navigate("/home")
+            onClose: async () => {
+              // Fetch drugs immediately after successful login
+              await refetchDrugs();
+              navigate("/home");
+            }
           },
           error: "Login failed. Please check your credentials."
         }
@@ -237,7 +242,7 @@ console.log(checkTokenAndGetUser,loading)
         <button
           onClick={isForgotPassword ? handleResetPassword : handleLogin}
           className="p-3 rounded-md bg-green-700 text-white font-semibold hover:bg-green-800 transition cursor-pointer"
-          //disabled={loading}
+          disabled={loading}
         >
           {isForgotPassword ? "Reset Password" : "Login"}
         </button>

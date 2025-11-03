@@ -21,3 +21,16 @@ export const normalizeValue = (value: any): string => {
   }
   return String(value);
 };
+
+
+export const  capitalizeFirstLetter = (
+    value: string | undefined | number | Date
+  ): string => {
+    if (!value || value === "" || value === null) {
+      return "----";
+    } else if (typeof value === "string") {
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    } else {
+      return String(value); // Convert other types to string without capitalization
+    }
+  };

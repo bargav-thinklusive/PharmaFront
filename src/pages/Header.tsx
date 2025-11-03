@@ -4,6 +4,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import CompanyLogo from "../assets/cmcintel.png";
 import SearchBar from "../components/SearchBar";
 import AuthService from "../services/AuthService";
+import { useUser } from "../context/UserContext";
+
 
 interface HeaderProps {
   isLoginPage?: boolean; // optional prop to indicate if on login page
@@ -13,6 +15,8 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const {user}=useUser()
+
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -117,7 +121,7 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
                 className="cursor-pointer font-bold"
                 onClick={() => setDropdownOpen((p) => !p)}
               >
-                👤 User
+                👤 {user?.data?.name||"User"}
               </span>
               {dropdownOpen && (
                 <div className="absolute top-full right-0 bg-white border border-gray-300 rounded-md shadow-md mt-2 min-w-[100px] overflow-hidden">

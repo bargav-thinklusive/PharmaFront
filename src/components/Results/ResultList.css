@@ -1,0 +1,50 @@
+
+.ag-theme-quartz .ag-cell-value {
+  font-weight: normal !important;
+}
+
+/* Clean table styling to match Market360UI */
+.ag-theme-quartz {
+  --ag-header-background-color: #f8f9fa;
+  --ag-header-foreground-color: #212529;
+  --ag-border-color: #dee2e6;
+  --ag-row-border-color: #dee2e6;
+  --ag-background-color: #ffffff;
+  --ag-odd-row-background-color: #ffffff;
+  --ag-even-row-background-color: #ffffff;
+  --ag-cell-horizontal-border: none;
+  --ag-header-cell-horizontal-padding: 12px;
+  --ag-cell-horizontal-padding: 12px;
+  --ag-header-height: 40px;
+  --ag-row-height: 40px;
+  --ag-font-size: 14px;
+  --ag-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Container styling for clean appearance */
+.test-container {
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Remove any additional borders that might interfere */
+.ag-theme-quartz .ag-header-cell {
+  border-right: none !important;
+}
+
+.ag-theme-quartz .ag-cell {
+  border-right: none !important;
+}
+
+/* Hide AG Grid watermark like Market360UI */
+.ag-watermark {
+  display: none;
+}
+
+
+.modal-footer {
+  display: "flex";
+  flex-direction: "row";
+  justify-content: "space-between";
+}

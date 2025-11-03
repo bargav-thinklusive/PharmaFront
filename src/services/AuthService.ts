@@ -3,7 +3,7 @@ import { REACT_API_URL } from "../urlConfig";
 import TokenService from "./shared/TokenService";
 
 class AuthService {
-  baseUrl: String;
+  baseUrl: string;
   constructor() {
     this.baseUrl = REACT_API_URL;
   }

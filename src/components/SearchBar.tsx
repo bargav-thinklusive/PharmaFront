@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { drugData } from "../sampleData/data";
 import { RxCross2 } from "react-icons/rx";
+import { useUser } from "../context/UserContext";
+import { debounce } from "lodash";
 
 interface SearchBarProps {
   compact?: boolean;
@@ -18,9 +19,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const { drugsData } = useUser();
 
-  // Hide suggestions when route changes
-  useEffect(() => {
+
+  // Compute suggestions with debouncing
+  const computeSuggestions = useCallback(() => {
     setShowSuggestions(false);
   }, [location.pathname]);
 
@@ -34,8 +37,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
     const q = search.trim().toLowerCase();
     const matches: any[] = [];
     const seen = new Set<string>();
+const dataSource = drugsData.length > 0 ? drugsData :[]
 
-    drugData.forEach((item) => {
+    dataSource?.forEach((item:any) => {
       if (category === "all") {
         const fields = [
           { text: item?.marketInformation?.brandName || "", type: "brandName" },
@@ -47,9 +51,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
             type: "chemicalName",
           },
           {
-            text:
-              item?.drugSubstance?.physicalAndChemicalProperties?.structureName ||
-              "",
+            text: (() => {
+              const structureName = item?.drugSubstance?.physicalAndChemicalProperties?.structureName;
+              if (typeof structureName === 'string') return structureName;
+              if (typeof structureName === 'object') return Object.values(structureName).join(' ');
+              return "";
+            })(),
             type: "structureName",
           },
           { text: item?.cid || "", type: "cid" },
@@ -57,7 +64,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         ];
 
         fields.forEach((field) => {
-          if (field.text && field.text.toLowerCase().includes(q)) {
+          if (field.text && typeof field.text === 'string' && field.text.toLowerCase().includes(q)) {
             const key = `${item.cid}-${field.text}`;
             if (!seen.has(key)) {
               seen.add(key);
@@ -86,17 +93,33 @@ const SearchBar: React.FC<SearchBarProps> = ({
           matches.push({ ...item, matchedText: text });
         }
       } else if (category === "structureName") {
-        const text =
-          item?.drugSubstance?.physicalAndChemicalProperties?.structureName || "";
-        if (text && text.toLowerCase().includes(q)) {
-          matches.push({ ...item, matchedText: text });
+        const structureName = item?.drugSubstance?.physicalAndChemicalProperties?.structureName;
+        if (structureName) {
+          if (typeof structureName === 'string' && structureName.toLowerCase().includes(q)) {
+            matches.push({ ...item, matchedText: structureName });
+          } else if (typeof structureName === 'object') {
+            Object.values(structureName).forEach((val: any) => {
+              if (typeof val === 'string' && val.trim() && val.toLowerCase().includes(q)) {
+                matches.push({ ...item, matchedText: val });
+              }
+            });
+          }
         }
       }
     });
 
     //setSuggestions(matches.slice(0, 50)); // limit to 50 results
     setSuggestions(matches);
-  }, [search, category]);
+ }, [search, category, drugsData]);
+
+  const debouncedComputeSuggestions = useCallback(
+    debounce(computeSuggestions, 300),
+    [computeSuggestions]
+  );
+
+  useEffect(() => {
+    debouncedComputeSuggestions();
+  }, [debouncedComputeSuggestions]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
