@@ -11,7 +11,7 @@ const authService = new AuthService();
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { refetchDrugs } = useUser();
+  const { refetchDrugs, checkTokenAndGetUser } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -62,6 +62,8 @@ const Login: React.FC = () => {
           success: {
             render: "Login successful!",
             onClose: async () => {
+              // Fetch user data to check role
+              await checkTokenAndGetUser();
               // Fetch drugs immediately after successful login
               await refetchDrugs();
               navigate("/home");
