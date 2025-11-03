@@ -9,6 +9,15 @@ interface KeyValueTableProps {
 
 const renderValue = (value: any) => {
   if (Array.isArray(value)) {
+    // Special handling for availableDmfVendors - extract vendor names only
+    if (value.length > 0 && typeof value[0] === 'object' && value[0] !== null && 'vendor' in value[0]) {
+      return value.map((item, index) => (
+        <span key={index}>
+          {index > 0 && ', '}
+          {item.vendor}
+        </span>
+      ));
+    }
     return value.map((item, index) => (
       <span key={index}>
         {index > 0 && ', '}
