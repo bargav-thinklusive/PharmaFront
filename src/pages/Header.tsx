@@ -121,7 +121,7 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
                 className="cursor-pointer font-bold"
                 onClick={() => setDropdownOpen((p) => !p)}
               >
-                👤 {user.data.name||"User"}
+                👤 {user?.data?.name||"User"}
               </span>
               {dropdownOpen && (
                 <div className="absolute top-full right-0 bg-white border border-gray-300 rounded-md shadow-md mt-2 min-w-[100px] overflow-hidden">
