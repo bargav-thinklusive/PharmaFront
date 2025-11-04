@@ -9,7 +9,7 @@ const Contacts = lazy(() => import('../pages/Contacts'));
 const ResultList = lazy(() => import('../components/Results/ResultList'));
 const NotFound = lazy(() => import("../pages/NotFound"));
 const UniversalCompoundRenderer = lazy(() => import("../components/Compound/shared/UniversalCompoundRenderer"));
-const SearchHistory = lazy(() => import("../components/SearchHistory/SearchHistory"));
+const BookMark = lazy(() => import("../components/Bookmark/BookMark"));
 const DrugsList = lazy(() => import("../components/DrugsList/DrugsList"));
 
 export const routesConfig=[
@@ -20,7 +20,7 @@ export const routesConfig=[
     {path:"/contacts",element:<Contacts />},
     {path:":ccategory/:searchtext",element:<ResultList />},
     {path:":ccategory/:searchtext/:cid/:version",element:<UniversalCompoundRenderer />},
-    {path:"/search-history",element:<SearchHistory />},
+    {path:"/bookmark",element:<BookMark />},
     {path:"/drugsList",element:<DrugsList />},
     {path:"*",element:<NotFound />}
 ]

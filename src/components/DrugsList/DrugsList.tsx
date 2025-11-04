@@ -8,6 +8,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import '../../components/AgGridHeaderStyle/AgGridHeaderStyle.css';
 import { ColumnsToolPanelModule, ExcelExportModule, ServerSideRowModelApiModule } from 'ag-grid-enterprise';
 import Loader from '../Loader';
+import { sampleRawData } from '../../sampleData/data';
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([ColumnsToolPanelModule, ExcelExportModule, ClientSideRowModelModule, NumberFilterModule,
@@ -32,7 +33,7 @@ const DrugsList = () => {
         >
           <AgGridReact
             ref={gridRef}
-            rowData={[]}
+            rowData={sampleRawData}
             columnDefs={columns}
             onGridReady={onGridReady}
             sideBar={{

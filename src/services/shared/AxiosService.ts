@@ -26,7 +26,7 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     // Checking if the error is due to token expiration
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
       TokenService.deleteToken();
       window.location.href = LOGIN_URL;
       // originalRequest._retry = true;
