@@ -11,15 +11,42 @@ const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
     if (typeof value === 'string') {
       return normalizeValue(value);
     } else if (value && typeof value === 'object') {
-      return (
-        <div>
-          {Object.entries(value).map(([key, val], idx) => (
-            <div key={idx} className="mb-1">
-              <span className="font-medium">{key}:</span> {typeof val === 'string' ? normalizeValue(val) : JSON.stringify(val)}
-            </div>
-          ))}
-        </div>
-      );
+      const entries = Object.entries(value).filter(([_, val]) => val !== null && val !== undefined && val !== "" && val !== "[object Object]");
+      if (entries.length > 0) {
+        return (
+          <div>
+            {entries.map(([key, val], idx) => (
+              <div key={idx} className="mb-1">
+                <span className="font-medium">{key}:</span> {typeof val === 'string' ? normalizeValue(val) : JSON.stringify(val)}
+              </div>
+            ))}
+          </div>
+        );
+      }
+      // If all values are empty or [object Object], just return the keys
+      const keys = Object.keys(value).filter(key => key && typeof key === 'string' && key.trim());
+      if (keys.length > 0) {
+        return keys.join('; ');
+      }
+      return "N/A";
+    }
+    return normalizeValue(value);
+  };
+
+  const getSynonymsString = (value: any) => {
+    if (typeof value === 'string') {
+      return normalizeValue(value);
+    } else if (value && typeof value === 'object') {
+      const entries = Object.entries(value).filter(([_, val]) => val !== null && val !== undefined && val !== "" && val !== "[object Object]");
+      if (entries.length > 0) {
+        return entries.map(([key, val]) => `${key}: ${typeof val === 'string' ? normalizeValue(val) : JSON.stringify(val)}`).join('; ');
+      }
+      // If all values are empty or [object Object], just return the keys
+      const keys = Object.keys(value).filter(key => key && typeof key === 'string' && key.trim());
+      if (keys.length > 0) {
+        return keys.join('; ');
+      }
+      return "";
     }
     return normalizeValue(value);
   };
@@ -79,9 +106,10 @@ const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
               <td className="p-3">
                 <span className="text-base text-black">
                   {[
-                    drug.marketInformation?.brandName ? renderValue(drug.marketInformation.brandName) : "",
-                    drug.drugSubstance?.physicalAndChemicalProperties?.structureName ? renderValue(drug.drugSubstance.physicalAndChemicalProperties.structureName) : ""
-                  ].filter(Boolean).join(", ") || "N/A"}
+                    drug.marketInformation?.brandName ? getSynonymsString(drug.marketInformation.brandName) : "",
+                    drug.drugSubstance?.physicalAndChemicalProperties?.chemicalName ? getSynonymsString(drug.drugSubstance.physicalAndChemicalProperties.chemicalName) : "",
+                    drug.drugSubstance?.physicalAndChemicalProperties?.structureName ? getSynonymsString(drug.drugSubstance.physicalAndChemicalProperties.structureName) : ""
+                  ].filter(val => val && val !== "[object Object]").join(", ") || "N/A"}
                 </span>
               </td>
             </tr>
