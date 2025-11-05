@@ -1,6 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
-import { useUser } from '../../context/UserContext';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 
 import type { GridApi, GridReadyEvent } from 'ag-grid-community';
@@ -10,12 +8,10 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import '../../components/AgGridHeaderStyle/AgGridHeaderStyle.css';
 import '../Results/ResultList.css';
 import { ColumnsToolPanelModule, ExcelExportModule, ServerSideRowModelApiModule } from 'ag-grid-enterprise';
-import { BiBell } from 'react-icons/bi';
-import { MdHistory } from 'react-icons/md';
-import { columns } from '../Results/columns';
 import Loader from '../Loader';
 import useGet from '../../hooks/useGet';
 import BookMarkService from '../../services/BookmarkService';
+import { columns } from './columns';
 
 
 // Register AG Grid modules
@@ -26,10 +22,13 @@ ModuleRegistry.registerModules([ColumnsToolPanelModule, ExcelExportModule, Clien
 const bookMarkService = new BookMarkService();
 const pageSize = 20; // Number of rows per page
 const Bookmark: React.FC = () => {
-  const { searchtext } = useParams();
+
   const gridRef = useRef<AgGridReact<any>>(null);
-  const { drugsData } = useUser();
+
   const { fetchData, data } = useGet()
+
+  // Memoize row data to avoid re-creating array references on each render
+  const rowData = useMemo(() => data?.data ?? [], [data]);
 
   const getBookmarks = async () => {
     await fetchData(bookMarkService.getBookmarks())
@@ -38,83 +37,6 @@ const Bookmark: React.FC = () => {
   useEffect(() => {
     getBookmarks()
   }, [])
-console.log(data)
-  // Use API data only
-  const categoryArr: any[] = drugsData;
-
-
-  // Remove duplicates by cid
-  const uniqueCategoryArr = Array.isArray(categoryArr)
-    ? categoryArr.filter((item, idx, arr) =>
-      arr.findIndex((i) => i.cid === item.cid) === idx
-    )
-    : [];
-
-  // Helper to extract all searchable fields from a record
-  function getAllSearchableStrings(item: any): string[] {
-    const arr: string[] = [];
-    if (item?.marketInformation?.brandName) arr.push(item.marketInformation.brandName);
-    if (item?.marketInformation?.genericName) arr.push(item.marketInformation.genericName);
-
-    // Handle nested chemicalName object
-    const chemicalName = item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName;
-    if (chemicalName) {
-      if (typeof chemicalName === 'string') {
-        arr.push(chemicalName);
-      } else if (typeof chemicalName === 'object') {
-        Object.keys(chemicalName).forEach((key: any) => {
-          if (typeof key === 'string' && key.trim()) arr.push(key);
-        });
-        Object.values(chemicalName).forEach((val: any) => {
-          if (typeof val === 'string' && val.trim()) arr.push(val);
-        });
-        // Add formatted display string for searching
-        const entries = Object.entries(chemicalName).filter(([_, val]) => val && typeof val === 'string' && val.trim());
-        if (entries.length > 0) {
-          const formatted = entries.map(([key, val]) => `${key}: ${val}`).join('; ');
-          arr.push(formatted);
-        }
-      }
-    }
-
-    // Handle nested structureName object
-    const structureName = item?.drugSubstance?.physicalAndChemicalProperties?.structureName;
-    if (structureName) {
-      if (typeof structureName === 'string') {
-        arr.push(structureName);
-      } else if (typeof structureName === 'object') {
-        Object.keys(structureName).forEach((key: any) => {
-          if (typeof key === 'string' && key.trim()) arr.push(key);
-        });
-        Object.values(structureName).forEach((val: any) => {
-          if (typeof val === 'string' && val.trim()) arr.push(val);
-        });
-        // Also add concatenated values for searching the full structure text
-        const concatenated = Object.values(structureName).filter((val: any) => typeof val === 'string' && val.trim()).join(' ');
-        if (concatenated) arr.push(concatenated);
-        // Add formatted display string for searching
-        const entries = Object.entries(structureName).filter(([_, val]) => val && typeof val === 'string' && val.trim());
-        if (entries.length > 0) {
-          const formatted = entries.map(([key, val]) => `${key}: ${val}`).join('; ');
-          arr.push(formatted);
-        }
-      }
-    }
-
-    if (item?.cid) arr.push(item.cid);
-    return arr;
-  }
-
-  // Robust filter: match searchtext against any searchable field
-  let results;
-  if (searchtext && searchtext.trim()) {
-    results = uniqueCategoryArr.filter((item: any) => {
-      const search = (searchtext || '').toLowerCase();
-      return getAllSearchableStrings(item).some(str => typeof str === 'string' && str.toLowerCase().includes(search));
-    });
-  } else {
-    results = uniqueCategoryArr.slice(0, 10); // Show first 10 items if no search
-  }
 
 
   const onGridReady = useCallback((params: GridReadyEvent): void => {
@@ -135,10 +57,8 @@ console.log(data)
 
         {/* Filters, sort, etc. can be added here */}
         <div className="flex justify-between items-center gap-8 border-b pb-2 mb-4">
-          <span className="font-bold text-blue-900 text-lg">{results.length} results</span>
+          <span className="font-bold text-blue-900 text-lg">{data?.data.length} results</span>
           <div className='flex justify-between items-center gap-2'>
-            <button><BiBell size={25} /></button>
-            <button><MdHistory size={25} /></button>
             <button onClick={onClickExport} className='bg-blue-500 text-white p-1 rounded'>Export </button>
           </div>
         </div>
@@ -150,8 +70,13 @@ console.log(data)
           >
             <AgGridReact
               ref={gridRef}
-              rowData={results}
+              rowData={rowData}
               columnDefs={columns}
+              getRowId={(params) =>
+                String(
+                  params.data?._id ?? (params.data?.cid ? `${params.data.cid}-${params.data?.version ?? ''}` : '')
+                )
+              }
               onGridReady={onGridReady}
               sideBar={{
                 toolPanels: ["columns"],

@@ -49,9 +49,9 @@ const Register: React.FC = () => {
       setError("");
 
       const payload = { name: username, email, password, role };
-      const response = await postData(login.createRegister(), payload);
+      await postData(login.createRegister(), payload);
 
-      console.log("Registration successful:", response);
+
       toast.success("🎉 Registration successful!");
       setTimeout(() => navigate("/login"), 2000); // redirect after 2s
     } catch (err: any) {
