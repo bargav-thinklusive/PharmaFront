@@ -111,6 +111,9 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
             <Link to="/contacts" className="text-white no-underline">
               Contacts
             </Link>
+            <Link to="/drugslist" className="text-white no-underline">
+            Drugs List
+            </Link>
 
             {/* User Dropdown */}
             <div
@@ -125,13 +128,13 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
               </span>
               {dropdownOpen && (
                 <div className="absolute top-full right-0 bg-white border border-gray-300 rounded-md shadow-md mt-2 min-w-[100px] overflow-hidden">
-                  <Link
+                  {/* <Link
                     to="/profile"
                     className="block px-4 py-2 border-b border-gray-300 text-black hover:bg-[#3678f4ff] hover:text-white transition-colors duration-200"
                     onClick={() => setDropdownOpen(false)}
                   >
                     Profile
-                  </Link>
+                  </Link> */}
 
                   <button
                     onClick={handleLogout}

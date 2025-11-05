@@ -26,7 +26,7 @@ export const columns: any = [
   {
     headerName: "Approval Date",
     headerClass: "table-header",
-    field: "Approval Date",
+    field: "approvalDate",
     sortable: true,
     filter: true,
     width:100,
@@ -36,7 +36,7 @@ export const columns: any = [
   {
     headerName: "Drug Name",
     headerClass: "table-header",
-    field: "Drug Name",
+    field: "drugName",
     sortable: true,
     filter: true,
     width:500,
@@ -47,7 +47,7 @@ export const columns: any = [
   {
     headerName: "Submission",
     headerClass: "table-header",
-    field: "Submission",
+    field: "submission",
     sortable: true,
     filter: true,
     width:100,
@@ -56,7 +56,7 @@ export const columns: any = [
   {
     headerName: "Active Ingriedients",
     headerClass: "table-header",
-    field: "Active Ingredients",
+    field: "activeIngredients",
     sortable: true,
     filter: true,
     width:400,
@@ -65,7 +65,7 @@ export const columns: any = [
   {
     headerName: "Company",
     headerClass: "table-header",
-    field: "Company",
+    field: "company",
     wrapText: true,
     autoHeight: true,
     filter: true,
@@ -75,7 +75,7 @@ export const columns: any = [
   {
     headerName: "SUbmission Classification",
     headerClass: "table-header",
-    field: "Submission Classification *",
+    field: "submissionClassification",
     sortable: true,
     filter: true,
     valueFormatter: valueFormatter
@@ -83,7 +83,7 @@ export const columns: any = [
   {
     headerName: "Submission Status",
     headerClass: "table-header",
-    field: "Submission Status",
+    field: "submissionStatus",
     sortable: true,
     filter: true,
     valueFormatter: valueFormatter
