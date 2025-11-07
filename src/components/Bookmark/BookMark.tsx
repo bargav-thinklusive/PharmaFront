@@ -28,7 +28,18 @@ const Bookmark: React.FC = () => {
   const { fetchData, data } = useGet()
 
   // Memoize row data to avoid re-creating array references on each render
-  const rowData = useMemo(() => data?.data ?? [], [data]);
+  // Handle both direct drug data and nested bookmark.drug structure
+  const rowData = useMemo(() => {
+    const bookmarks = data?.data ?? [];
+    return bookmarks.map((bookmark: any) => {
+      // If bookmark has nested drug property, flatten it
+      if (bookmark.drug) {
+        return { ...bookmark.drug, _id: bookmark._id || bookmark.drug._id };
+      }
+      // Otherwise return as is (direct drug data)
+      return bookmark;
+    });
+  }, [data]);
 
   const getBookmarks = async () => {
     await fetchData(bookMarkService.getBookmarks())
