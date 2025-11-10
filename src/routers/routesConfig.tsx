@@ -11,6 +11,7 @@ const NotFound = lazy(() => import("../pages/NotFound"));
 const UniversalCompoundRenderer = lazy(() => import("../components/Compound/shared/UniversalCompoundRenderer"));
 const BookMark = lazy(() => import("../components/Bookmark/BookMark"));
 const DrugsList = lazy(() => import("../components/DrugsList/DrugsList"));
+const AddDrugForm = lazy(() => import("../components/DrugsList/AddDrugForm"));
 
 export const routesConfig=[
     {path:"/register",element:<Register />},
@@ -22,5 +23,6 @@ export const routesConfig=[
     {path:":ccategory/:searchtext/:cid/:version",element:<UniversalCompoundRenderer />},
     {path:"/bookmark",element:<BookMark />},
     {path:"/drugsList",element:<DrugsList />},
+    {path:"/add-drug",element:<AddDrugForm />},
     {path:"*",element:<NotFound />}
 ]
