@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import { AgGridReact } from 'ag-grid-react';
@@ -10,10 +10,12 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import '../../components/AgGridHeaderStyle/AgGridHeaderStyle.css';
 import './ResultList.css';
 import { ColumnsToolPanelModule, ExcelExportModule, ServerSideRowModelApiModule } from 'ag-grid-enterprise';
-import { BiBell } from 'react-icons/bi';
-import { MdHistory } from 'react-icons/md';
+import { FaRegBookmark } from "react-icons/fa";
+import Loader from '../Loader';
+import useGet from '../../hooks/useGet';
+import BookMarkService from '../../services/BookmarkService';
 
-
+  const bookMarkService = new BookMarkService();
 // Register AG Grid modules
 ModuleRegistry.registerModules([ColumnsToolPanelModule, ExcelExportModule, ClientSideRowModelModule, NumberFilterModule,
   TextFilterModule, ValidationModule,  RowAutoHeightModule,CellStyleModule,ServerSideRowModelApiModule,PaginationModule,RowSelectionModule]);
@@ -26,9 +28,22 @@ const ResultList: React.FC = () => {
   const { searchtext } = useParams();
   const gridRef = useRef<AgGridReact<any>>(null);
   const { drugsData } = useUser();
+  const { fetchData } = useGet();
+  const [bookmarks, setBookmarks] = useState<any[]>([]);
 
   // Use API data only
   const categoryArr: any[] = drugsData;
+
+  const getBookmarks = async () => {
+    const response = await fetchData(bookMarkService.getBookmarks());
+    if (response?.data) {
+      setBookmarks(response.data);
+    }
+  };
+
+  useEffect(() => {
+    getBookmarks();
+  }, []);
 
 
   // Remove duplicates by cid and version
@@ -37,7 +52,7 @@ const ResultList: React.FC = () => {
       arr.findIndex((i) => i.cid === item.cid && i.version === item.version) === idx
     )
     : [];
-console.log("Unique Category Array:", uniqueCategoryArr);
+
   // Helper to extract all searchable fields from a record
   function getAllSearchableStrings(item: any): string[] {
     const arr: string[] = [];
@@ -65,6 +80,9 @@ console.log("Unique Category Array:", uniqueCategoryArr);
         Object.values(structureName).forEach((val: any) => {
           if (typeof val === 'string' && val.trim()) arr.push(val);
         });
+        // Also add concatenated values for searching the full structure text
+        const concatenated = Object.values(structureName).filter((val: any) => typeof val === 'string' && val.trim()).join(' ');
+        if (concatenated) arr.push(concatenated);
       }
     }
 
@@ -72,16 +90,40 @@ console.log("Unique Category Array:", uniqueCategoryArr);
     return arr;
   }
 
-  // Robust filter: match searchtext against any searchable field
-  let results;
-  if (searchtext && searchtext.trim()) {
-    results = uniqueCategoryArr.filter((item: any) => {
+  // Robust filter: match searchtext against any searchable field (memoized)
+  const results = useMemo(() => {
+    if (searchtext && searchtext.trim()) {
       const search = (searchtext || '').toLowerCase();
-      return getAllSearchableStrings(item).some(str => typeof str === 'string' && str.toLowerCase().includes(search));
+      return uniqueCategoryArr.filter((item: any) =>
+        getAllSearchableStrings(item).some(
+          (str) => typeof str === 'string' && str.toLowerCase().includes(search)
+        )
+      );
+    }
+    return uniqueCategoryArr.slice(0, 10);
+  }, [searchtext, uniqueCategoryArr]);
+
+  // Add isBookmarked flag to each result (support multiple bookmark shapes) - memoized
+  const resultsWithBookmarks = useMemo(() => {
+    return results.map((item: any) => {
+      const itemCid = item?.cid;
+      const itemVersion = item?.version;
+      const itemId = item?._id;
+
+      const isBookmarked = bookmarks.some((bookmark: any) => {
+        const bDrugId = bookmark?.drugId || bookmark?.drug?._id || bookmark?._id;
+        const bCid = bookmark?.cid || bookmark?.drug?.cid;
+        const bVersion = bookmark?.version ?? bookmark?.drug?.version;
+
+        return (
+          (itemId && bDrugId && String(bDrugId) === String(itemId)) ||
+          (itemCid && bCid && String(bCid) === String(itemCid) && Number(bVersion) === Number(itemVersion))
+        );
+      });
+
+      return { ...item, isBookmarked };
     });
-  } else {
-    results = uniqueCategoryArr.slice(0, 10); // Show first 10 items if no search
-  }
+  }, [results, bookmarks]);
 
 
   const onGridReady = useCallback((params: GridReadyEvent): void => {
@@ -96,8 +138,9 @@ console.log("Unique Category Array:", uniqueCategoryArr);
   }, []);
 
 const handleSearchHistory = () => {
-  navigate(`/search-history/${searchtext}`);
+  navigate(`/bookmark`);
 }
+
   return (
     <div className="w-full min-h-[60vh] flex flex-col items-center bg-white/80 py-8">
       <div className="w-full max-w-5xl ">
@@ -106,8 +149,7 @@ const handleSearchHistory = () => {
         <div className="flex justify-between items-center gap-8 border-b pb-2 mb-4">
           <span className="font-bold text-blue-900 text-lg">{results.length} results</span>
           <div className='flex justify-between items-center gap-2'>
-            <button ><BiBell size={25} /></button>
-            <button onClick={handleSearchHistory}><MdHistory size={25} /></button>
+            <button onClick={handleSearchHistory}><FaRegBookmark size={25} /></button>
             <button onClick={onClickExport} className='bg-blue-500 text-white p-1 rounded'>Export </button>
           </div>
         </div>
@@ -119,17 +161,22 @@ const handleSearchHistory = () => {
           >
             <AgGridReact
               ref={gridRef}
-              rowData={results}
+              rowData={resultsWithBookmarks}
               columnDefs={columns}
+              getRowId={(params) =>
+                String(
+                  params.data?._id ?? (params.data?.cid ? `${params.data.cid}-${params.data?.version ?? ''}` : '')
+                )
+              }
               onGridReady={onGridReady}
               sideBar={{
                 toolPanels: ["columns"],
               }}
               pagination={true}
               paginationPageSize={pageSize}
-              loadingOverlayComponent={() => <div>Loading...</div>}
+              loadingOverlayComponent={() => <div><Loader /></div>}
               defaultColDef={{
-                filter: true, 
+                filter: true,
               }}
               rowSelection="single"
             />

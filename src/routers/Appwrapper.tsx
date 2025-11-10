@@ -1,8 +1,10 @@
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { Suspense } from 'react';
 import Header from '../pages/Header';
 import Body from '../pages/Body';
 import Footer from '../pages/Footer';
 import { routesConfig } from './routesConfig';
+import Loader from '../components/Loader';
 
 const AppWrapper = () => {
   const location = useLocation();
@@ -13,13 +15,15 @@ const AppWrapper = () => {
       <Header isLoginPage={isLoginPage} />
 
       <Body>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          
-          {routesConfig.map(({ path, element }, index) => (
-            <Route key={`${path}-${index}`} path={path} element={element} />
-          ))}
-        </Routes>
+        <Suspense fallback={<Loader fullScreen message="Loading page..." />}>
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" replace />} />
+
+            {routesConfig.map(({ path, element }, index) => (
+              <Route key={`${path}-${index}`} path={path} element={element} />
+            ))}
+          </Routes>
+        </Suspense>
       </Body>
 
       {!isLoginPage && <Footer />}

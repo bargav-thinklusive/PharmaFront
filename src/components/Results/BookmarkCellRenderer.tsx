@@ -1,23 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import usePost from "../../hooks/usePost";
 import useDelete from "../../hooks/useDelete";
-import DrugService from "../../services/DrugService";
 import { toast } from "react-toastify";
+import BookMarkService from "../../services/BookmarkService";
 
 const BookmarkCellRenderer = (params: any) => {
-  const [isBookmarked, setIsBookmarked] = useState(false); // Assuming initial state, you might need to fetch from API
+  const [isBookmarked, setIsBookmarked] = useState(params.data?.isBookmarked || false);
   const { postData } = usePost();
   const { deleteData } = useDelete();
-  const drugService = new DrugService();
+  const bookMark = new BookMarkService();
+
+  useEffect(() => {
+    setIsBookmarked(params.data?.isBookmarked || false);
+  }, [params.data?.isBookmarked]);
 
   const handleBookmarkChange = async (checked: boolean) => {
     try {
       if (checked) {
-        await postData(drugService.createSearchHistory(), { cid: params.data.cid });
-        toast.success("Added to search history");
+        const {_id}=params.data; 
+        const payload={drugId:_id,};
+
+        await postData(bookMark.createBookmark(),payload);
+        toast.success("Added to BookMark");
       } else {
-        await deleteData(drugService.deleteSearchHistory(params.data.cid));
-        toast.success("Removed from search history");
+        await deleteData(bookMark.deleteBookmark(params.data._id));
+        toast.success("Removed from BookMark");
       }
       setIsBookmarked(checked);
     } catch (error) {

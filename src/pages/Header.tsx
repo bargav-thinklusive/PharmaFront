@@ -15,7 +15,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const {user}=useUser()
+  const { user } = useUser()
 
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -60,7 +60,7 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
       <div className="flex-shrink-0">
         {showMinimalHeader ? (
           <div className="flex items-center gap-2">
-            <img src={CompanyLogo} alt="Logo"  className="h-10" />
+            <img src={CompanyLogo} alt="Logo" className="h-10" />
             <span className="font-bold text-xl">CMCINTEL</span>
           </div>
         ) : (
@@ -111,6 +111,9 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
             <Link to="/contacts" className="text-white no-underline">
               Contacts
             </Link>
+            <Link to="/drugslist" className="text-white no-underline">
+              Drugs List
+            </Link>
 
             {/* User Dropdown */}
             <div
@@ -121,17 +124,17 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
                 className="cursor-pointer font-bold"
                 onClick={() => setDropdownOpen((p) => !p)}
               >
-                👤 {user?.data?.name||"User"}
+                👤 {user?.data?.name || "User"}
               </span>
               {dropdownOpen && (
                 <div className="absolute top-full right-0 bg-white border border-gray-300 rounded-md shadow-md mt-2 min-w-[100px] overflow-hidden">
-                  <Link
+                  {/* <Link
                     to="/profile"
                     className="block px-4 py-2 border-b border-gray-300 text-black hover:bg-[#3678f4ff] hover:text-white transition-colors duration-200"
                     onClick={() => setDropdownOpen(false)}
                   >
                     Profile
-                  </Link>
+                  </Link> */}
 
                   <button
                     onClick={handleLogout}

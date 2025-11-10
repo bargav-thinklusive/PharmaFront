@@ -15,8 +15,8 @@ const useGet = () => {
       setData(response.data);
       return response.data;
     } catch (error: any) {
-      console.error(error.message);
-      setError(error.message);
+      console.error(error?.message || error);
+      setError(error?.message || error);
       throw error;
     } finally {
       setLoading(false);

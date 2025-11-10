@@ -20,21 +20,6 @@ class DrugService {
     return `${this.baseUrl}/drugs/`;
   };
 
-  getDrugsByProject = (project = "profile.firstName,profile._id") =>
-    `${this.baseUrl}/drug?project=${project}`;
-
-  getDrugsOnlyByProject = (
-    project = "profile._id,profile.firstName,profile.lastName,profile.authRole"
-  ) => `${this.baseUrl}/drug?project=${project}&onlydrugs=true`;
-
-  getAdminsOnlyByProject = (
-    project = "profile._id,profile.firstName,profile.lastName,profile.authRole"
-  ) => `${this.baseUrl}/drug?project=${project}&onlyAdmins=true`;
-
-  getAdminsSourcingMangagerOnlyByProject = (
-    project = "profile._id,profile.firstName,profile.lastName,profile.authRole"
-  ) =>
-    `${this.baseUrl}/drug?project=${project}&onlyAdmins=true&sourceManagers=true`;
 
   getDrug = (id: string) => `${this.baseUrl}/drug/${id}`;
   

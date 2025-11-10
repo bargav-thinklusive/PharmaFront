@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import usePost from "../hooks/usePost";
 import LoginService from "../services/LoginService";
 import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import TokenService from "../services/shared/TokenService";
 
 const login = new LoginService();
 
@@ -13,16 +12,12 @@ const Register: React.FC = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("user");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const { postData, loading } = usePost();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (TokenService.getToken()) {
-      navigate("/home");
-    }
-  }, [navigate]);
 
   const validateEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -53,10 +48,10 @@ const Register: React.FC = () => {
 
       setError("");
 
-      const payload = { name: username, email, password };
-      const response = await postData(login.createRegister(), payload);
+      const payload = { name: username, email, password, role };
+      await postData(login.createRegister(), payload);
 
-      console.log("Registration successful:", response);
+
       toast.success("🎉 Registration successful!");
       setTimeout(() => navigate("/login"), 2000); // redirect after 2s
     } catch (err: any) {
@@ -111,6 +106,15 @@ const Register: React.FC = () => {
             onChange={(e) => setEmail(e.target.value)}
             className="p-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
           />
+
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="p-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+          >
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
 
           <div className="relative w-full">
             <input
