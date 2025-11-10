@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import CompanyLogo from "../assets/cmcintel.png";
+import CompanyLogo from "../assets/CMCINTELLOGO.png";
 import SearchBar from "../components/SearchBar";
 import AuthService from "../services/AuthService";
 import { useUser } from "../context/UserContext";
@@ -60,16 +60,16 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
       <div className="flex-shrink-0">
         {showMinimalHeader ? (
           <div className="flex items-center gap-2">
-            <img src={CompanyLogo} alt="Logo" className="h-10" />
-            <span className="font-bold text-xl">CMCINTEL</span>
+            <img src={CompanyLogo} alt="Logo" className="h-10 w-15" />
+            {/* <span className="font-bold text-xl">CMCINTEL</span> */}
           </div>
         ) : (
           <Link
             to="/home"
             className="flex items-center gap-2 text-white no-underline"
           >
-            <img src={CompanyLogo} alt="Logo" className="h-10" />
-            <span className="font-bold text-xl">CMCINTEL</span>
+            <img src={CompanyLogo} alt="Logo" className="h-10 w-15" />
+            {/* <span className="font-bold text-xl">CMCINTEL</span> bg-[#36b669]*/}
           </Link>
         )}
       </div>
