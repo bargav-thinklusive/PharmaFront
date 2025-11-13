@@ -188,5 +188,3 @@ const handleSearchHistory = () => {
 };
 
 export default ResultList;
-
-//https://www.ag-grid.com/react-data-grid/modules/

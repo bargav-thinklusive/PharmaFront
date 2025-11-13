@@ -6,7 +6,7 @@ import CompanyLogo from "../assets/CMCINTELLOGO.png";
 const Header1 = () => {
 
     return (
-        <header className={`flex items-center bg-[#36b669] text-white px-6 py-3 fixed top-0 left-0 w-full z-[1000] `}>
+        <header className={`flex items-center justify-between bg-[#36b669] text-white px-6 py-3 fixed top-0 left-0 w-full z-[1000] `}>
             {/* Logo Section */}
             <div className="flex-shrink-0">
 
@@ -20,22 +20,37 @@ const Header1 = () => {
 
             {/* Navigation Section */}
             <nav className="flex gap-4 items-center flex-shrink-0">
-
                 <Link
-                    to="/about"
-                    state={{ fromLogin: true }}
+                    to="/what-we-do"
                     className="text-white no-underline"
                 >
-                    About
+                    What we do
                 </Link>
                 <Link
-                    to="/contacts"
-                    state={{ fromLogin: true }}
+                    to="/areas-served"
                     className="text-white no-underline"
                 >
-                    Contacts
+                    Areas Served
+                </Link>
+                <Link
+                    to="/about1"
+                    className="text-white no-underline"
+                >
+                    About us
+                </Link>
+                <Link
+                    to="/contacts1"
+                    className="text-white no-underline"
+                >
+                    Contacts us
                 </Link>
 
+                <Link
+                    to="/login"
+                    className="bg-white text-[#36b669] px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                >
+                    Login
+                </Link>
 
             </nav>
         </header>
