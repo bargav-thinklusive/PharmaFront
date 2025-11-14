@@ -12,7 +12,6 @@ const Register: React.FC = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("user");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const { postData, loading } = usePost();
@@ -48,7 +47,7 @@ const Register: React.FC = () => {
 
       setError("");
 
-      const payload = { name: username, email, password, role };
+      const payload = { name: username, email, password };
       await postData(login.createRegister(), payload);
 
 
@@ -107,14 +106,6 @@ const Register: React.FC = () => {
             className="p-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
           />
 
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="p-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
-          >
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-          </select>
 
           <div className="relative w-full">
             <input
