@@ -10,11 +10,12 @@ import Header1 from '../pages/Header1';
 const AppWrapper = () => {
   const location = useLocation();
   const isLoginPage = location.pathname === '/login' || location.pathname === '/register';
-  const isHome1Page = location.pathname === "/" || location.pathname === "/what-we-do" || location.pathname === "/areas-served" || location.pathname === "/about1" || location.pathname === "/contacts1";
+  const isHome1Page = location.pathname === "/" || location.pathname === "/what-we-do" || location.pathname === "/areas-served";
+  const showHeader1 = isHome1Page || location.state?.headerType === 'header1';
 
   return (
     <div className="min-h-screen flex flex-col">
-      {isHome1Page?<Header1 />:<Header isLoginPage={isLoginPage} />}
+      {!isLoginPage && (showHeader1 ? <Header1 /> : <Header />)}
 
       <Body>
         <Suspense fallback={<Loader fullScreen message="Loading page..." />}>

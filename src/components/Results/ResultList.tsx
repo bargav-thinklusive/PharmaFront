@@ -151,6 +151,7 @@ const handleSearchHistory = () => {
           <div className='flex justify-between items-center gap-2'>
             <button onClick={handleSearchHistory}><FaRegBookmark size={25} /></button>
             <button onClick={onClickExport} className='bg-blue-500 text-white p-1 rounded'>Export </button>
+            <button onClick={()=>navigate("/drug-form")} className='bg-blue-500 text-white p-1 rounded cursor-pointer'>Add Drug</button>
           </div>
         </div>
 

@@ -68,7 +68,7 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
             to="/home"
             className="flex items-center gap-2 text-white no-underline"
           >
-            <img src={CompanyLogo} alt="Logo" className="h-10 w-15" />
+            <img src={CompanyLogo} alt="Logo" className="h-10 w-20" />
             {/* <span className="font-bold text-xl">CMCINTEL</span> bg-[#36b669]*/}
           </Link>
         )}
@@ -87,17 +87,17 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
           <>
             <Link
               to="/about"
-              state={{ fromLogin: true }}
+              state={{ fromLogin: true, headerType: 'header' }}
               className="text-white no-underline"
             >
-              About
+              About us
             </Link>
             <Link
               to="/contacts"
-              state={{ fromLogin: true }}
+              state={{ fromLogin: true, headerType: 'header' }}
               className="text-white no-underline"
             >
-              Contacts
+              Contacts us
             </Link>
           </>
         ) : (
@@ -105,11 +105,11 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
             <Link to="/home" className="text-white no-underline">
               Home
             </Link>
-            <Link to="/about" className="text-white no-underline">
-              About
+            <Link to="/about" state={{ headerType: 'header' }} className="text-white no-underline">
+              About us
             </Link>
-            <Link to="/contacts" className="text-white no-underline">
-              Contacts
+            <Link to="/contacts" state={{ headerType: 'header' }} className="text-white no-underline">
+              Contacts us
             </Link>
             <Link to="/drugslist" className="text-white no-underline">
               Drugs List

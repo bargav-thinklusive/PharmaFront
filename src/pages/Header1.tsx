@@ -11,7 +11,7 @@ const Header1 = () => {
             <div className="flex-shrink-0">
 
                 <div className="flex items-center gap-2">
-                    <img src={CompanyLogo} alt="Logo" className="h-10 w-15" />
+                    <img src={CompanyLogo} alt="Logo" className="h-10 w-20" />
                     {/* <span className="font-bold text-xl">CMCINTEL</span> */}
                 </div>
             </div>
@@ -33,13 +33,15 @@ const Header1 = () => {
                     Areas Served
                 </Link>
                 <Link
-                    to="/about1"
+                    to="/about"
+                    state={{ headerType: 'header1' }}
                     className="text-white no-underline"
                 >
                     About us
                 </Link>
                 <Link
-                    to="/contacts1"
+                    to="/contacts"
+                    state={{ headerType: 'header1' }}
                     className="text-white no-underline"
                 >
                     Contacts us

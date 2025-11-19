@@ -135,7 +135,7 @@ const Login: React.FC = () => {
         toastClassName="!bg-black !text-white text-center rounded-lg shadow-lg"
       />
 
-      <div className="flex justify-center items-center min-h-screen w-screen bg-gradient-to-br from-green-700 to-blue-500 fixed inset-0 pt-16">
+      <div className="flex justify-center items-center min-h-screen w-screen bg-gradient-to-br from-green-700 to-blue-500 fixed inset-0">
       <div className="bg-white p-8 rounded-xl shadow-lg w-[450px] h-auto min-h-[500px] max-w-[90vw] flex flex-col gap-5 justify-center">
         <h2 className="text-2xl font-bold text-center text-green-700">
           {isForgotPassword ? "Reset Password" : "Login"}
