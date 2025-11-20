@@ -28,7 +28,7 @@ const PhysicalChemicalPropertiesStep: React.FC<{ formData: DrugEntry; setFormDat
               key={field.label}
               label={field.label}
               value={getNestedValue(formData, field.path) as any}
-              onChange={(value) => { console.log('chemicalStructure onChange called with', value); setFormData(prev => updateNested(prev, field.path, value as any)) }}
+              onChange={(value) => setFormData(prev => updateNested(prev, field.path, value as any))}
               multiple={field.multiple}
             />
           ) : (

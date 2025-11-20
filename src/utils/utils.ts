@@ -44,7 +44,6 @@ export const getNestedValue = (obj: any, path: string): string => {
 
 
 export const updateNested = (obj: any, path: string, value: any): any => {
-  console.log('updateNested called with path', path, 'value', value);
   const keys = path.split('.');
   const newObj = { ...obj };
   let current: any = newObj;
@@ -53,7 +52,6 @@ export const updateNested = (obj: any, path: string, value: any): any => {
     current = current[keys[i]];
   }
   current[keys[keys.length - 1]] = value;
-  console.log('newObj', newObj);
   return newObj;
 };
 

@@ -39,7 +39,6 @@ export const FileUploadField: React.FC<{
           accept={accept}
           multiple={multiple}
           onChange={(e) => {
-            console.log('FileUploadField input onChange fired', e.target.files);
             const files = e.target.files;
             if (!files) return;
             if (multiple) {

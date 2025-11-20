@@ -38,7 +38,7 @@ const AppendicesReferencesStep: React.FC<{
                 key={field.label}
                 label={field.label}
                 value={getNestedValue(formData, field.path)}
-                onChange={(value) => { console.log('appendix5 onChange called with', value); setFormData(prev => updateNested(prev, field.path, value as any)) }}
+                onChange={(value) => setFormData(prev => updateNested(prev, field.path, value as any))}
               />
             )
           ))}

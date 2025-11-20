@@ -213,7 +213,6 @@ const handleSubmit = async (e: React.FormEvent) => {
     
     const formDataToSend = new FormData();
     const payload = processDrugData(dataToSend);
-    console.log('payload:', payload);
     formDataToSend.append('data', JSON.stringify(payload));
 
     // Use the extracted files
@@ -233,8 +232,6 @@ const handleSubmit = async (e: React.FormEvent) => {
       });
     }
 
-    console.log('formDataToSend entries:', [...formDataToSend.entries()]);
-    console.log('Calling postData with FormData', formDataToSend);
     await postData(drugservice.createDrug(), formDataToSend);
     console.log('postData completed successfully');
     toast.success('Drug entry submitted successfully!');
