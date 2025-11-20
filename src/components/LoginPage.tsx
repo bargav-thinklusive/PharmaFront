@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState,  } from "react";
 import { useNavigate } from "react-router";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import AuthService from "../services/AuthService";
-import TokenService from "../services/shared/TokenService";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useUser } from "../context/UserContext";
@@ -26,11 +25,11 @@ const Login: React.FC = () => {
 
 
 
-  useEffect(() => {
-    if (TokenService.getToken()) {
-      navigate("/home");
-    }
-  }, [navigate]);
+  // useEffect(() => {
+  //   if (TokenService.getToken()) {
+  //     navigate("/home");
+  //   }
+  // }, [navigate]);
 
   const validateEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);

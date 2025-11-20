@@ -15,7 +15,7 @@ const AppendicesReferencesStep: React.FC<{
     { label: 'Appendix 2', path: 'appendices.appendix2' },
     { label: 'Appendix 3', path: 'appendices.appendix3' },
     { label: 'Appendix 4', path: 'appendices.appendix4' },
-    { label: 'Appendix 5', path: 'appendices.appendix5', type: 'file' },
+    { label: 'Appendix 5', path: 'appendices.appendix5', type: 'file', multiple: true },
     { label: 'Appendix 6', path: 'appendices.appendix6' },
   ];
 
@@ -29,14 +29,16 @@ const AppendicesReferencesStep: React.FC<{
               <FileUploadField
                 key={field.label}
                 label={field.label}
-                onChange={(value) => setFormData(prev => updateNested(prev, field.path, value))}
+                value={getNestedValue(formData, field.path) as any}
+                onChange={(value) => setFormData(prev => updateNested(prev, field.path, value as any))}
+                multiple={field.multiple}
               />
             ) : (
               <TextareaField
                 key={field.label}
                 label={field.label}
                 value={getNestedValue(formData, field.path)}
-                onChange={(value) => setFormData(prev => updateNested(prev, field.path, value))}
+                onChange={(value) => { console.log('appendix5 onChange called with', value); setFormData(prev => updateNested(prev, field.path, value as any)) }}
               />
             )
           ))}

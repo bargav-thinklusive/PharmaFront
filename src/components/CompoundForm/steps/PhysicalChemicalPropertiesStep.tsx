@@ -6,7 +6,7 @@ import { TextareaField, FileUploadField } from '../formFields';
 const PhysicalChemicalPropertiesStep: React.FC<{ formData: DrugEntry; setFormData: React.Dispatch<React.SetStateAction<DrugEntry>> }> = ({ formData, setFormData }) => {
   const fields = [
     { label: 'Chemical Name', path: 'drugSubstance.physicalAndChemicalProperties.chemicalName' },
-    { label: 'Chemical Structure', path: 'drugSubstance.physicalAndChemicalProperties.chemicalStructure', type: 'file' },
+    { label: 'Chemical Structure', path: 'drugSubstance.physicalAndChemicalProperties.chemicalStructure', type: 'file', multiple: true },
     { label: 'Potency Classification', path: 'drugSubstance.physicalAndChemicalProperties.potencyClassification' },
     { label: 'Elemental Formula', path: 'drugSubstance.physicalAndChemicalProperties.elementalFormula' },
     { label: 'BCS Class', path: 'drugSubstance.physicalAndChemicalProperties.bcsClass' },
@@ -27,7 +27,9 @@ const PhysicalChemicalPropertiesStep: React.FC<{ formData: DrugEntry; setFormDat
             <FileUploadField
               key={field.label}
               label={field.label}
-              onChange={(value) => setFormData(prev => updateNested(prev, field.path, value))}
+              value={getNestedValue(formData, field.path) as any}
+              onChange={(value) => { console.log('chemicalStructure onChange called with', value); setFormData(prev => updateNested(prev, field.path, value as any)) }}
+              multiple={field.multiple}
             />
           ) : (
             <TextareaField

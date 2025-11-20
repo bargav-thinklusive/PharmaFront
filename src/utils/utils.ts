@@ -1,4 +1,4 @@
-import type { DrugEntry } from './types';
+
 
 export const formatKey = (key: string): string => {
   const result = key.replace(/([A-Z])/g, " $1");
@@ -43,15 +43,17 @@ export const getNestedValue = (obj: any, path: string): string => {
 };
 
 
-export const updateNested = (obj: DrugEntry, path: string, value: string): DrugEntry => {
+export const updateNested = (obj: any, path: string, value: any): any => {
+  console.log('updateNested called with path', path, 'value', value);
   const keys = path.split('.');
   const newObj = { ...obj };
   let current: any = newObj;
   for (let i = 0; i < keys.length - 1; i++) {
-    if (!current[keys[i]]) current[keys[i]] = {};
+    current[keys[i]] = { ...current[keys[i]] };
     current = current[keys[i]];
   }
   current[keys[keys.length - 1]] = value;
+  console.log('newObj', newObj);
   return newObj;
 };
 

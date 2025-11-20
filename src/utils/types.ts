@@ -15,7 +15,7 @@ export interface DrugEntry {
   drugSubstance: {
     physicalAndChemicalProperties: {
       chemicalName: string;
-      chemicalStructure: string;
+      chemicalStructure: File | null;
       potencyClassification: string;
       elementalFormula: string;
       bcsClass: string;
@@ -93,7 +93,7 @@ export interface DrugEntry {
     appendix2: string;
     appendix3: string;
     appendix4: string;
-    appendix5: string;
+    appendix5: File[];
     appendix6: string;
   };
   references?: { title: string; url: string }[];
