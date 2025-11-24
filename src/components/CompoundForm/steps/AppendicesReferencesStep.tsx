@@ -6,17 +6,18 @@ import { TextareaField, FileUploadField } from '../formFields';
 const AppendicesReferencesStep: React.FC<{
   formData: DrugEntry;
   setFormData: React.Dispatch<React.SetStateAction<DrugEntry>>;
+  fieldErrors: Record<string, string>;
   addReference: () => void;
   updateReference: (index: number, field: 'title' | 'url', value: string) => void;
   removeReference: (index: number) => void;
-}> = ({ formData, setFormData, addReference, updateReference, removeReference }) => {
+}> = ({ formData, setFormData, fieldErrors, addReference, updateReference, removeReference }) => {
   const appendixFields = [
-    { label: 'Appendix 1', path: 'appendices.appendix1' },
-    { label: 'Appendix 2', path: 'appendices.appendix2' },
-    { label: 'Appendix 3', path: 'appendices.appendix3' },
-    { label: 'Appendix 4', path: 'appendices.appendix4' },
-    { label: 'Appendix 5', path: 'appendices.appendix5', type: 'file', multiple: true },
-    { label: 'Appendix 6', path: 'appendices.appendix6' },
+    { label: 'Appendix 1', path: 'appendices.appendix1', required: false },
+    { label: 'Appendix 2', path: 'appendices.appendix2', required: false },
+    { label: 'Appendix 3', path: 'appendices.appendix3', required: false },
+    { label: 'Appendix 4', path: 'appendices.appendix4', required: false },
+    { label: 'Appendix 5', path: 'appendices.appendix5', type: 'file', multiple: true, required: false },
+    { label: 'Appendix 6', path: 'appendices.appendix6', required: false },
   ];
 
   return (
@@ -30,7 +31,7 @@ const AppendicesReferencesStep: React.FC<{
                 key={field.label}
                 label={field.label}
                 value={getNestedValue(formData, field.path) as any}
-                onChange={(value) => setFormData(prev => updateNested(prev, field.path, value as any))}
+                onChange={(value) => setFormData((prev: any) => updateNested(prev, field.path, value as any))}
                 multiple={field.multiple}
               />
             ) : (
@@ -38,10 +39,19 @@ const AppendicesReferencesStep: React.FC<{
                 key={field.label}
                 label={field.label}
                 value={getNestedValue(formData, field.path)}
-                onChange={(value) => setFormData(prev => updateNested(prev, field.path, value as any))}
+                onChange={(value) => setFormData((prev: any) => updateNested(prev, field.path, value))}
+                required={field.required}
+                error={fieldErrors[field.path]}
               />
             )
           ))}
+          
+          {/* Show appendix validation error if exists */}
+          {fieldErrors['appendices'] && (
+            <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-sm text-red-600">{fieldErrors['appendices']}</p>
+            </div>
+          )}
         </div>
       </fieldset>
 

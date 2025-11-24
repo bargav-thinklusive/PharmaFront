@@ -3,19 +3,19 @@ import type { DrugEntry } from '../../../utils/types';
 import { getNestedValue, updateNested } from '../../../utils/utils';
 import { TextareaField } from '../formFields';
 
-const MarketInformationStep: React.FC<{ formData: DrugEntry; setFormData: React.Dispatch<React.SetStateAction<DrugEntry>> }> = ({ formData, setFormData }) => {
+const MarketInformationStep: React.FC<{ formData: DrugEntry; setFormData: React.Dispatch<React.SetStateAction<DrugEntry>>; fieldErrors: Record<string, string> }> = ({ formData, setFormData, fieldErrors }) => {
   const fields = [
-    { label: 'Version', path: 'marketInformation.version' },
-    { label: 'Brand Name', path: 'marketInformation.brandName' },
-    { label: 'Indication', path: 'marketInformation.indication' },
-    { label: 'Approved For', path: 'marketInformation.approvedFor' },
-    { label: 'Approved Countries', path: 'marketInformation.approvedCountries' },
-    { label: 'Approved Date', path: 'marketInformation.approvedDate' },
-    { label: 'Generic Name', path: 'marketInformation.genericName' },
-    { label: 'Generic Approved Date', path: 'marketInformation.genericApprovedDate' },
-    { label: 'Potential Generic Availability', path: 'marketInformation.potentialGenericAvailability' },
-    { label: 'Special Status', path: 'marketInformation.specialStatus' },
-    { label: 'Patent Exclusivity Info', path: 'marketInformation.patentExclusivityInfo' },
+    { label: 'Version', path: 'marketInformation.version', required: false },
+    { label: 'Brand Name', path: 'marketInformation.brandName', required: true },
+    { label: 'Indication', path: 'marketInformation.indication', required: true },
+    { label: 'Approved For', path: 'marketInformation.approvedFor', required: false },
+    { label: 'Approved Countries', path: 'marketInformation.approvedCountries', required: false },
+    { label: 'Approved Date', path: 'marketInformation.approvedDate', required: false },
+    { label: 'Generic Name', path: 'marketInformation.genericName', required: true },
+    { label: 'Generic Approved Date', path: 'marketInformation.genericApprovedDate', required: false },
+    { label: 'Potential Generic Availability', path: 'marketInformation.potentialGenericAvailability', required: false },
+    { label: 'Special Status', path: 'marketInformation.specialStatus', required: false },
+    { label: 'Patent Exclusivity Info', path: 'marketInformation.patentExclusivityInfo', required: false },
   ];
 
   
@@ -28,7 +28,9 @@ const MarketInformationStep: React.FC<{ formData: DrugEntry; setFormData: React.
             key={field.label}
             label={field.label}
             value={getNestedValue(formData, field.path)}
-            onChange={(value) => setFormData(prev => updateNested(prev, field.path, value))}
+            onChange={(value) => setFormData((prev: any) => updateNested(prev, field.path, value))}
+            required={field.required}
+            error={fieldErrors[field.path]}
           />
         ))}
       </div>

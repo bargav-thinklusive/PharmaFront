@@ -126,10 +126,29 @@ const UniversalForm: React.FC = () => {
   const {postData}=usePost()
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, dispatch] = useReducer(reducer, initialFormData);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const setFormData = (updater: ((prev: DrugEntry) => DrugEntry) | DrugEntry) => {
     if (typeof updater === 'function') {
       const newState = updater(formData);
       dispatch({ type: 'update', value: newState });
+    } else {
+      dispatch({ type: 'update', value: updater });
+    }
+  };
+
+  const setFormDataWithValidation = (updater: ((prev: DrugEntry) => DrugEntry) | DrugEntry, path?: string) => {
+    if (typeof updater === 'function') {
+      const newState = updater(formData);
+      dispatch({ type: 'update', value: newState });
+      
+      // If a specific path was provided, clear its error when user starts typing
+      if (path && fieldErrors[path]) {
+        setFieldErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors[path];
+          return newErrors;
+        });
+      }
     } else {
       dispatch({ type: 'update', value: updater });
     }
@@ -143,7 +162,83 @@ const UniversalForm: React.FC = () => {
     { title: 'Appendices & References', component: 'appendices' }
   ];
 
+  const validateCurrentStep = (): Record<string, string> => {
+    const errors: Record<string, string> = {};
+    
+    switch (currentStep) {
+      case 0: // Market Information
+        if (!formData.marketInformation.brandName.trim()) {
+          errors['marketInformation.brandName'] = 'Brand Name is required';
+        }
+        if (!formData.marketInformation.indication.trim()) {
+          errors['marketInformation.indication'] = 'Indication is required';
+        }
+        if (!formData.marketInformation.genericName.trim()) {
+          errors['marketInformation.genericName'] = 'Generic Name is required';
+        }
+        break;
+        
+      case 1: // Physical & Chemical Properties
+        if (!formData.drugSubstance.physicalAndChemicalProperties.chemicalName.trim()) {
+          errors['drugSubstance.physicalAndChemicalProperties.chemicalName'] = 'Chemical Name is required';
+        }
+        if (!formData.drugSubstance.physicalAndChemicalProperties.molecularWeight.trim()) {
+          errors['drugSubstance.physicalAndChemicalProperties.molecularWeight'] = 'Molecular Weight is required';
+        }
+        if (!formData.drugSubstance.physicalAndChemicalProperties.elementalFormula.trim()) {
+          errors['drugSubstance.physicalAndChemicalProperties.elementalFormula'] = 'Elemental Formula is required';
+        }
+        break;
+        
+      case 2: // Process Development
+        if (!formData.drugSubstance.processDevelopment.manufacturingSites.trim()) {
+          errors['drugSubstance.processDevelopment.manufacturingSites'] = 'Manufacturing Sites is required';
+        }
+        if (!formData.drugSubstance.processDevelopment.manufacturingRoute.trim()) {
+          errors['drugSubstance.processDevelopment.manufacturingRoute'] = 'Manufacturing Route is required';
+        }
+        break;
+        
+      case 3: // Analytical Development
+        if (!formData.drugSubstance.analyticalDevelopment.finalApiMethods.trim()) {
+          errors['drugSubstance.analyticalDevelopment.finalApiMethods'] = 'Final API Methods is required';
+        }
+        break;
+        
+      case 4: // Drug Product
+        if (!formData.drugProduct.information.dosageForms.trim()) {
+          errors['drugProduct.information.dosageForms'] = 'Dosage Forms is required';
+        }
+        if (!formData.drugProduct.information.strengths.trim()) {
+          errors['drugProduct.information.strengths'] = 'Strengths is required';
+        }
+        break;
+        
+      case 5: // Appendices & References
+        const hasAtLeastOneAppendix = formData.appendices.appendix1.trim() || 
+                                     formData.appendices.appendix2.trim() || 
+                                     formData.appendices.appendix3.trim() || 
+                                     formData.appendices.appendix4.trim() || 
+                                     formData.appendices.appendix6.trim();
+        if (!hasAtLeastOneAppendix) {
+          errors['appendices'] = 'At least one appendix section must be filled';
+        }
+        break;
+    }
+    
+    return errors;
+  };
+
   const nextStep = () => {
+    const stepValidationErrors = validateCurrentStep();
+    if (Object.keys(stepValidationErrors).length > 0) {
+      setFieldErrors(stepValidationErrors);
+      toast.error('Please fix the highlighted errors before proceeding');
+      return;
+    }
+    
+    // Clear errors and move to next step
+    setFieldErrors({});
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
@@ -160,11 +255,36 @@ const UniversalForm: React.FC = () => {
 
   const validate = (): string | null => {
     const errors: string[] = [];
+    
+    // Market Information validations
     if (!formData.marketInformation.brandName.trim()) errors.push('Brand Name is required');
-    // if (!formData.marketInformation.indication.trim()) errors.push('Indication is required');
+    if (!formData.marketInformation.indication.trim()) errors.push('Indication is required');
+    if (!formData.marketInformation.genericName.trim()) errors.push('Generic Name is required');
+    
+    // Physical & Chemical Properties validations
     if (!formData.drugSubstance.physicalAndChemicalProperties.chemicalName.trim()) errors.push('Chemical Name is required');
-    // if (!formData.drugSubstance.physicalAndChemicalProperties.molecularWeight.trim()) errors.push('Molecular Weight is required');
-    // Add more validations as needed
+    if (!formData.drugSubstance.physicalAndChemicalProperties.molecularWeight.trim()) errors.push('Molecular Weight is required');
+    if (!formData.drugSubstance.physicalAndChemicalProperties.elementalFormula.trim()) errors.push('Elemental Formula is required');
+    
+    // Process Development validations
+    if (!formData.drugSubstance.processDevelopment.manufacturingSites.trim()) errors.push('Manufacturing Sites is required');
+    if (!formData.drugSubstance.processDevelopment.manufacturingRoute.trim()) errors.push('Manufacturing Route is required');
+    
+    // Analytical Development validations
+    if (!formData.drugSubstance.analyticalDevelopment.finalApiMethods.trim()) errors.push('Final API Methods is required');
+    
+    // Drug Product validations
+    if (!formData.drugProduct.information.dosageForms.trim()) errors.push('Dosage Forms is required');
+    if (!formData.drugProduct.information.strengths.trim()) errors.push('Strengths is required');
+    
+    // Appendices validation
+    const hasAtLeastOneAppendix = formData.appendices.appendix1.trim() || 
+                                 formData.appendices.appendix2.trim() || 
+                                 formData.appendices.appendix3.trim() || 
+                                 formData.appendices.appendix4.trim() || 
+                                 formData.appendices.appendix6.trim();
+    if (!hasAtLeastOneAppendix) errors.push('At least one appendix section must be filled');
+    
     return errors.length > 0 ? errors.join(', ') : null;
   };
 
@@ -231,7 +351,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         formDataToSend.append(`appendix5_${index}`, file);
       });
     }
-
+console.log(formDataToSend)
     await postData(drugservice.createDrug(), formDataToSend);
     console.log('postData completed successfully');
     toast.success('Drug entry submitted successfully!');
@@ -242,19 +362,25 @@ const handleSubmit = async (e: React.FormEvent) => {
 };
 
   const renderStepContent = () => {
+    const stepProps = {
+      formData,
+      setFormData: setFormDataWithValidation,
+      fieldErrors
+    };
+
     switch (currentStep) {
       case 0:
-        return <MarketInformationStep formData={formData} setFormData={setFormData} />;
+        return <MarketInformationStep {...stepProps} />;
       case 1:
-        return <PhysicalChemicalPropertiesStep formData={formData} setFormData={setFormData} />;
+        return <PhysicalChemicalPropertiesStep {...stepProps} />;
       case 2:
-        return <ProcessDevelopmentStep formData={formData} setFormData={setFormData} />;
+        return <ProcessDevelopmentStep {...stepProps} />;
       case 3:
-        return <AnalyticalDevelopmentStep formData={formData} setFormData={setFormData} />;
+        return <AnalyticalDevelopmentStep {...stepProps} />;
       case 4:
-        return <DrugProductStep formData={formData} setFormData={setFormData} />;
+        return <DrugProductStep {...stepProps} />;
       case 5:
-        return <AppendicesReferencesStep formData={formData} setFormData={setFormData} addReference={addReference} updateReference={updateReference} removeReference={removeReference} />;
+        return <AppendicesReferencesStep {...stepProps} addReference={addReference} updateReference={updateReference} removeReference={removeReference} />;
       default:
         return <div>Step not implemented</div>;
     }

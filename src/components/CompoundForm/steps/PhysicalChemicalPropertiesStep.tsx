@@ -3,19 +3,19 @@ import type { DrugEntry } from '../../../utils/types';
 import { getNestedValue, updateNested } from '../../../utils/utils';
 import { TextareaField, FileUploadField } from '../formFields';
 
-const PhysicalChemicalPropertiesStep: React.FC<{ formData: DrugEntry; setFormData: React.Dispatch<React.SetStateAction<DrugEntry>> }> = ({ formData, setFormData }) => {
+const PhysicalChemicalPropertiesStep: React.FC<{ formData: DrugEntry; setFormData: React.Dispatch<React.SetStateAction<DrugEntry>>; fieldErrors: Record<string, string> }> = ({ formData, setFormData, fieldErrors }) => {
   const fields = [
-    { label: 'Chemical Name', path: 'drugSubstance.physicalAndChemicalProperties.chemicalName' },
-    { label: 'Chemical Structure', path: 'drugSubstance.physicalAndChemicalProperties.chemicalStructure', type: 'file', multiple: true },
-    { label: 'Potency Classification', path: 'drugSubstance.physicalAndChemicalProperties.potencyClassification' },
-    { label: 'Elemental Formula', path: 'drugSubstance.physicalAndChemicalProperties.elementalFormula' },
-    { label: 'BCS Class', path: 'drugSubstance.physicalAndChemicalProperties.bcsClass' },
-    { label: 'Molecular Weight', path: 'drugSubstance.physicalAndChemicalProperties.molecularWeight' },
-    { label: 'Average Isotopic Mass', path: 'drugSubstance.physicalAndChemicalProperties.averageIsotopicMass' },
-    { label: 'Structure Name', path: 'drugSubstance.physicalAndChemicalProperties.structureName' },
-    { label: 'Solubility', path: 'drugSubstance.physicalAndChemicalProperties.solubility' },
-    { label: 'pKa', path: 'drugSubstance.physicalAndChemicalProperties.pka' },
-    { label: 'logP', path: 'drugSubstance.physicalAndChemicalProperties.logp' },
+    { label: 'Chemical Name', path: 'drugSubstance.physicalAndChemicalProperties.chemicalName', required: true },
+    { label: 'Chemical Structure', path: 'drugSubstance.physicalAndChemicalProperties.chemicalStructure', type: 'file', multiple: true, required: false },
+    { label: 'Potency Classification', path: 'drugSubstance.physicalAndChemicalProperties.potencyClassification', required: false },
+    { label: 'Elemental Formula', path: 'drugSubstance.physicalAndChemicalProperties.elementalFormula', required: true },
+    { label: 'BCS Class', path: 'drugSubstance.physicalAndChemicalProperties.bcsClass', required: false },
+    { label: 'Molecular Weight', path: 'drugSubstance.physicalAndChemicalProperties.molecularWeight', required: true },
+    { label: 'Average Isotopic Mass', path: 'drugSubstance.physicalAndChemicalProperties.averageIsotopicMass', required: false },
+    { label: 'Structure Name', path: 'drugSubstance.physicalAndChemicalProperties.structureName', required: false },
+    { label: 'Solubility', path: 'drugSubstance.physicalAndChemicalProperties.solubility', required: false },
+    { label: 'pKa', path: 'drugSubstance.physicalAndChemicalProperties.pka', required: false },
+    { label: 'logP', path: 'drugSubstance.physicalAndChemicalProperties.logp', required: false },
   ];
 
   return (
@@ -28,7 +28,7 @@ const PhysicalChemicalPropertiesStep: React.FC<{ formData: DrugEntry; setFormDat
               key={field.label}
               label={field.label}
               value={getNestedValue(formData, field.path) as any}
-              onChange={(value) => setFormData(prev => updateNested(prev, field.path, value as any))}
+              onChange={(value) => setFormData((prev: any) => updateNested(prev, field.path, value as any))}
               multiple={field.multiple}
             />
           ) : (
@@ -36,7 +36,9 @@ const PhysicalChemicalPropertiesStep: React.FC<{ formData: DrugEntry; setFormDat
               key={field.label}
               label={field.label}
               value={getNestedValue(formData, field.path)}
-              onChange={(value) => setFormData(prev => updateNested(prev, field.path, value))}
+              onChange={(value) => setFormData((prev: any) => updateNested(prev, field.path, value))}
+              required={field.required}
+              error={fieldErrors[field.path]}
             />
           )
         ))}

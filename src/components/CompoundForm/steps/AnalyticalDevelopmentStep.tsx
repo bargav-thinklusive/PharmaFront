@@ -3,17 +3,17 @@ import type { DrugEntry } from '../../../utils/types';
 import { getNestedValue, updateNested } from '../../../utils/utils';
 import { TextareaField } from '../formFields';
 
-const AnalyticalDevelopmentStep: React.FC<{ formData: DrugEntry; setFormData: React.Dispatch<React.SetStateAction<DrugEntry>> }> = ({ formData, setFormData }) => {
+const AnalyticalDevelopmentStep: React.FC<{ formData: DrugEntry; setFormData: React.Dispatch<React.SetStateAction<DrugEntry>>; fieldErrors: Record<string, string> }> = ({ formData, setFormData, fieldErrors }) => {
   const fields = [
-    { label: 'RSM Methods', path: 'drugSubstance.analyticalDevelopment.rsmMethods' },
-    { label: 'IPC Test Methods', path: 'drugSubstance.analyticalDevelopment.ipcTestMethods' },
-    { label: 'Final API Methods', path: 'drugSubstance.analyticalDevelopment.finalApiMethods' },
-    { label: 'Residual Solvent Risk Assessment', path: 'drugSubstance.analyticalDevelopment.residualSolventRiskAssessment' },
-    { label: 'RSM Synthesis', path: 'drugSubstance.analyticalDevelopment.rsmSynthesis' },
-    { label: 'Stability of Drug Substance', path: 'drugSubstance.stabilityOfDrugSubstance' },
-    { label: 'Drug Substance Sites', path: 'drugSubstance.drugSubstanceSites' },
-    { label: 'DS Impurities', path: 'drugSubstance.dsImpurities' },
-    { label: 'DS Impurity Methods', path: 'drugSubstance.analyticalDevelopment.dsImpurityMethods' },
+    { label: 'RSM Methods', path: 'drugSubstance.analyticalDevelopment.rsmMethods', required: false },
+    { label: 'IPC Test Methods', path: 'drugSubstance.analyticalDevelopment.ipcTestMethods', required: false },
+    { label: 'Final API Methods', path: 'drugSubstance.analyticalDevelopment.finalApiMethods', required: true },
+    { label: 'Residual Solvent Risk Assessment', path: 'drugSubstance.analyticalDevelopment.residualSolventRiskAssessment', required: false },
+    { label: 'RSM Synthesis', path: 'drugSubstance.analyticalDevelopment.rsmSynthesis', required: false },
+    { label: 'Stability of Drug Substance', path: 'drugSubstance.stabilityOfDrugSubstance', required: false },
+    { label: 'Drug Substance Sites', path: 'drugSubstance.drugSubstanceSites', required: false },
+    { label: 'DS Impurities', path: 'drugSubstance.dsImpurities', required: false },
+    { label: 'DS Impurity Methods', path: 'drugSubstance.analyticalDevelopment.dsImpurityMethods', required: false },
   ];
 
   return (
@@ -25,7 +25,9 @@ const AnalyticalDevelopmentStep: React.FC<{ formData: DrugEntry; setFormData: Re
             key={field.label}
             label={field.label}
             value={getNestedValue(formData, field.path)}
-            onChange={(value) => setFormData(prev => updateNested(prev, field.path, value))}
+            onChange={(value) => setFormData((prev: any) => updateNested(prev, field.path, value))}
+            required={field.required}
+            error={fieldErrors[field.path]}
           />
         ))}
       </div>

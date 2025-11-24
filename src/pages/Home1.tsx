@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import video from "../assets/AdobeStock_178894522_Video_4K_Preview.mov"
 
 const Home1: React.FC = () => {
 
@@ -7,8 +8,17 @@ const Home1: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="w-full py-12">
           <div className="text-center">
+            <video 
+              src={video} 
+              autoPlay 
+              loop 
+              muted 
+              playsInline
+              className="w-screen h-auto mb-8 object-cover"
+              style={{ maxHeight: '90vh' }}
+            />
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
               Welcome to <span className="text-[#36b669]"> CMCINTEL</span>
             </h1>
