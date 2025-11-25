@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import usePost from "../hooks/usePost";
-import LoginService from "../services/LoginService";
+import usePost from "../../hooks/usePost";
+import LoginService from "../../services/LoginService";
 import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,7 +17,6 @@ const Register: React.FC = () => {
   const [error, setError] = useState("");
   const { postData, loading } = usePost();
   const navigate = useNavigate();
-
 
   const validateEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -51,9 +50,8 @@ const Register: React.FC = () => {
       const payload = { name: username, email, password, role };
       await postData(login.createRegister(), payload);
 
-
       toast.success("🎉 Registration successful!");
-      setTimeout(() => navigate("/login"), 2000); // redirect after 2s
+      setTimeout(() => navigate("/login"), 2000);
     } catch (err: any) {
       if (err.response?.data?.detail === "Email already registered") {
         setError("Email already registered. Please use a different email.");
@@ -68,7 +66,6 @@ const Register: React.FC = () => {
 
   return (
     <>
-      {/* Toast notifications - moved outside main container */}
       <ToastContainer
         position="top-center"
         autoClose={3000}
@@ -79,10 +76,9 @@ const Register: React.FC = () => {
         draggable
         pauseOnHover
         className="z-[9999]"
-        theme="dark" // 🔑 this forces dark styling
+        theme="dark"
         toastClassName="!bg-black !text-white text-center rounded-lg shadow-lg"
       />
-
 
       <div className="flex justify-center items-center min-h-screen w-screen bg-gradient-to-br from-green-700 to-blue-500 fixed inset-0 pt-16">
         <form

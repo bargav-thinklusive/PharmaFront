@@ -1,27 +1,23 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import CompanyLogo from "../assets/CMCINTELLOGO.png";
-import SearchBar from "../components/SearchBar";
-import AuthService from "../services/AuthService";
-import { useUser } from "../context/UserContext";
+import CompanyLogo from "../../assets/CMCINTELLOGO.png";
+import SearchBar from "../SearchBar";
+import AuthService from "../../services/AuthService";
+import { useUser } from "../../context/UserContext";
 
-
-interface HeaderProps {
-  isLoginPage?: boolean; // optional prop to indicate if on login page
+interface AuthenticatedHeaderProps {
+  isLoginPage?: boolean;
 }
 
-
-const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
+const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useUser()
-
+  const { user } = useUser();
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // close dropdown if clicked outside
+  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -32,24 +28,21 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // detect login page
-  //const isLoginPage = location.pathname === "/login";
-
-  // detect about/contacts pages
+  // Detect about/contacts pages
   const isAboutOrContacts =
     location.pathname === "/about" || location.pathname === "/contacts";
 
-  // check if we came from login (router state flag)
+  // Check if we came from login (router state flag)
   const fromLogin = location.state?.fromLogin === true;
 
-  // minimal header condition
+  // Minimal header condition
   const showMinimalHeader = isLoginPage || (isAboutOrContacts && fromLogin);
 
-  // show search bar condition (not on home page and not on login/minimal pages)
+  // Show search bar condition (not on home page and not on login/minimal pages)
   const showSearchBar = !isLoginPage && location.pathname !== "/home" && !showMinimalHeader;
 
   const handleLogout = () => {
-    AuthService.logout(); // This deletes token and localStorage user
+    AuthService.logout();
     setDropdownOpen(false);
     navigate("/login");
   };
@@ -61,7 +54,6 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
         {showMinimalHeader ? (
           <div className="flex items-center gap-2">
             <img src={CompanyLogo} alt="Logo" className="h-10 w-15" />
-            {/* <span className="font-bold text-xl">CMCINTEL</span> */}
           </div>
         ) : (
           <Link
@@ -69,7 +61,6 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
             className="flex items-center gap-2 text-white no-underline"
           >
             <img src={CompanyLogo} alt="Logo" className="h-10 w-20" />
-            {/* <span className="font-bold text-xl">CMCINTEL</span> bg-[#36b669]*/}
           </Link>
         )}
       </div>
@@ -116,10 +107,7 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
             </Link>
 
             {/* User Dropdown */}
-            <div
-              ref={dropdownRef}
-              className="ml-8 relative"
-            >
+            <div ref={dropdownRef} className="ml-8 relative">
               <span
                 className="cursor-pointer font-bold"
                 onClick={() => setDropdownOpen((p) => !p)}
@@ -128,21 +116,12 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
               </span>
               {dropdownOpen && (
                 <div className="absolute top-full right-0 bg-white border border-gray-300 rounded-md shadow-md mt-2 min-w-[100px] overflow-hidden">
-                  {/* <Link
-                    to="/profile"
-                    className="block px-4 py-2 border-b border-gray-300 text-black hover:bg-[#3678f4ff] hover:text-white transition-colors duration-200"
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    Profile
-                  </Link> */}
-
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 text-black hover:bg-[#3678f4ff] hover:text-white transition-colors duration-200 cursor-pointer"
                   >
                     Logout
                   </button>
-
                 </div>
               )}
             </div>
@@ -153,4 +132,4 @@ const Header: React.FC<HeaderProps> = ({ isLoginPage }) => {
   );
 };
 
-export default Header;
+export default AuthenticatedHeader;
