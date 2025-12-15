@@ -12,10 +12,6 @@ const Register: React.FC = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-<<<<<<< HEAD:src/pages/auth/RegisterPage.tsx
-
-=======
->>>>>>> master:src/components/RegisterPage.tsx
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const { postData, loading } = usePost();
@@ -106,10 +102,6 @@ const Register: React.FC = () => {
             className="p-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
           />
 
-<<<<<<< HEAD:src/pages/auth/RegisterPage.tsx
-=======
-
->>>>>>> master:src/components/RegisterPage.tsx
           <div className="relative w-full">
             <input
               type={showPassword ? "text" : "password"}
