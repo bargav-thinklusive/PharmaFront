@@ -8,7 +8,7 @@ import ProcessDevelopmentStep from './steps/ProcessDevelopmentStep';
 import AnalyticalDevelopmentStep from './steps/AnalyticalDevelopmentStep';
 import DrugProductStep from './steps/DrugProductStep';
 import AppendicesReferencesStep from './steps/AppendicesReferencesStep';
-import usePostFormData from '../../hooks/usePostFormData';
+import usePost from '../../hooks/usePost';
 import DrugService from '../../services/DrugService';
 import { toast } from 'react-toastify';
 
@@ -108,8 +108,8 @@ const initialFormData = {
     appendix1: '',
     appendix2: '',
     appendix3: '',
-    appendix4: '',
-    appendix5: [],
+    appendix4: [],
+    appendix5: '',
     appendix6: '',
   },
   references: [],
@@ -117,7 +117,7 @@ const initialFormData = {
 
 
 const UniversalForm: React.FC = () => {
-  const { postFormData, loading } = usePostFormData();
+  const { postData, loading } = usePost();
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<DrugEntry>(initialFormData);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -207,7 +207,7 @@ const UniversalForm: React.FC = () => {
         const hasAtLeastOneAppendix = formData.appendices.appendix1.trim() ||
           formData.appendices.appendix2.trim() ||
           formData.appendices.appendix3.trim() ||
-          formData.appendices.appendix4.trim() ||
+          formData.appendices.appendix5.trim() ||
           formData.appendices.appendix6.trim();
         if (!hasAtLeastOneAppendix) {
           errors['appendices'] = 'At least one appendix section must be filled';
@@ -270,7 +270,7 @@ const UniversalForm: React.FC = () => {
     const hasAtLeastOneAppendix = formData.appendices.appendix1.trim() ||
       formData.appendices.appendix2.trim() ||
       formData.appendices.appendix3.trim() ||
-      formData.appendices.appendix4.trim() ||
+      formData.appendices.appendix5.trim() ||
       formData.appendices.appendix6.trim();
     if (!hasAtLeastOneAppendix) errors.push('At least one appendix section must be filled');
 
@@ -313,12 +313,12 @@ const UniversalForm: React.FC = () => {
 
       // Extract files FIRST before modifying anything
       const chemicalStructureFiles = formData.drugSubstance.physicalAndChemicalProperties.chemicalStructure;
-      const appendix5Files = formData.appendices.appendix5;
+      const appendix4Files = formData.appendices.appendix4;
 
       // Now create dataToSend and remove file references
       const dataToSend = { ...formData };
       (dataToSend as any).drugSubstance.physicalAndChemicalProperties.chemicalStructure = undefined;
-      (dataToSend as any).appendices.appendix5 = undefined;
+      (dataToSend as any).appendices.appendix4 = undefined;
 
       const formDataToSend = new FormData();
       const payload = processDrugData(dataToSend);
@@ -327,22 +327,32 @@ const UniversalForm: React.FC = () => {
       // Use the extracted files
       if (chemicalStructureFiles) {
         if (Array.isArray(chemicalStructureFiles)) {
-          chemicalStructureFiles.forEach((file, index) => {
-            formDataToSend.append(`chemicalStructure_${index}`, file);
+          chemicalStructureFiles.forEach((file) => {
+            formDataToSend.append('chemicalStructure', file);
           });
         } else {
           formDataToSend.append('chemicalStructure', chemicalStructureFiles);
         }
       }
 
-      if (appendix5Files && appendix5Files.length > 0) {
-        appendix5Files.forEach((file, index) => {
-          formDataToSend.append(`appendix5_${index}`, file);
+      if (appendix4Files && appendix4Files.length > 0) {
+        appendix4Files.forEach((file) => {
+          formDataToSend.append('appendix4', file);
         });
       }
-      console.log(formDataToSend);
-      await postFormData(drugservice.createDrug(), formDataToSend);
-      console.log('postFormData completed successfully');
+      // Log FormData contents
+      console.log('=== FormData Contents ===');
+      const filesByKey: Record<string, File[]> = {};
+      for (let [key, value] of formDataToSend.entries()) {
+        if (value instanceof File) {
+          if (!filesByKey[key]) filesByKey[key] = [];
+          filesByKey[key].push(value);
+        }
+      }
+      console.log('chemicalStructure:', filesByKey['chemicalStructure'] || []);
+      console.log('appendix4:', filesByKey['appendix4'] || []);
+      await postData(drugservice.createDrug(), formDataToSend);
+      console.log('postData completed successfully');
       toast.success('Drug entry submitted successfully!');
     } catch (err: any) {
       console.log(err);

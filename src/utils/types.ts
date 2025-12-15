@@ -92,8 +92,8 @@ export interface DrugEntry {
     appendix1: string;
     appendix2: string;
     appendix3: string;
-    appendix4: string;
-    appendix5: File[];
+    appendix4: File[];
+    appendix5: string;
     appendix6: string;
   };
   references?: { title: string; url: string }[];

@@ -15,8 +15,8 @@ const AppendicesReferencesStep: React.FC<{
     { label: 'Appendix 1', path: 'appendices.appendix1', required: false },
     { label: 'Appendix 2', path: 'appendices.appendix2', required: false },
     { label: 'Appendix 3', path: 'appendices.appendix3', required: false },
-    { label: 'Appendix 4', path: 'appendices.appendix4', required: false },
-    { label: 'Appendix 5', path: 'appendices.appendix5', type: 'file', multiple: true, required: false },
+    { label: 'Appendix 4', path: 'appendices.appendix4', type: 'file', multiple: true, required: false },
+    { label: 'Appendix 5', path: 'appendices.appendix5', required: false },
     { label: 'Appendix 6', path: 'appendices.appendix6', required: false },
   ];
 
@@ -45,7 +45,7 @@ const AppendicesReferencesStep: React.FC<{
               />
             )
           ))}
-          
+
           {/* Show appendix validation error if exists */}
           {fieldErrors['appendices'] && (
             <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-md">
