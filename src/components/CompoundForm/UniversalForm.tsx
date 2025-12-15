@@ -117,7 +117,7 @@ const initialFormData = {
 
 
 const UniversalForm: React.FC = () => {
-  const { postData, loading } = usePost();
+  const { postData, } = usePost();
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<DrugEntry>(initialFormData);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
