@@ -13,7 +13,7 @@ class DrugService {
     return `${this.baseUrl}/drug/${drug_id}`;
   };
   // Create operation
-  createDrug = () => `${this.baseUrl}/drugs`;
+  createDrug = () => `${this.baseUrl}/drugs/`;
 
   // Read operation
   getDrugs = () => {

@@ -1,35 +1,72 @@
 import React from 'react';
 
-const About: React.FC = () => (
-  <div className="h-full w-full bg-gray-50 flex flex-col">
-    <div className="flex-1 py-16">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">About ChemBank</h2>
-      <div className="max-w-4xl">
-        <p className="text-gray-600 mb-6">
-          ChemBank is a comprehensive chemical database that provides quick access to authoritative chemical information. Our platform helps researchers, students, and professionals find reliable data about compounds, taxonomy, and chemical genres.
-        </p>
-        
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h3 className="text-lg font-semibold mb-3 text-gray-800">Our Mission</h3>
-            <p className="text-gray-600">
-              To provide fast, reliable access to chemical information from trusted sources, supporting research and education in chemistry.
-            </p>
+const About: React.FC = () => {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-2">
+              About us
+            </h1>
           </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h3 className="text-lg font-semibold mb-3 text-gray-800">Features</h3>
-            <ul className="text-gray-600 space-y-1">
-              <li>• Comprehensive compound database</li>
-              <li>• Taxonomy classifications</li>
-              <li>• Genre-based searching</li>
-              <li>• Authoritative sources</li>
-            </ul>
+        </div>
+
+        {/* Background decoration */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#36b669]/10 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl"></div>
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+        <div className="bg-white rounded-lg shadow-lg p-8 min-h-[500px]">
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Hypothesis-driven decision-making to comprehensive data-driven approach
+                </h3>
+                <p className="text-gray-700">
+                  Hypothesis-driven decision-making to a comprehensive, data-driven approach that accelerates and de-risks drug development.
+                </p>
+              </div>
+
+              <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  We have seasoned CMC professionals to provide
+                </h3>
+                <p className="text-gray-700">
+                  We have seasoned CMC professionals to provide expert guidance and support throughout your drug development journey.
+                </p>
+              </div>
+
+              <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Newsletter
+                </h3>
+                <p className="text-gray-700 mb-4">
+                  Stay updated with the latest news and insights from CMC Intel.
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#36b669]"
+                  />
+                  <button className="bg-[#36b669] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#2d9d58] transition-colors">
+                    Subscribe
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default About;

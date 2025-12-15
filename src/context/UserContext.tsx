@@ -28,7 +28,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         await fetchUser(userService.getUserById(id))
       }
     }else{
-      if(location.pathname !== '/login' && location.pathname !== '/register'){
+      if(location.pathname !== '/login' && location.pathname !== '/register' && location.pathname !== '/home1' && location.pathname !== '/'){
         navigate(LOGIN_URL)
       }
     }

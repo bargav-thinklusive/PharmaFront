@@ -1,8 +1,9 @@
+import { useNavigate } from 'react-router';
 import SearchBar from '../components/SearchBar';
 
 
 const Home: React.FC = () => {
-
+const navigate=useNavigate()
 
   return (
     <div className="min-h-[calc(100vh-120px)] w-full bg-gradient-to-b from-blue-900 to-blue-600 flex flex-col  px-4">
@@ -17,6 +18,9 @@ const Home: React.FC = () => {
         {/* Search bar container */}
         <div className="w-full max-w-2xl">
           <SearchBar   />
+        </div>
+        <div>
+           <button onClick={()=>navigate("/drug-form")} className='bg-blue-500 text-white p-1 rounded cursor-pointer'>Add Drug</button>
         </div>
       </div>
     </div>

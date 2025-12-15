@@ -4,7 +4,17 @@ import { useUser } from '../../context/UserContext';
 import { AgGridReact } from 'ag-grid-react';
 import { columns } from './columns';
 import type { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { CellStyleModule, ClientSideRowModelModule, ModuleRegistry, NumberFilterModule, PaginationModule, RowAutoHeightModule, RowSelectionModule, TextFilterModule, ValidationModule, } from 'ag-grid-community';
+import {
+  CellStyleModule,
+  ClientSideRowModelModule,
+  ModuleRegistry,
+  NumberFilterModule,
+  PaginationModule,
+  RowAutoHeightModule,
+  RowSelectionModule,
+  TextFilterModule,
+  ValidationModule,
+} from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import '../../components/AgGridHeaderStyle/AgGridHeaderStyle.css';
@@ -15,10 +25,22 @@ import Loader from '../Loader';
 import useGet from '../../hooks/useGet';
 import BookMarkService from '../../services/BookmarkService';
 
-  const bookMarkService = new BookMarkService();
+const bookMarkService = new BookMarkService();
+
 // Register AG Grid modules
-ModuleRegistry.registerModules([ColumnsToolPanelModule, ExcelExportModule, ClientSideRowModelModule, NumberFilterModule,
-  TextFilterModule, ValidationModule,  RowAutoHeightModule,CellStyleModule,ServerSideRowModelApiModule,PaginationModule,RowSelectionModule]);
+ModuleRegistry.registerModules([
+  ColumnsToolPanelModule,
+  ExcelExportModule,
+  ClientSideRowModelModule,
+  NumberFilterModule,
+  TextFilterModule,
+  ValidationModule,
+  RowAutoHeightModule,
+  CellStyleModule,
+  ServerSideRowModelApiModule,
+  PaginationModule,
+  RowSelectionModule
+]);
 
 
 
@@ -43,6 +65,7 @@ const ResultList: React.FC = () => {
 
   useEffect(() => {
     getBookmarks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
@@ -137,9 +160,9 @@ const ResultList: React.FC = () => {
     }
   }, []);
 
-const handleSearchHistory = () => {
-  navigate(`/bookmark`);
-}
+  const handleSearchHistory = () => {
+    navigate(`/bookmark`);
+  };
 
   return (
     <div className="w-full min-h-[60vh] flex flex-col items-center bg-white/80 py-8">
@@ -151,6 +174,7 @@ const handleSearchHistory = () => {
           <div className='flex justify-between items-center gap-2'>
             <button onClick={handleSearchHistory}><FaRegBookmark size={25} /></button>
             <button onClick={onClickExport} className='bg-blue-500 text-white p-1 rounded'>Export </button>
+
           </div>
         </div>
 
@@ -188,5 +212,3 @@ const handleSearchHistory = () => {
 };
 
 export default ResultList;
-
-//https://www.ag-grid.com/react-data-grid/modules/

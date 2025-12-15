@@ -37,9 +37,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
     const q = search.trim().toLowerCase();
     const matches: any[] = [];
     const seen = new Set<string>();
-const dataSource = drugsData.length > 0 ? drugsData :[]
+    const dataSource = drugsData.length > 0 ? drugsData : [];
 
-    dataSource?.forEach((item:any) => {
+    dataSource?.forEach((item: any) => {
       if (category === "all") {
         const fields = [
           { text: item?.marketInformation?.brandName || "", type: "brandName" },
@@ -69,7 +69,6 @@ const dataSource = drugsData.length > 0 ? drugsData :[]
             type: "structureName",
           },
           { text: item?.cid || "", type: "cid" },
-          //{ text: item?.marketInformation?.indication || "", type: "indication" },
         ];
 
         fields.forEach((field) => {
@@ -122,9 +121,8 @@ const dataSource = drugsData.length > 0 ? drugsData :[]
       }
     });
 
-    //setSuggestions(matches.slice(0, 50)); // limit to 50 results
     setSuggestions(matches);
- }, [search, category, drugsData]);
+  }, [search, category, drugsData]);
 
   const debouncedComputeSuggestions = useCallback(
     debounce(computeSuggestions, 300),
