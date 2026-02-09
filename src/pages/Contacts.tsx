@@ -1,4 +1,5 @@
 import React from 'react';
+import Contact from "../../public/assets/Contactusimage.webp"
 
 const Contacts: React.FC = () => {
   return (
@@ -26,6 +27,10 @@ const Contacts: React.FC = () => {
           <div className="max-w-2xl">
             <form className="space-y-6">
               <div>
+                <div className='w-full'>
+                  <img src={Contact} alt="Contact Us" />
+                  <p>Please contact <a href="mailto:Sgarapati@cmcintel.com" className="text-[#36b669] underline hover:text-[#2d9d58] font-semibold">Sgarapati@cmcintel.com</a> for any queries</p>
+                </div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                   Name *
                 </label>

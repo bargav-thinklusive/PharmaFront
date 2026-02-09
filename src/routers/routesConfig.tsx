@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+import DrugForm from '../components/MainForm/MainForm';
 
 // Lazy load all components
 const Login = lazy(() => import("../pages/auth/LoginPage"));
@@ -27,7 +28,8 @@ export const routesConfig = [
     { path: "/contacts", element: <Contacts /> },
     { path: ":ccategory/:searchtext", element: <ResultList /> },
     { path: ":ccategory/:searchtext/:cid/:version", element: <UniversalCompoundRenderer /> },
-    { path: "/drug-form", element: <UniversalForm /> },
+    //{ path: "/drug-form", element: <UniversalForm /> },
+    { path: "/drug-form", element: <DrugForm /> },
     { path: "/bookmark", element: <BookMark /> },
     { path: "/drugsList", element: <DrugsList /> },
     { path: "*", element: <NotFound /> }
