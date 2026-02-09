@@ -19,36 +19,37 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const { fetchData: fetchUser, data: user, loading: userLoading } = useGet();
   const { fetchData: fetchDrugs, data: drugsData, loading: drugsLoading } = useGet();
 
-  const checkTokenAndGetUser=async()=>{
+  const checkTokenAndGetUser = async () => {
     const token = tokenService.getToken();
-    if(token){
-      const id=tokenService.decodeToken()?.sub 
-      if(id){
-        const userService=new UserService()
+    if (token) {
+      const id = tokenService.decodeToken()?.sub
+      if (id) {
+        const userService = new UserService()
         await fetchUser(userService.getUserById(id))
       }
-    }else{
-      if(location.pathname !== '/login' && location.pathname !== '/register' && location.pathname !== '/home1' && location.pathname !== '/'){
+    } else {
+      const publicPaths = ['/login', '/register', '/home1', '/', '/what-we-do', '/areas-served', '/about', '/contacts'];
+      if (!publicPaths.includes(location.pathname)) {
         navigate(LOGIN_URL)
       }
     }
   }
 
-  const getDrugs=async()=>{
-    const drugService=new DrugService()
+  const getDrugs = async () => {
+    const drugService = new DrugService()
     await fetchDrugs(drugService.getDrugs())
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     const init = async () => {
       const hasToken = !!tokenService.getToken();
       await checkTokenAndGetUser();
-      if(hasToken){
+      if (hasToken) {
         await getDrugs();
       }
     };
     init();
-  },[])
+  }, [])
 
   // const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
   // if(!isAuthPage && (userLoading || !user)){
@@ -56,7 +57,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // }
 
   return (
-    <UserContext.Provider value={{user, userLoading, checkTokenAndGetUser, drugsData: drugsData?.data || [], drugsLoading, refetchDrugs: getDrugs}}>
+    <UserContext.Provider value={{ user, userLoading, checkTokenAndGetUser, drugsData: drugsData?.data || [], drugsLoading, refetchDrugs: getDrugs }}>
       {children}
     </UserContext.Provider>
   )

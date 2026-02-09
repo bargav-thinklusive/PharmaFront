@@ -27,22 +27,20 @@ const About: React.FC = () => {
             <div className="space-y-4">
               <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Hypothesis-driven decision-making to comprehensive data-driven approach
+                  Mission
                 </h3>
                 <p className="text-gray-700">
-                  Hypothesis-driven decision-making to a comprehensive, data-driven approach that accelerates and de-risks drug development.
+                  Unify trusted, fragmented intelligence and equip pharmaceutical teams with the clarity and confidence needed to execute portfolio building, product development and global filings successfully.
                 </p>
               </div>
-
               <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  We have seasoned CMC professionals to provide
+                  Vision
                 </h3>
                 <p className="text-gray-700">
-                  We have seasoned CMC professionals to provide expert guidance and support throughout your drug development journey.
+                  Our vision is to become a trusted global source of CMC and regulatory intelligence - turning complexity into clarity across global development and approvals.
                 </p>
               </div>
-
               <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
                   Newsletter

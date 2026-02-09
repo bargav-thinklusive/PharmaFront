@@ -1,13 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CompanyLogo from "../../assets/CMCINTELLOGO.png";
 
 const PublicHeader = () => {
+    const navigate = useNavigate();
     return (
-        <header className="flex items-center justify-between bg-[#36b669] text-white px-6 py-3 fixed top-0 left-0 w-full z-[1000]">
+        <header className="flex items-center justify-between bg-[#8ce1ae] text-white px-6 py-3 fixed top-0 left-0 w-full z-[1000]">
             {/* Logo Section */}
             <div className="flex-shrink-0">
                 <div className="flex items-center gap-2">
-                    <img src={CompanyLogo} alt="Logo" className="h-10 w-20" />
+                    <img src={CompanyLogo} alt="Logo" className="h-10 w-20 cursor-pointer" onClick={() => navigate("/")} />
                 </div>
             </div>
 
