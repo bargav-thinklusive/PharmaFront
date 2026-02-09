@@ -15,7 +15,7 @@ const NotFound = lazy(() => import("../pages/NotFound"));
 const UniversalCompoundRenderer = lazy(() => import("../components/Compound/shared/UniversalCompoundRenderer"));
 const BookMark = lazy(() => import("../components/Bookmark/BookMark"));
 const DrugsList = lazy(() => import("../components/DrugsList/DrugsList"));
-const UniversalForm = lazy(() => import("../components/CompoundForm/UniversalForm"));
+//const UniversalForm = lazy(() => import("../components/CompoundForm/UniversalForm"));
 
 export const routesConfig = [
     { path: "/", element: <LandingPage /> },
