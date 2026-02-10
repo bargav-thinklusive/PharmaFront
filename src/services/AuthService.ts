@@ -23,7 +23,7 @@ class AuthService {
   }
 
   async forgotPassword(email: string, newPassword: string) {
-    const payload={email,new_password:newPassword}
+    const payload = { email, new_password: newPassword }
     try {
       const resp = await axios.post(`${this.baseUrl}/forgot-password`, payload);
       return resp.data;

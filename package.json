@@ -12,7 +12,6 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
     "@types/lodash": "^4.17.20",
-    "@types/react-datepicker": "^6.2.0",
     "ag-grid-community": "^34.2.0",
     "ag-grid-enterprise": "^34.2.0",
     "ag-grid-react": "^34.2.0",
@@ -22,9 +21,7 @@
     "lodash": "^4.17.21",
     "lodash.get": "^4.4.2",
     "react": "^19.1.1",
-    "react-datepicker": "^9.1.0",
     "react-dom": "^19.1.1",
-    "react-hook-form": "^7.71.1",
     "react-icons": "^5.5.0",
     "react-phone-input-2": "^2.15.1",
     "react-router": "^7.8.2",
