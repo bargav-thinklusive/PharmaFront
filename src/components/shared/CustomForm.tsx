@@ -245,7 +245,7 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                                 aria-label="Remove field"
                             >
                                 <FiTrash2 className="w-4 h-4" />
-                                Remove
+
                             </button>
                         </div>
                     </div>

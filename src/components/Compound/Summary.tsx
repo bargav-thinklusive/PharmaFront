@@ -60,89 +60,91 @@ const Summary: React.FC<SummaryProps> = ({ drug, sectionId }) => {
         >
           {sectionId}. Title and Summary
         </h1>
-        <div className={`text-xl font-semibold text-black mb-2 ${drug.marketInformation?.brandName && normalizeValue(drug.marketInformation.brandName) === "No data available" ? "text-gray-500 italic" : ""}`}>
-          {drug.marketInformation?.brandName ? normalizeValue(drug.marketInformation.brandName) : "N/A"}
+        <div className={`text-xl font-semibold text-black mb-2 ${(drug.MarketInformation?.drugName || drug.drugName) && normalizeValue(drug.MarketInformation?.drugName || drug.drugName) === "No data available" ? "text-gray-500 italic" : ""}`}>
+          {drug.MarketInformation?.drugName || drug.drugName ? normalizeValue(drug.MarketInformation?.drugName || drug.drugName) : "N/A"}
         </div>
       </div>
 
       <div className='border-2 border-sky-400 rounded bg-white max-w-3xl'>
-        <table className='w-full text-sm text-black'>
+        <table className='w-full text-sm text-black border-collapse'>
           <tbody>
             <tr className='align-top border-b border-blue-100'>
-              <td className='w-56 p-3 text-black font-semibold'>CID</td>
+              <td className='w-56 p-3 text-black font-semibold border-r border-sky-200'>CID</td>
               <td className="p-3">
                 <span className={`text-base font-semibold text-black ${drug.cid && normalizeValue(drug.cid) === "No data available" ? "text-gray-500 italic" : ""}`}>{drug.cid ? normalizeValue(drug.cid) : "N/A"}</span>
               </td>
             </tr>
             <tr className='align-top border-b border-blue-100'>
-              <td className='w-56 p-3 text-black font-semibold'>Version</td>
+              <td className='w-56 p-3 text-black font-semibold border-r border-sky-200'>Version</td>
               <td className="p-3">
-                <span className={`text-base text-black ${drug.version && normalizeValue(drug.version) === "No data available" ? "text-gray-500 italic" : ""}`}>{drug.version ? normalizeValue(drug.version) : "N/A"}</span>
+                <span className={`text-base text-black ${(drug.MarketInformation?.version || drug.version) && normalizeValue(drug.MarketInformation?.version || drug.version) === "No data available" ? "text-gray-500 italic" : ""}`}>{drug.MarketInformation?.version || drug.version ? normalizeValue(drug.MarketInformation?.version || drug.version) : "N/A"}</span>
               </td>
             </tr>
             <tr className='align-top border-b border-blue-100'>
-              <td className='w-56 p-3 text-black font-semibold'>Structure</td>
+              <td className='w-56 p-3 text-black font-semibold border-r border-sky-200'>Structure</td>
               <td className='p-3'>
-                
-                {drug.drugSubstance?.physicalAndChemicalProperties?.chemicalStructure ? (
+
+                {drug.PhysicalChemicalProperties?.chemicalStructure ? (
                   <img
-                    src={drug.drugSubstance.physicalAndChemicalProperties.chemicalStructure}
-                    alt={drug.marketInformation?.brandName || "structure"}
+                    src={drug.PhysicalChemicalProperties.chemicalStructure}
+                    alt={drug.MarketInformation?.drugName || drug.MarketInformation?.brandName || drug.drugName || "structure"}
                     className="w-52 h-52 object-contain border my-2 cursor-pointer hover:shadow-lg"
                   />
                 ) : "N/A"}
               </td>
             </tr>
             <tr className='align-top border-b border-blue-100'>
-              <td className='w-56 p-3 text-black font-semibold'>Chemical Formula</td>
+              <td className='w-56 p-3 text-black font-semibold border-r border-sky-200'>Chemical Formula</td>
               <td className="p-3">
-                <span className={`text-base text-black ${drug.drugSubstance?.physicalAndChemicalProperties?.elementalFormula && renderValue(drug.drugSubstance.physicalAndChemicalProperties.elementalFormula) === "No data available" ? "text-gray-500 italic" : ""}`}>
-                  {drug.drugSubstance?.physicalAndChemicalProperties?.elementalFormula ? renderValue(drug.drugSubstance.physicalAndChemicalProperties.elementalFormula) : "N/A"}
+                <span className={`text-base text-black ${drug.PhysicalChemicalProperties?.molecularFormula && renderValue(drug.PhysicalChemicalProperties.molecularFormula) === "No data available" ? "text-gray-500 italic" : ""}`}>
+                  {drug.PhysicalChemicalProperties?.molecularFormula ? renderValue(drug.PhysicalChemicalProperties.molecularFormula) : "N/A"}
                 </span>
               </td>
             </tr>
             <tr className='align-top border-b border-blue-100'>
-              <td className='w-56 p-3 text-black font-semibold'>Synonyms</td>
+              <td className='w-56 p-3 text-black font-semibold border-r border-sky-200'>Synonyms</td>
               <td className="p-3">
                 <span className="text-base text-black">
                   {[
-                    drug.marketInformation?.brandName ? getSynonymsString(drug.marketInformation.brandName) : "",
-                    drug.drugSubstance?.physicalAndChemicalProperties?.chemicalName ? getSynonymsString(drug.drugSubstance.physicalAndChemicalProperties.chemicalName) : "",
-                    drug.drugSubstance?.physicalAndChemicalProperties?.structureName ? getSynonymsString(drug.drugSubstance.physicalAndChemicalProperties.structureName) : ""
+                    drug.MarketInformation?.drugName ? getSynonymsString(drug.MarketInformation.drugName) : "",
+                    drug.drugName ? getSynonymsString(drug.drugName) : "",
+                    drug.PhysicalChemicalProperties?.synonyms ? getSynonymsString(drug.PhysicalChemicalProperties.synonyms) : "",
+                    drug.PhysicalChemicalProperties?.innName ? getSynonymsString(drug.PhysicalChemicalProperties.innName) : "",
+                    drug.PhysicalChemicalProperties?.iupacName ? getSynonymsString(drug.PhysicalChemicalProperties.iupacName) : ""
                   ].filter(val => val && val !== "[object Object]").join(", ") || "N/A"}
                 </span>
               </td>
             </tr>
             <tr className='align-top border-b border-blue-100'>
-              <td className='w-56 p-3 text-black font-semibold'>Molecular Weight</td>
+              <td className='w-56 p-3 text-black font-semibold border-r border-sky-200'>Molecular Weight</td>
               <td className="p-3">
-                <span className={`text-base text-black ${drug.drugSubstance?.physicalAndChemicalProperties?.molecularWeight && renderValue(drug.drugSubstance.physicalAndChemicalProperties.molecularWeight) === "No data available" ? "text-gray-500 italic" : ""}`}>
-                  {drug.drugSubstance?.physicalAndChemicalProperties?.molecularWeight ? renderValue(drug.drugSubstance.physicalAndChemicalProperties.molecularWeight) : "N/A"}
+                <span className={`text-base text-black ${drug.PhysicalChemicalProperties?.molecularWeight && renderValue(drug.PhysicalChemicalProperties.molecularWeight) === "No data available" ? "text-gray-500 italic" : ""}`}>
+                  {drug.PhysicalChemicalProperties?.molecularWeight ? renderValue(drug.PhysicalChemicalProperties.molecularWeight) : "N/A"}
                 </span>
               </td>
             </tr>
             <tr className='align-top border-b border-blue-100'>
-              <td className='w-56 p-3 text-black font-semibold'>Structure Name</td>
+              <td className='w-56 p-3 text-black font-semibold border-r border-sky-200'>Structure Name</td>
               <td className="p-3">
-                <span className={`text-base text-black ${drug.drugSubstance?.physicalAndChemicalProperties?.structureName && renderValue(drug.drugSubstance.physicalAndChemicalProperties.structureName) === "No data available" ? "text-gray-500 italic" : ""}`}>
-                  {drug.drugSubstance?.physicalAndChemicalProperties?.structureName ? renderValue(drug.drugSubstance.physicalAndChemicalProperties.structureName) : "N/A"}
+                <span className={`text-base text-black ${drug.PhysicalChemicalProperties?.structureName && renderValue(drug.PhysicalChemicalProperties.structureName) === "No data available" ? "text-gray-500 italic" : ""}`}>
+                  {drug.PhysicalChemicalProperties?.structureName ? renderValue(drug.PhysicalChemicalProperties.structureName) : "N/A"}
                 </span>
               </td>
             </tr>
             <tr className='align-top border-b border-blue-100'>
-              <td className='w-56 p-3 text-black font-semibold'>Dates</td>
+              <td className='w-56 p-3 text-black font-semibold border-r border-sky-200'>Dates</td>
               <td className="p-3">
                 <div className="flex gap-8">
                   <div>
                     <div className="text-xs font-semibold text-black">Approved:</div>
-                    <div className={`text-xs text-black ${drug.marketInformation?.approvedDate && normalizeValue(drug.marketInformation.approvedDate) === "No data available" ? "text-gray-500 italic" : ""}`}>
-                      {drug.marketInformation?.approvedDate ? normalizeValue(drug.marketInformation.approvedDate) : "N/A"}
+                    <div className={`text-xs text-black ${drug.MarketInformation?.firstApprovedDate && normalizeValue(drug.MarketInformation.firstApprovedDate) === "No data available" ? "text-gray-500 italic" : ""}`}>
+                      {drug.MarketInformation?.firstApprovedDate ? normalizeValue(drug.MarketInformation.firstApprovedDate) : "N/A"}
                     </div>
                   </div>
                   <div>
                     <div className="text-xs font-semibold text-black">Generic Approved:</div>
-                    <div className={`text-xs text-black ${drug.marketInformation?.genericApprovedDate && normalizeValue(drug.marketInformation.genericApprovedDate) === "No data available" ? "text-gray-500 italic" : ""}`}>
-                      {drug.marketInformation?.genericApprovedDate ? normalizeValue(drug.marketInformation.genericApprovedDate) : "N/A"}
+                    <div className={`text-xs text-black ${drug.MarketInformation?.genericApprovedDate && normalizeValue(drug.MarketInformation.genericApprovedDate) === "No data available" ? "text-gray-500 italic" : ""}`}>
+                      {drug.MarketInformation?.genericApprovedDate ? normalizeValue(drug.MarketInformation.genericApprovedDate) : "N/A"}
                     </div>
                   </div>
                 </div>

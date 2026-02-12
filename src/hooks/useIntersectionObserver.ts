@@ -11,25 +11,25 @@ export const useIntersectionObserver = () => {
       if (!isScrolling) return;
 
       const headings = document.querySelectorAll('[id^="section-"]');
-      let bestSection = '';
-      let bestDistance = Infinity;
-      let bestDepth = 0;
+      const threshold = 150; // Pixels from top to trigger section change
+      let currentSection = '';
 
-      headings.forEach((heading) => {
-        const rect = heading.getBoundingClientRect();
-        const depth = heading.id.split('-').length;
-        const distanceFromTop = Math.abs(rect.top);
+      // Check for bottom of page
+      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50;
 
-        // Pick the section closest to viewport top, preferring deeper sections
-        if (distanceFromTop < bestDistance || (distanceFromTop === bestDistance && depth > bestDepth)) {
-          bestDistance = distanceFromTop;
-          bestDepth = depth;
-          bestSection = heading.id;
-        }
-      });
+      if (isAtBottom && headings.length > 0) {
+        currentSection = headings[headings.length - 1].id;
+      } else {
+        headings.forEach((heading) => {
+          const rect = heading.getBoundingClientRect();
+          if (rect.top <= threshold) {
+            currentSection = heading.id;
+          }
+        });
+      }
 
-      if (bestSection) {
-        setActiveSection(bestSection);
+      if (currentSection && currentSection !== activeSection) {
+        setActiveSection(currentSection);
       }
     };
 

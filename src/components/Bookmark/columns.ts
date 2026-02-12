@@ -1,5 +1,5 @@
 import { capitalizeFirstLetter } from "../../utils/utils";
-import BrandNameCellRenderer from "../Results/BrandNameCellRenderer";
+import BrandNameCellRenderer from "../DrugTable/BrandNameCellRenderer";
 
 
 const valueFormatter = (params: { value?: any }): string => {

@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import AuthService from "../../services/AuthService";
+import AuthService from "../../../services/AuthService";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useUser } from "../../context/UserContext";
+import { useUser } from "../../../context/UserContext";
 
 const authService = new AuthService();
 

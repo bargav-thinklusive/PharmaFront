@@ -1,5 +1,7 @@
+import { convertDatesToUnix } from "../../utils/utils";
+
 export const formatCreatedDrug = (formData: any) => {
-    return {
+    const result = {
         MarketInformation: {
             version: formData.version,
             drugName: formData.drugName,
@@ -60,4 +62,6 @@ export const formatCreatedDrug = (formData: any) => {
             appendices: formData.appendices,
         }
     };
+
+    return convertDatesToUnix(result);
 };

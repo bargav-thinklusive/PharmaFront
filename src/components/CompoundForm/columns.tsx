@@ -121,12 +121,6 @@ export const addPhysicalChemicalProperties: FieldConfig[] = [
         type: "text",
         required: false,
         placeholder: "Enter Stereochemistry",
-    }, {
-        key: "mechanismOfAction",
-        label: "Mechanism of Action",
-        type: "text",
-        required: false,
-        placeholder: "Enter Mechanism of Action",
     },
     {
         key: "solubility",
