@@ -6,7 +6,6 @@ import { CellStyleModule, ClientSideRowModelModule, ModuleRegistry, NumberFilter
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import '../../components/AgGridHeaderStyle/AgGridHeaderStyle.css';
-import '../Results/ResultList.css';
 import { ColumnsToolPanelModule, ExcelExportModule, ServerSideRowModelApiModule } from 'ag-grid-enterprise';
 import Loader from '../Loader';
 import useGet from '../../hooks/useGet';
