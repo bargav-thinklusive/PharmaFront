@@ -163,6 +163,7 @@ export interface FieldConfig {
     singleFieldInRow?: boolean;
     fullRowWidth?: boolean;
     additinalLabel?: string;
+    initialValues?: any[];
     dynamicFields?: FieldConfig[];
     tooltip?: string;
     defaultValue?: string;

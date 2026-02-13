@@ -12,7 +12,7 @@ const About = lazy(() => import('../components/pages/About'));
 const Contacts = lazy(() => import('../components/pages/Contacts'));
 const DrugsTable = lazy(() => import('../components/DrugTable/DrugsTable'));
 const NotFound = lazy(() => import("../components/pages/NotFound"));
-const DynamicDataRenderer = lazy(() => import("../components/Compound/ViewDrug"));
+const ViewDrug = lazy(() => import("../components/Compound/ViewDrug"));
 const BookMark = lazy(() => import("../components/Bookmark/BookMark"));
 const DrugsList = lazy(() => import("../components/DrugsList/DrugsList"));
 //const UniversalForm = lazy(() => import("../components/CompoundForm/UniversalForm"));
@@ -31,7 +31,6 @@ export const routesConfig = [
     { path: "/drug-form", element: <DrugForm /> },
     { path: "/bookmark", element: <BookMark /> },
     { path: "/drugsList", element: <DrugsList /> },
-    { path: "/sample-drug", element: <DynamicDataRenderer /> },
-    { path: ":ccategory/:searchtext/:cid/:version", element: <DynamicDataRenderer /> },
+    { path: ":ccategory/:searchtext/:cid/:version", element: <ViewDrug /> },
     { path: "*", element: <NotFound /> }
 ];

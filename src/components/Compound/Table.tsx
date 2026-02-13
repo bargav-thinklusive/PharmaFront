@@ -32,7 +32,7 @@ const Table: React.FC<TableProps> = ({ drug, activeSection, onNavigate }) => {
             hasChildren: false
           }));
         } else {
-          // Only include "complex" fields in TOC that will be rendered with headers in DynamicDataRenderer
+          // Only include "complex" fields in TOC that will be rendered with headers in ViewDrug
           subsections = Object.entries(data)
             .filter(([_, v]) => Array.isArray(v) || (typeof v === 'object' && v !== null))
             .map(([subKey, subVal]) => ({

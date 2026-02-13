@@ -1,11 +1,10 @@
 
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { toTitleCase, normalizeValue } from '../../utils/utils';
 import Summary from './Summary';
 import Table from './Table';
 import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 import { useUser } from '../../context/UserContext';
-import sampleDrug from '../../data/sampleDrug.json';
 
 import { KeyValueDisplay, DataTable } from './shared/renderValue';
 
@@ -142,30 +141,26 @@ function InternalRenderer({ data, sections, startSectionIndex = 1 }: { data: any
 
 // --- Main component ---
 
-interface DynamicDataRendererProps {
+interface ViewDrugProps {
     data?: any;
     sections?: string[];
     startSectionIndex?: number;
 }
 
-export default function DynamicDataRenderer({ data, sections, startSectionIndex = 1 }: DynamicDataRendererProps) {
+export default function ViewDrug({ data, sections, startSectionIndex = 1 }: ViewDrugProps) {
     const { cid, version } = useParams();
-    const location = useLocation();
     const { activeSection, handleNavigate } = useIntersectionObserver();
     const { drugsData } = useUser();
 
-    // Check if this is the sample-drug route or cid is present
-    const isSampleRoute = location.pathname === '/sample-drug';
-    const isViewerRoute = isSampleRoute || cid;
+    // Check if cid is present
+    const isViewerRoute = cid;
 
     // Use passed data or fetch if in viewer mode
     let displayData = data;
     let drugToDisplay: any = null;
 
     if (!data && isViewerRoute) {
-        drugToDisplay = isSampleRoute
-            ? sampleDrug
-            : drugsData.find((d: any) => d.cid === cid && d.version === parseInt(version || '1'));
+        drugToDisplay = drugsData.find((d: any) => d.cid === cid && d.version === parseInt(version || '1'));
 
         if (drugToDisplay) {
             displayData = Object.keys(drugToDisplay).reduce((acc: any, key) => {
@@ -212,7 +207,7 @@ export default function DynamicDataRenderer({ data, sections, startSectionIndex 
     if (isViewerRoute && !drugToDisplay) {
         return (
             <div className="p-8 text-center text-red-600 text-xl">
-                No data found for this drug{isSampleRoute ? '' : ` with CID ${cid}`}.
+                No data found for this drug with CID {cid}.
             </div>
         );
     }
