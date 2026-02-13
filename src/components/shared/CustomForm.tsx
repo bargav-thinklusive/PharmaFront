@@ -27,15 +27,15 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
     useEffect(() => {
         const values = form.getFieldValue?.(key) || [];
         if (values.length === 0) {
-            const initialValues = getInitialValues();
-            setFormFields([initialValues]);
+            const initialValuesRows = field.initialValues || [getInitialValues()];
+            setFormFields(initialValuesRows);
             if (form.setFieldsValue) {
-                form.setFieldsValue({ [key]: [initialValues] });
+                form.setFieldsValue({ [key]: initialValuesRows });
             }
         } else {
             setFormFields(values);
         }
-    }, []);
+    }, [key, field.initialValues]);
 
     const handleAddDynamicField = () => {
         const initialValues = getInitialValues();
@@ -245,7 +245,7 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                                 aria-label="Remove field"
                             >
                                 <FiTrash2 className="w-4 h-4" />
-                                Remove
+
                             </button>
                         </div>
                     </div>

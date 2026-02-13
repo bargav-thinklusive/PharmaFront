@@ -1,10 +1,17 @@
-import { capitalizeFirstLetter } from "../../utils/utils";
+import { capitalizeFirstLetter, unixToDate } from "../../utils/utils";
 import BookmarkCellRenderer from "./BookmarkCellRenderer";
 import BrandNameCellRenderer from "./BrandNameCellRenderer";
 
 
-const valueFormatter = (params: { value?: any }): string => {
-  if (params.value == null) return "-"; // handle null/undefined
+const valueFormatter = (params: { value?: any; colDef?: any }): string => {
+  if (params.value == null) return "-";
+
+  const field = params.colDef?.field || "";
+
+  // Handle Date fields explicitly or by value detection
+  if (field.toLowerCase().includes('date') || (typeof params.value === 'number' && params.value > 100000000)) {
+    return unixToDate(params.value);
+  }
 
   if (typeof params.value === "string") {
     if (params.value.includes("@")) return params.value;
@@ -12,8 +19,6 @@ const valueFormatter = (params: { value?: any }): string => {
   }
 
   if (typeof params.value === "object") {
-    // Handle nested objects like chemicalName: {Cefepime: "", Enmetazobactam: ""}
-    // or molecularWeight: {Cefepime: "480.6 g/mol", Enmetazobactam: "314.32 g/mol"}
     const entries = Object.entries(params.value).filter(([_, val]) => val && typeof val === 'string' && val.trim());
     if (entries.length > 0) {
       return entries.map(([key, val]) => `${key}: ${val}`).join('; ');
@@ -21,7 +26,6 @@ const valueFormatter = (params: { value?: any }): string => {
     return "-";
   }
 
-  // For numbers or other types
   return String(params.value);
 };
 
@@ -56,9 +60,9 @@ export const columns: any = [
 
   },
   {
-    headerName: "Brand Name",
+    headerName: "Drug Name",
     headerClass: "table-header",
-    field: "marketInformation.brandName",
+    field: "marketInformation.drugName",
     sortable: true,
     filter: true,
     autoHeight: true,
@@ -66,9 +70,9 @@ export const columns: any = [
     cellRenderer: BrandNameCellRenderer,
   },
   {
-    headerName: "Generic Name",
+    headerName: "API Name",
     headerClass: "table-header",
-    field: "marketInformation.genericName",
+    field: "marketInformation.apiName",
     sortable: true,
     filter: true,
     autoHeight: true,

@@ -1,14 +1,17 @@
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DynamicFormBuilder from "../shared";
 import { addMarketInformation, addPhysicalChemicalProperties, addProcessDevelopment, addAnalyticalDevelopment, addDrugProductInformation, addAppendices } from "./columns";
 import { formatCreatedDrug } from "./helper";
 import usePost from "../../hooks/usePost";
 import DrugService from "../../services/DrugService";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const drugService = new DrugService();
 
 const DrugForm = () => {
+    const navigate = useNavigate();
     const { postData } = usePost();
     const [formData, setFormData] = useState<any>({});
     const formDataRef = useRef<any>({});
@@ -67,11 +70,8 @@ const DrugForm = () => {
             try {
                 const formattedData = formatCreatedDrug(formDataRef.current);
                 await postData(drugService.createDrug(), formattedData);
-                toast.success("Drug entry submitted successfully!");
-                // Optionally reset form or redirect
-                // setFormData({});
-                // formDataRef.current = {};
-                // setCurrentStep(0);
+                toast.success("Drug Entry successfully submitted");
+                navigate("/home");
             } catch (error) {
                 console.error(error);
                 toast.error("Failed to submit drug entry. Please try again.");

@@ -1,5 +1,5 @@
 import React from 'react';
-import Contact from "../../public/assets/Contactusimage.webp"
+import Contact from "../../../public/assets/Contactusimage.webp"
 
 const Contacts: React.FC = () => {
   return (

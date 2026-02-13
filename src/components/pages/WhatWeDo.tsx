@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import Image1 from "../../public/assets/Whatwedoimage1.png"
-import Image2 from "../../public/assets/Whatwedoimage2.png"
-import Image3 from "../../public/assets/Whatwedoimage3.png"
+import Image1 from "../../../public/assets/Whatwedoimage1.png"
+import Image2 from "../../../public/assets/Whatwedoimage21.jpg"
+import Image3 from "../../../public/assets/Whatwedoimage3.png"
 
 const WhatWeDo: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -126,7 +126,7 @@ const WhatWeDo: React.FC = () => {
   }
 
   useEffect(() => {
-    const timer = setInterval(nextSlide, 5000)
+    const timer = setInterval(nextSlide, 10000)
     return () => clearInterval(timer)
   }, [])
 

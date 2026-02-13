@@ -18,7 +18,7 @@ import {
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import '../../components/AgGridHeaderStyle/AgGridHeaderStyle.css';
-import './ResultList.css';
+import './DrugsTable.css';
 import { ColumnsToolPanelModule, ExcelExportModule, ServerSideRowModelApiModule } from 'ag-grid-enterprise';
 import { FaRegBookmark } from "react-icons/fa";
 import Loader from '../Loader';
@@ -45,7 +45,7 @@ ModuleRegistry.registerModules([
 
 
 const pageSize = 20; // Number of rows per page
-const ResultList: React.FC = () => {
+const DrugsTable: React.FC = () => {
   const navigate = useNavigate();
   const { searchtext } = useParams();
   const gridRef = useRef<AgGridReact<any>>(null);
@@ -79,8 +79,10 @@ const ResultList: React.FC = () => {
   // Helper to extract all searchable fields from a record
   function getAllSearchableStrings(item: any): string[] {
     const arr: string[] = [];
-    if (item?.marketInformation?.brandName) arr.push(item.marketInformation.brandName);
-    if (item?.marketInformation?.genericName) arr.push(item.marketInformation.genericName);
+    if (item?.marketInformation?.drugName) arr.push(item.marketInformation.drugName);
+    if (item?.drugName) arr.push(item.drugName);
+    if (item?.marketInformation?.apiName) arr.push(item.marketInformation.apiName);
+    if (item?.apiName) arr.push(item.apiName);
 
     // Handle nested chemicalName object
     const chemicalName = item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName;
@@ -211,4 +213,4 @@ const ResultList: React.FC = () => {
   );
 };
 
-export default ResultList;
+export default DrugsTable;

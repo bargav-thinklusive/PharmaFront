@@ -42,8 +42,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
     dataSource?.forEach((item: any) => {
       if (category === "all") {
         const fields = [
-          { text: item?.marketInformation?.brandName || "", type: "brandName" },
-          { text: item?.marketInformation?.genericName || "", type: "genericName" },
+          { text: item?.marketInformation?.drugName || item?.marketInformation?.brandName || item?.drugName || "", type: "drugName" },
+          { text: item?.marketInformation?.apiName || item?.marketInformation?.genericName || item?.apiName || "", type: "apiName" },
           {
             text: (() => {
               const chemicalName = item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName;
@@ -84,13 +84,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
             }
           }
         });
-      } else if (category === "brandName") {
-        const text = item?.marketInformation?.brandName || "";
+      } else if (category === "drugName") {
+        const text = item?.marketInformation?.drugName || item?.marketInformation?.brandName || item?.drugName || "";
         if (text && text.toLowerCase().includes(q)) {
           matches.push({ ...item, matchedText: text });
         }
-      } else if (category === "genericName") {
-        const text = item?.marketInformation?.genericName || "";
+      } else if (category === "apiName") {
+        const text = item?.marketInformation?.apiName || item?.marketInformation?.genericName || item?.apiName || "";
         if (text && text.toLowerCase().includes(q)) {
           matches.push({ ...item, matchedText: text });
         }
@@ -163,7 +163,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleSelect = (item: any) => {
     const searchText =
-      item.matchedText || item?.marketInformation?.brandName || item?.cid || "";
+      item.matchedText || item?.marketInformation?.drugName || item?.marketInformation?.brandName || item?.drugName || item?.cid || "";
     navigate(`/${category}/${encodeURIComponent(searchText)}`);
     setSearch(searchText);
     setShowSuggestions(false);
@@ -213,8 +213,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
               onChange={handleCategoryChange}
             >
               <option value="all">All</option>
-              <option value="brandName">Brand</option>
-              <option value="genericName">Generic</option>
+              <option value="drugName">Drug Name</option>
+              <option value="apiName">API Name</option>
               <option value="chemicalName">Chemical</option>
               <option value="structureName">Structure</option>
             </select>
@@ -233,7 +233,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
               suggestions.map((item, index) => {
                 const displayText =
                   item.matchedText ||
+                  item?.marketInformation?.drugName ||
                   item?.marketInformation?.brandName ||
+                  item?.drugName ||
                   item?.cid ||
                   "";
                 return (

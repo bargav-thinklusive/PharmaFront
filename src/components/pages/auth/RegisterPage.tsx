@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import usePost from "../../hooks/usePost";
-import LoginService from "../../services/LoginService";
+import usePost from "../../../hooks/usePost";
+import LoginService from "../../../services/LoginService";
 import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
