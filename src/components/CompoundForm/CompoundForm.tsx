@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DynamicFormBuilder from "../shared";
 import { addMarketInformation, addPhysicalChemicalProperties, addProcessDevelopment, addAnalyticalDevelopment, addDrugProductInformation, addAppendices } from "./columns";
@@ -13,10 +13,39 @@ const drugService = new DrugService();
 const DrugForm = () => {
     const navigate = useNavigate();
     const { postData } = usePost();
-    const [formData, setFormData] = useState<any>({});
-    const formDataRef = useRef<any>({});
-    const [currentStep, setCurrentStep] = useState(0);
+
+    // Initialize state from localStorage once
+    const [formData, setFormData] = useState<any>(() => {
+        try {
+            const saved = localStorage.getItem("DRUG_FORM_DATA");
+            return saved ? JSON.parse(saved) : {};
+        } catch (e) {
+            console.error("Failed to parse form data from localStorage", e);
+            return {};
+        }
+    });
+
+    const [currentStep, setCurrentStep] = useState(() => {
+        const saved = localStorage.getItem("DRUG_FORM_STEP");
+        const step = saved ? parseInt(saved, 10) : 0;
+        return isNaN(step) ? 0 : step;
+    });
+
+    const formDataRef = useRef<any>(formData);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+    // Keep ref in sync with state
+    useEffect(() => {
+        formDataRef.current = formData;
+    }, [formData]);
+
+    // Save to localStorage on change
+    useEffect(() => {
+        if (Object.keys(formData).length > 0 || currentStep > 0) {
+            localStorage.setItem("DRUG_FORM_DATA", JSON.stringify(formData));
+            localStorage.setItem("DRUG_FORM_STEP", currentStep.toString());
+        }
+    }, [formData, currentStep]);
 
     const steps = [
         { title: "Market Information", fields: addMarketInformation },
@@ -71,6 +100,8 @@ const DrugForm = () => {
                 const formattedData = formatCreatedDrug(formDataRef.current);
                 await postData(drugService.createDrug(), formattedData);
                 toast.success("Drug Entry successfully submitted");
+                localStorage.removeItem("DRUG_FORM_DATA");
+                localStorage.removeItem("DRUG_FORM_STEP");
                 navigate("/home");
             } catch (error) {
                 console.error(error);
