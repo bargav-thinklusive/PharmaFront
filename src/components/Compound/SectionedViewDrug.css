@@ -1,0 +1,56 @@
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+.sectioned-view-container {
+    width: 100%;
+    min-height: 100vh;
+    background-color: white;
+    padding: 0;
+    color: black;
+}
+
+.sectioned-view-content {
+    width: 100%;
+    max-width: 100%;
+    background-color: white;
+    padding: 3rem 5rem;
+    min-height: 100vh;
+}
+
+.section-nav-button {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.section-nav-button:hover:not(:disabled) {
+    background-color: rgb(239 246 255);
+    color: rgb(29 78 216);
+    border-color: rgb(191 219 254);
+}
+
+.section-nav-button:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.section-nav-button:disabled {
+    opacity: 0;
+    cursor: default;
+}
