@@ -247,6 +247,11 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
                     error = zipError;
                 }
             }
+            if (key === "version") {
+                if (!/^\d+$/.test(value)) {
+                    error = "version should be number only";
+                }
+            }
         }
 
         setErrors(prev => ({

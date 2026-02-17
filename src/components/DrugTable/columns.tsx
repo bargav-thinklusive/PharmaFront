@@ -80,9 +80,9 @@ export const columns: any = [
     valueFormatter: valueFormatter
   },
   {
-    headerName: "Chemical Name",
+    headerName: "IUPAC Name",
     headerClass: "table-header",
-    field: "drugSubstance.physicalAndChemicalProperties.chemicalName",
+    field: "drugSubstance.physicalAndChemicalProperties.iupacName",
     sortable: true,
     filter: true,
     autoHeight: true,
@@ -90,9 +90,9 @@ export const columns: any = [
     valueFormatter: valueFormatter
   },
   {
-    headerName: "Structure Name",
+    headerName: "INN Name",
     headerClass: "table-header",
-    field: "drugSubstance.physicalAndChemicalProperties.structureName",
+    field: "drugSubstance.physicalAndChemicalProperties.innName",
     wrapText: true,
     autoHeight: true,
     filter: true,
@@ -102,9 +102,9 @@ export const columns: any = [
 
   },
   {
-    headerName: "Element Formula",
+    headerName: "Molecular Formula",
     headerClass: "table-header",
-    field: "drugSubstance.physicalAndChemicalProperties.elementalFormula",
+    field: "drugSubstance.physicalAndChemicalProperties.molecularFormula",
     sortable: true,
     filter: true,
     autoHeight: true,
@@ -122,17 +122,17 @@ export const columns: any = [
     valueFormatter: valueFormatter
   },
   {
-    headerName: "Approved Date",
+    headerName: "Approval Date",
     headerClass: "table-header",
-    field: "marketInformation.approvedDate",
+    field: "marketInformation.firstApprovedDate",
     sortable: true,
     filter: true,
     valueFormatter: valueFormatter
   },
   {
-    headerName: "Approved Company",
+    headerName: "Company Name",
     headerClass: "table-header",
-    field: "marketInformation.approvedFor",
+    field: "marketInformation.companyName",
     sortable: true,
     filter: true,
     valueFormatter: valueFormatter
