@@ -25,7 +25,14 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
     };
 
     useEffect(() => {
-        const values = form.getFieldValue?.(key) || [];
+        let values = form.getFieldValue?.(key) || [];
+
+        // Defensive check: ensure values is always an array
+        if (!Array.isArray(values)) {
+            console.warn(`CustomForm: Expected array for field "${key}" but got:`, typeof values);
+            values = [];
+        }
+
         if (values.length === 0) {
             const initialValuesRows = field.initialValues || [getInitialValues()];
             setFormFields(initialValuesRows);

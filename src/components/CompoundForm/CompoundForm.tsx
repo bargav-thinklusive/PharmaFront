@@ -7,6 +7,8 @@ import usePost from "../../hooks/usePost";
 import DrugService from "../../services/DrugService";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { parseExcelFile, mapExcelToFormFields, validateExcelFile } from "../../utils/excelImportUtils";
+import { FiUpload } from "react-icons/fi";
 
 const drugService = new DrugService();
 
@@ -33,6 +35,10 @@ const DrugForm = () => {
 
     const formDataRef = useRef<any>(formData);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Excel import states
+    const [isProcessing, setIsProcessing] = useState(false);
 
     // Keep ref in sync with state
     useEffect(() => {
@@ -112,6 +118,75 @@ const DrugForm = () => {
         }
     };
 
+    // Excel Import Handlers
+    const handleImportClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        // Validate file
+        const validation = validateExcelFile(file);
+        if (!validation.valid) {
+            toast.error(validation.error || "Invalid file");
+            return;
+        }
+
+        setIsProcessing(true);
+        try {
+            // Parse Excel file
+            const excelData = await parseExcelFile(file);
+
+            if (excelData.length === 0) {
+                toast.warning("The Excel file is empty");
+                setIsProcessing(false);
+                return;
+            }
+
+            // Map Excel data to form fields
+            const allFormConfigs = steps.map(step => step.fields);
+            const mappingResult = mapExcelToFormFields(excelData, allFormConfigs);
+
+            // Merge imported data with existing form data directly
+            const mergedData = {
+                ...formDataRef.current,
+                ...mappingResult.mappedData
+            };
+
+            // Sanitize: remove any dynamic field values that are not arrays
+            // (can happen from previous bad imports or stale state)
+            const flatConfig = allFormConfigs.flat();
+            flatConfig.forEach(field => {
+                if (field.dynamicFields && field.dynamicFields.length > 0) {
+                    const val = mergedData[field.key];
+                    if (val !== undefined && !Array.isArray(val)) {
+                        delete mergedData[field.key];
+                    }
+                }
+            });
+
+            setFormData(mergedData);
+            formDataRef.current = mergedData;
+
+            toast.success(`Successfully imported ${Object.keys(mappingResult.mappedData).length} fields`);
+
+            if (mappingResult.unmappedFields.length > 0) {
+                toast.info(`${mappingResult.unmappedFields.length} fields were not mapped and were skipped`);
+            }
+        } catch (error) {
+            console.error("Error processing Excel file:", error);
+            toast.error("Failed to process Excel file. Please check the file format.");
+        } finally {
+            setIsProcessing(false);
+            // Reset file input
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        }
+    };
+
     // Create a form object with error support
     const formWithErrors = {
         ...formData,
@@ -126,6 +201,26 @@ const DrugForm = () => {
 
     return (
         <div className="mt-5 max-w-7xl mx-auto px-4">
+            {/* Header with Import Button */}
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold text-gray-800">Drug Information Form</h1>
+                <button
+                    onClick={handleImportClick}
+                    disabled={isProcessing}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                    <FiUpload className="w-4 h-4" />
+                    {isProcessing ? "Processing..." : "Import from Excel"}
+                </button>
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".xlsx,.xls,.csv"
+                    onChange={handleFileChange}
+                    className="hidden"
+                />
+            </div>
+
             {/* Progress Indicator */}
             <div className="mb-8">
                 <div className="flex justify-between items-center mb-4">
@@ -185,6 +280,7 @@ const DrugForm = () => {
                     )}
                 </div>
             </form>
+
         </div>
     );
 };

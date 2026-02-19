@@ -36,6 +36,8 @@ class AuthService {
   static logout() {
     TokenService.deleteToken();
     localStorage.removeItem('user');
+    localStorage.removeItem('DRUG_FORM_DATA');
+    localStorage.removeItem('DRUG_FORM_STEP');
     return true;
   }
 
