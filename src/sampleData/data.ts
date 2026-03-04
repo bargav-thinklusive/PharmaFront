@@ -1,6 +1,4 @@
 ﻿
-
-
 export const sampleRawData: any = [
   {
     "approvalDate": "01/02/2024",
