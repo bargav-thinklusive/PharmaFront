@@ -4,7 +4,7 @@ import { LOGIN_URL } from "../../urlConfig";
 
 const axiosInstance = axios.create();
 
-//A request interceptor
+// ── Request interceptor: attach access token to every request ────────────────
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = TokenService.getToken();
@@ -13,27 +13,35 @@ axiosInstance.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// A response interceptor
+// ── Response interceptor: silently refresh on 401 ────────────────────────────
 axiosInstance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    // Checking if the error is due to token expiration
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
-      TokenService.deleteToken();
+
+    // Only attempt a refresh once per request (avoid infinite loops)
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
+
+      // Try to get a new access token using the refresh token cookie
+      const newAccessToken = await TokenService.refreshToken();
+
+      if (newAccessToken) {
+        // Update the Authorization header and retry the original request
+        originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+        return axiosInstance(originalRequest);
+      }
+
+      // Refresh also failed — clear all tokens and send user to login
+      TokenService.clearAll();
       window.location.href = LOGIN_URL;
-      // originalRequest._retry = true;
-      // const newToken = await TokenService.refreshToken();
-      // originalRequest.headers["Authorization"] = `access_Token ${newToken}`;
-      // Retring the original request
-      // return axiosInstance(originalRequest);
     }
 
     return Promise.reject(error);

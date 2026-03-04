@@ -71,6 +71,23 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
         );
     }
 
+    if (normalizedTitle.includes('manufacturingroutes') || normalizedTitle.includes('manufacturing routes')) {
+        const steps = Array.isArray(data) ? data : [data];
+        return (
+            <div className="space-y-4">
+                <h2 className="text-lg font-bold text-gray-800 border-blue-400 border-b-2 pb-1">{index} {toTitleCase(title)}</h2>
+                <div className="space-y-4">
+                    {steps.map((item, i) => (
+                        <div key={i} className="p-4 border border-blue-100 rounded bg-blue-50/30">
+                            <h3 className="font-bold text-blue-900 mb-1 italic">Step {i + 1}</h3>
+                            <div className="text-gray-700 whitespace-pre-wrap">{item.step || (typeof item === 'string' ? item : JSON.stringify(item))}</div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
     // Array/Complex object rendering
     if (Array.isArray(data)) {
         if (data.length > 0 && typeof data[0] === 'object' && data[0] !== null) {
@@ -102,7 +119,15 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
  * Handles rendering of fields within a section.
  */
 export default function SectionContent({ data, sectionIndex }: SectionContentProps) {
-    if (typeof data !== 'object' || data === null) return <div>{normalizeValue(data)}</div>;
+    if (data === null || data === undefined) {
+        return (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="text-4xl mb-3 opacity-30">📋</div>
+                <p className="text-gray-400 text-sm italic">No data available for this section.</p>
+            </div>
+        );
+    }
+    if (typeof data !== 'object') return <div>{normalizeValue(data)}</div>;
 
     const entries = Object.entries(data);
     const simpleFields: Record<string, any> = {};
