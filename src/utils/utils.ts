@@ -126,6 +126,18 @@ export const convertDatesToUnix = (data: any): any => {
   return result;
 };
 
+/**
+ * Converts a File object to a Base64 string.
+ */
+export const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+};
+
 // Helper to process drug data: formalize by removing empty strings and map to detailed structure
 export const processDrugData = (data: any): any => {
   // First, formalize by removing empty strings

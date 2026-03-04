@@ -70,6 +70,20 @@ export function renderLink(text: string) {
     return <AppendixLink text={text} />;
 }
 
+/**
+ * Helper to detect if an object matches the ImageObject pattern (has imageData)
+ */
+const isImageObject = (obj: any): boolean => {
+    return obj && typeof obj === 'object' && ('imageData' in obj || 'image' in obj || 'url' in obj) &&
+        (typeof obj.imageData === 'string' || typeof obj.image === 'string' || typeof obj.url === 'string');
+};
+
+const getImgSrc = (item: any): string | null => {
+    if (typeof item === 'string') return item;
+    if (!item || typeof item !== 'object') return null;
+    return item.imageData || item.image || item.url || null;
+};
+
 export function renderValue(value: any): React.ReactNode {
     if (Array.isArray(value)) {
         if (value.length > 0 && typeof value[0] === 'object' && value[0] !== null && 'vendor' in value[0]) {
@@ -83,10 +97,32 @@ export function renderValue(value: any): React.ReactNode {
         return value.map((item, index) => (
             <span key={index}>
                 {index > 0 && ', '}
-                {typeof item === 'object' && item !== null ? JSON.stringify(item) : renderLink(normalizeValue(item))}
+                {isImageObject(item) ? (
+                    <img
+                        src={getImgSrc(item)!}
+                        alt="item"
+                        className="h-10 w-auto inline cursor-pointer border rounded"
+                        onClick={() => window.open(getImgSrc(item)!, '_blank')}
+                    />
+                ) : (
+                    typeof item === 'object' && item !== null ? JSON.stringify(item) : renderLink(normalizeValue(item))
+                )}
             </span>
         ));
     }
+
+    if (isImageObject(value)) {
+        const src = getImgSrc(value)!;
+        return (
+            <img
+                src={src}
+                alt="value"
+                className="max-w-[200px] h-auto cursor-pointer border rounded shadow-sm hover:scale-[1.05] transition-transform"
+                onClick={() => window.open(src, '_blank')}
+            />
+        );
+    }
+
     if (typeof value === 'object' && value !== null) {
         return Object.entries(value).map(([k, v], idx) => (
             <div key={idx} className="mb-1">
@@ -103,27 +139,40 @@ export function DataTable({ data }: { data: any[] }) {
 
     const renderCell = (header: string, value: any) => {
         // Detect image fields by key name or value type
-        const isImageKey = /^images?$/i.test(header);
+        const isImageKey = /^images?$/i.test(header) || /image/i.test(header) || /structure/i.test(header);
         const isFile = typeof File !== 'undefined' && value instanceof File;
         const isBlob = typeof Blob !== 'undefined' && value instanceof Blob;
         const isImageUrl = typeof value === 'string' && /\.(png|jpg|jpeg|gif|svg|webp)(\?.*)?$/i.test(value.trim());
         const isDataUrl = typeof value === 'string' && value.startsWith('data:image/');
+        const isImageObj = isImageObject(value);
+        const isImageArray = Array.isArray(value) && value.length > 0 && isImageObject(value[0]);
 
-        if (isImageKey || isFile || isBlob || isImageUrl || isDataUrl) {
-            const src = isFile || isBlob ? URL.createObjectURL(value) : value;
-            if (!src) return <span className="text-gray-400 italic text-xs">No image</span>;
+        if (isImageKey || isFile || isBlob || isImageUrl || isDataUrl || isImageObj || isImageArray) {
+            const images = Array.isArray(value) ? value : [value];
             return (
-                <img
-                    src={src}
-                    alt={header}
-                    className="h-16 w-auto max-w-[120px] object-contain rounded cursor-pointer border border-gray-200"
-                    onClick={() => window.open(src, '_blank')}
-                    title="Click to open full size"
-                />
+                <div className="flex flex-wrap gap-1">
+                    {images.map((item, idx) => {
+                        const src = isImageObject(item) ? getImgSrc(item) : (isFile || isBlob ? URL.createObjectURL(item) : (typeof item === 'string' ? item : null));
+                        if (!src) return null;
+                        return (
+                            <img
+                                key={idx}
+                                src={src}
+                                alt={`${header}-${idx}`}
+                                className="h-12 w-12 object-contain rounded cursor-pointer border border-gray-200 bg-white"
+                                onClick={() => window.open(src, '_blank')}
+                                title="Click to open full size"
+                                onError={(e: any) => {
+                                    e.target.style.display = 'none';
+                                }}
+                            />
+                        );
+                    })}
+                </div>
             );
         }
 
-        return <>{normalizeValue(value)}</>;
+        return <>{renderValue(value)}</>;
     };
 
     return (

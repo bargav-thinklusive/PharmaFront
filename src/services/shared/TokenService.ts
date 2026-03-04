@@ -17,10 +17,12 @@ class TokenService {
   }
 
   private static getCookie(name: string): string | null {
+    const prefix = `${name}=`;
     const match = document.cookie
       .split(";")
-      .find((c) => c.trim().startsWith(`${name}=`));
-    return match ? match.trim().split("=")[1] : null;
+      .map(c => c.trim())
+      .find((c) => c.startsWith(prefix));
+    return match ? match.substring(prefix.length) : null;
   }
 
   private static deleteCookie(name: string) {

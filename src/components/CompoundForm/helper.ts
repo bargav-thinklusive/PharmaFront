@@ -1,4 +1,4 @@
-import { convertDatesToUnix } from "../../utils/utils";
+import { convertDatesToUnix, fileToBase64 } from "../../utils/utils";
 
 /**
  * Flattens a stored drug record (nested sections) into
@@ -86,14 +86,52 @@ export const flattenDrug = (drug: any): any => {
         dissolutionTestMethodAndSamplingTimes: drug.BaBeStudies?.dissolutionTestMethodAndSamplingTimes ?? "",
 
         // Sources / Glossary / Appendices
-        sources: drug.Sources?.sources ?? "",
-        glossary: drug.Glossary?.glossary ?? "",
+        sources: drug.Sources?.sources ?? (typeof drug.Sources === 'string' ? drug.Sources : ""),
+        glossary: drug.Glossary?.glossary ?? (typeof drug.Glossary === 'string' ? drug.Glossary : ""),
         appendices: drug.Appendices?.appendices ?? [],
     };
 };
 
-export const formatCreatedDrug = (formData: any) => {
-    const result = {
+/**
+ * Recursively scans the object for File objects and converts them to Base64 ImageObjects.
+ */
+async function processImagesToBase64(data: any): Promise<any> {
+    if (!data || typeof data !== 'object') return data;
+
+    if (Array.isArray(data)) {
+        return Promise.all(data.map(item => processImagesToBase64(item)));
+    }
+
+    const result: any = {};
+    for (const key in data) {
+        const val = data[key];
+
+        if (val instanceof File) {
+            // Convert single File to ImageObject
+            const base64 = await fileToBase64(val);
+            result[key] = {
+                fileName: val.name,
+                contentType: val.type,
+                imageData: base64
+            };
+        } else if (Array.isArray(val) && val.length > 0 && val[0] instanceof File) {
+            // Convert Array of Files
+            result[key] = await Promise.all(val.map(async (file: File) => ({
+                fileName: file.name,
+                contentType: file.type,
+                imageData: await fileToBase64(file)
+            })));
+        } else if (typeof val === 'object') {
+            result[key] = await processImagesToBase64(val);
+        } else {
+            result[key] = val;
+        }
+    }
+    return result;
+}
+
+export const formatCreatedDrug = async (formData: any) => {
+    const rawResult = {
         ExecutiveSummary: formData.executiveSummary,
         ProductOverview: {
             version: formData.version,
@@ -101,8 +139,12 @@ export const formatCreatedDrug = (formData: any) => {
             apiName: formData.apiName,
             mechanismOfAction: formData.mechanismOfAction,
             companyName: formData.companyName,
+            approvedIndications: formData.approvedIndications,
             firstApprovedDate: formData.firstApprovedDate,
             firstApprovedRegion: formData.firstApprovedRegion,
+            dosageForms: formData.dosageForms,
+            lossOfExclusivity: formData.lossOfExclusivity,
+            globalAnnualRevenue: formData.globalAnnualRevenue,
         },
         RegulatoryInsights: {
             regulatoryInsights: formData.regulatoryInsights,
@@ -166,16 +208,16 @@ export const formatCreatedDrug = (formData: any) => {
             biowaiverRequest: formData.biowaiverRequest,
             dissolutionTestMethodAndSamplingTimes: formData.dissolutionTestMethodAndSamplingTimes,
         },
-        Sources: {
-            sources: formData.sources,
-        },
-        Glossary: {
-            glossary: formData.glossary,
-        },
+        Sources: formData.sources,
+        Glossary: formData.glossary,
         Appendices: {
             appendices: formData.appendices,
         }
     };
 
-    return convertDatesToUnix(result);
+    // First convert images to Base64 strings
+    const withImages = await processImagesToBase64(rawResult);
+
+    // Then convert dates to Unix
+    return convertDatesToUnix(withImages);
 };
