@@ -1,5 +1,4 @@
 import { lazy } from 'react';
-import DrugForm from '../components/CompoundForm/CompoundForm';
 
 // Lazy load all components
 const Login = lazy(() => import("../components/pages/auth/LoginPage"));
@@ -12,10 +11,10 @@ const About = lazy(() => import('../components/pages/About'));
 const Contacts = lazy(() => import('../components/pages/Contacts'));
 const DrugsTable = lazy(() => import('../components/DrugTable/DrugsTable'));
 const NotFound = lazy(() => import("../components/pages/NotFound"));
-const ViewDrug = lazy(() => import("../components/Compound/ViewDrug"));
+const DrugForm = lazy(() => import("../components/CompoundForm/CompoundForm"));
+const SectionedViewDrug = lazy(() => import("../components/Compound/SectionedViewDrug"));
 const BookMark = lazy(() => import("../components/Bookmark/BookMark"));
 const DrugsList = lazy(() => import("../components/DrugsList/DrugsList"));
-//const UniversalForm = lazy(() => import("../components/CompoundForm/UniversalForm"));
 
 export const routesConfig = [
     { path: "/", element: <LandingPage /> },
@@ -27,10 +26,9 @@ export const routesConfig = [
     { path: "/about", element: <About /> },
     { path: "/contacts", element: <Contacts /> },
     { path: ":ccategory/:searchtext", element: <DrugsTable /> },
-    // { path: ":ccategory/:searchtext/:cid/:version", element: <DrugViewer /> },
     { path: "/drug-form", element: <DrugForm /> },
     { path: "/bookmark", element: <BookMark /> },
     { path: "/drugsList", element: <DrugsList /> },
-    { path: ":ccategory/:searchtext/:cid/:version", element: <ViewDrug /> },
+    { path: ":ccategory/:searchtext/:cid/:version", element: <SectionedViewDrug /> },
     { path: "*", element: <NotFound /> }
 ];

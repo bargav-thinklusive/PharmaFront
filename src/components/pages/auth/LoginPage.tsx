@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import AuthService from "../../../services/AuthService";
 import { toast, ToastContainer } from "react-toastify";
@@ -10,6 +10,7 @@ const authService = new AuthService();
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { refetchDrugs, checkTokenAndGetUser } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -63,9 +64,11 @@ const Login: React.FC = () => {
             onClose: async () => {
               // Fetch user data to check role
               await checkTokenAndGetUser();
-              // Fetch drugs immediately after successful login
               await refetchDrugs();
-              navigate("/home");
+              // Go back to the page the user was on before token expired,
+              // or fall back to /home for a normal login
+              const from = (location.state as any)?.from || "/home";
+              navigate(from, { replace: true });
             }
           },
           error: "Login failed. Please check your credentials."

@@ -100,6 +100,32 @@ export function renderValue(value: any): React.ReactNode {
 export function DataTable({ data }: { data: any[] }) {
     if (!data || data.length === 0) return <div>No data available</div>;
     const headers = Object.keys(data[0]);
+
+    const renderCell = (header: string, value: any) => {
+        // Detect image fields by key name or value type
+        const isImageKey = /^images?$/i.test(header);
+        const isFile = typeof File !== 'undefined' && value instanceof File;
+        const isBlob = typeof Blob !== 'undefined' && value instanceof Blob;
+        const isImageUrl = typeof value === 'string' && /\.(png|jpg|jpeg|gif|svg|webp)(\?.*)?$/i.test(value.trim());
+        const isDataUrl = typeof value === 'string' && value.startsWith('data:image/');
+
+        if (isImageKey || isFile || isBlob || isImageUrl || isDataUrl) {
+            const src = isFile || isBlob ? URL.createObjectURL(value) : value;
+            if (!src) return <span className="text-gray-400 italic text-xs">No image</span>;
+            return (
+                <img
+                    src={src}
+                    alt={header}
+                    className="h-16 w-auto max-w-[120px] object-contain rounded cursor-pointer border border-gray-200"
+                    onClick={() => window.open(src, '_blank')}
+                    title="Click to open full size"
+                />
+            );
+        }
+
+        return <>{normalizeValue(value)}</>;
+    };
+
     return (
         <div className="overflow-x-auto border-2 border-sky-400 rounded-lg">
             <table className="w-full text-sm text-left text-gray-700 border-collapse">
@@ -117,7 +143,7 @@ export function DataTable({ data }: { data: any[] }) {
                         <tr key={rowIndex} className="bg-white border-b hover:bg-gray-50">
                             {headers.map((header, idx) => (
                                 <td key={header} className={`px-6 py-4 whitespace-pre-wrap ${idx < headers.length - 1 ? 'border-r border-sky-100' : ''}`}>
-                                    {normalizeValue(row[header])}
+                                    {renderCell(header, row[header])}
                                 </td>
                             ))}
                         </tr>

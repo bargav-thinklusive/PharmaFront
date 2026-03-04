@@ -47,22 +47,20 @@ export const columns: any = [
     filter: true,
     width: 100,
     valueFormatter: valueFormatter,
-
   },
   {
     headerName: "Version",
     headerClass: "table-header",
-    field: "version",
+    field: "ProductOverview.version",
     sortable: true,
     filter: true,
     width: 80,
     valueFormatter: valueFormatter,
-
   },
   {
     headerName: "Drug Name",
     headerClass: "table-header",
-    field: "marketInformation.drugName",
+    field: "ProductOverview.drugName",
     sortable: true,
     filter: true,
     autoHeight: true,
@@ -72,7 +70,7 @@ export const columns: any = [
   {
     headerName: "API Name",
     headerClass: "table-header",
-    field: "marketInformation.apiName",
+    field: "ProductOverview.apiName",
     sortable: true,
     filter: true,
     autoHeight: true,
@@ -82,7 +80,7 @@ export const columns: any = [
   {
     headerName: "IUPAC Name",
     headerClass: "table-header",
-    field: "drugSubstance.physicalAndChemicalProperties.iupacName",
+    field: "PhysicalChemicalProperties.iupacName",
     sortable: true,
     filter: true,
     autoHeight: true,
@@ -92,19 +90,18 @@ export const columns: any = [
   {
     headerName: "INN Name",
     headerClass: "table-header",
-    field: "drugSubstance.physicalAndChemicalProperties.innName",
+    field: "PhysicalChemicalProperties.innName",
     wrapText: true,
     autoHeight: true,
     filter: true,
     width: 350,
     cellStyle: { lineHeight: '2' },
     valueFormatter: valueFormatter,
-
   },
   {
     headerName: "Molecular Formula",
     headerClass: "table-header",
-    field: "drugSubstance.physicalAndChemicalProperties.molecularFormula",
+    field: "PhysicalChemicalProperties.molecularFormula",
     sortable: true,
     filter: true,
     autoHeight: true,
@@ -114,7 +111,7 @@ export const columns: any = [
   {
     headerName: "Molecular Weight",
     headerClass: "table-header",
-    field: "drugSubstance.physicalAndChemicalProperties.molecularWeight",
+    field: "PhysicalChemicalProperties.molecularWeight",
     sortable: true,
     filter: true,
     autoHeight: true,
@@ -124,7 +121,7 @@ export const columns: any = [
   {
     headerName: "Approval Date",
     headerClass: "table-header",
-    field: "marketInformation.firstApprovedDate",
+    field: "ProductOverview.firstApprovedDate",
     sortable: true,
     filter: true,
     valueFormatter: valueFormatter
@@ -132,7 +129,7 @@ export const columns: any = [
   {
     headerName: "Company Name",
     headerClass: "table-header",
-    field: "marketInformation.companyName",
+    field: "ProductOverview.companyName",
     sortable: true,
     filter: true,
     valueFormatter: valueFormatter
