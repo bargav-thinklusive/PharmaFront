@@ -9,10 +9,17 @@ const BrandNameCellRenderer = (params: any) => {
     const drugData = params.data?.drug || params.data;
 
     if (drugData?.cid) {
-      // Use route params if available, otherwise use defaults
       const category = ccategory || 'all';
-      const search = searchtext || drugData?.marketInformation?.drugName || drugData?.drugName || drugData?.cid || '';
-      navigate(`/${category}/${encodeURIComponent(search)}/${drugData.cid}/${drugData.version}`);
+      // Drug name — check all three API data shapes
+      const drugName =
+        drugData?.ProductOverview?.drugName ||
+        drugData?.ProductOverview?.brandName ||
+        drugData?.drugName ||
+        drugData?.cid;
+      const search = searchtext || drugName || drugData.cid;
+      // Version lives inside ProductOverview
+      const version = drugData?.ProductOverview?.version ?? 1;
+      navigate(`/${category}/${encodeURIComponent(search)}/${drugData.cid}/${version}`);
     }
   };
 

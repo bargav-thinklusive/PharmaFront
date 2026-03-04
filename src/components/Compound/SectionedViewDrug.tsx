@@ -1,15 +1,12 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import Summary from './Summary';
 import { useUser } from '../../context/UserContext';
 import './SectionedViewDrug.css';
 
 // Modular Components
 import SectionHeader from './sectioned/SectionHeader';
 import SectionContent from './sectioned/SectionContent';
-import NavigationControls from './sectioned/NavigationControls';
-import { sampleDrugData } from './sectioned/sampleData';
 
 /**
  * Main component for the section-based drug details view.
@@ -20,10 +17,10 @@ export default function SectionedViewDrug() {
     const { drugsData } = useUser();
     const [currentStep, setCurrentStep] = useState(1);
 
-    // Find drug data
+    // Find drug data by cid (version is nested inside MarketInformation/ProductOverview, not top-level)
     const drugToDisplay = useMemo(() => {
-        const found = drugsData.find((d: any) => d.cid === cid && d.version === parseInt(version || '1'));
-        return found || sampleDrugData; // Fallback to sample data if not found
+        const found = drugsData.find((d: any) => d.cid === cid);
+        return found || null;
     }, [cid, version, drugsData]);
 
     // Format display data by excluding internal fields
@@ -40,16 +37,22 @@ export default function SectionedViewDrug() {
     // Build section list for navigation
     const sections = useMemo(() => {
         const sequence = [
-            { id: 1, key: 'summary', title: 'Title and Summary' },
-            { id: 2, key: 'marketInformation', title: 'Market Information' },
-            { id: 3, key: 'physicalAndChemicalProperties', title: 'Physical and Chemical Properties' },
-            { id: 4, key: 'analyticalDevelopment', title: 'Analytical Development' },
-            { id: 5, key: 'drugProductInformation', title: 'Drug Product Information' },
-            { id: 6, key: 'appendices', title: 'Appendices' },
+            { id: 1, key: 'ExecutiveSummary', title: 'Executive Summary' },
+            { id: 2, key: 'ProductOverview', title: 'Product Overview' },
+            { id: 3, key: 'RegulatoryInsights', title: 'Regulatory Insights' },
+            { id: 4, key: 'GenericEntrants', title: 'Generic Entrants' },
+            { id: 5, key: 'PhysicalChemicalProperties', title: 'Physical & Chemical Properties' },
+            { id: 6, key: 'DrugSubstance', title: 'Drug Substance' },
+            { id: 7, key: 'DrugProductInformation', title: 'Drug Product Information' },
+            { id: 8, key: 'LabelingInformation', title: 'Labeling Information' },
+            { id: 9, key: 'BaBeStudies', title: 'BA/BE Studies' },
+            { id: 10, key: 'Sources', title: 'Sources' },
+            { id: 11, key: 'Glossary', title: 'Glossary' },
+            { id: 12, key: 'Appendices', title: 'Appendices' },
         ];
 
-        // Filter based on what exists in data, but keep Summary
-        return sequence.filter(s => s.key === 'summary' || (displayData && displayData[s.key]));
+        // Always show all sections regardless of whether the data is populated
+        return sequence;
     }, [displayData]);
 
     // Cleanup: Scroll to top on step change
@@ -68,15 +71,9 @@ export default function SectionedViewDrug() {
     }
 
     const currentSection = sections.find(s => s.id === currentStep);
-    const prevSection = currentStep > 1 ? sections.find(s => s.id === currentStep - 1) : null;
-    const nextSection = currentStep < sections.length ? sections.find(s => s.id === currentStep + 1) : null;
 
-    const handleNavigate = (direction: 'next' | 'prev') => {
-        if (direction === 'next') {
-            setCurrentStep(prev => Math.min(sections.length, prev + 1));
-        } else {
-            setCurrentStep(prev => Math.max(1, prev - 1));
-        }
+    const handleNavigateById = (id: number) => {
+        setCurrentStep(id);
     };
 
     return (
@@ -84,35 +81,26 @@ export default function SectionedViewDrug() {
             <div className="sectioned-view-content">
 
                 <SectionHeader
+                    sections={sections}
                     currentStep={currentStep}
-                    totalSteps={sections.length}
-                    title={currentSection?.title}
+                    onNavigate={handleNavigateById}
                 />
 
                 <main className="min-h-[50vh] animate-fadeIn">
-                    {currentStep === 1 ? (
-                        <Summary drug={drugToDisplay} sectionId={1} />
-                    ) : (
-                        <div>
-                            <h1 className="text-2xl font-bold border-sky-400 border-b-4 pb-1 mb-6 inline-block">
-                                {currentStep}. {currentSection?.title}
-                            </h1>
-                            {displayData && currentSection && (
-                                <SectionContent
-                                    data={displayData[currentSection.key]}
-                                    sectionIndex={`${currentStep}`}
-                                />
-                            )}
-                        </div>
-                    )}
+                    <div>
+                        <h1 className="text-2xl font-bold border-sky-400 border-b-4 pb-1 mb-6 inline-block">
+                            {currentStep}. {currentSection?.title}
+                        </h1>
+                        {displayData && currentSection && (
+                            <SectionContent
+                                data={displayData[currentSection.key]}
+                                sectionIndex={`${currentStep}`}
+                            />
+                        )}
+                    </div>
                 </main>
 
-                <NavigationControls
-                    currentSection={currentSection}
-                    prevSection={prevSection}
-                    nextSection={nextSection}
-                    onNavigate={handleNavigate}
-                />
+
             </div>
         </div>
     );

@@ -1,5 +1,5 @@
 export interface DrugEntry {
-  marketInformation: {
+  productOverview: {
     version: string;
     brandName: string;
     indication: string;

@@ -42,31 +42,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
     dataSource?.forEach((item: any) => {
       if (category === "all") {
         const fields = [
-          { text: item?.marketInformation?.drugName || item?.marketInformation?.brandName || item?.drugName || "", type: "drugName" },
-          { text: item?.marketInformation?.apiName || item?.marketInformation?.genericName || item?.apiName || "", type: "apiName" },
+          { text: item?.ProductOverview?.drugName || item?.ProductOverview?.brandName || "", type: "drugName" },
+          { text: item?.ProductOverview?.apiName || "", type: "apiName" },
           {
-            text: (() => {
-              const chemicalName = item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName;
-              if (typeof chemicalName === 'string') return chemicalName;
-              if (typeof chemicalName === 'object') {
-                const keys = Object.keys(chemicalName).filter((key: any) => typeof key === 'string' && key.trim());
-                return keys.join(' ');
-              }
-              return "";
-            })(),
-            type: "chemicalName",
+            text: item?.PhysicalChemicalProperties?.iupacName || "",
+            type: "iupacName",
           },
           {
-            text: (() => {
-              const structureName = item?.drugSubstance?.physicalAndChemicalProperties?.structureName;
-              if (typeof structureName === 'string') return structureName;
-              if (typeof structureName === 'object') {
-                const values = Object.values(structureName).filter((val: any) => typeof val === 'string' && val.trim());
-                return values.join(' ');
-              }
-              return "";
-            })(),
-            type: "structureName",
+            text: item?.PhysicalChemicalProperties?.innName || "",
+            type: "innName",
           },
           { text: item?.cid || "", type: "cid" },
         ];
@@ -85,38 +69,24 @@ const SearchBar: React.FC<SearchBarProps> = ({
           }
         });
       } else if (category === "drugName") {
-        const text = item?.marketInformation?.drugName || item?.marketInformation?.brandName || item?.drugName || "";
+        const text = item?.ProductOverview?.drugName || item?.ProductOverview?.brandName || "";
         if (text && text.toLowerCase().includes(q)) {
           matches.push({ ...item, matchedText: text });
         }
       } else if (category === "apiName") {
-        const text = item?.marketInformation?.apiName || item?.marketInformation?.genericName || item?.apiName || "";
+        const text = item?.ProductOverview?.apiName || "";
         if (text && text.toLowerCase().includes(q)) {
           matches.push({ ...item, matchedText: text });
         }
-      } else if (category === "chemicalName") {
-        const text =
-          item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName || "";
+      } else if (category === "iupacName") {
+        const text = item?.PhysicalChemicalProperties?.iupacName || "";
         if (text && text.toLowerCase().includes(q)) {
           matches.push({ ...item, matchedText: text });
         }
-      } else if (category === "structureName") {
-        const structureName = item?.drugSubstance?.physicalAndChemicalProperties?.structureName;
-        if (structureName) {
-          if (typeof structureName === 'string' && structureName.toLowerCase().includes(q)) {
-            matches.push({ ...item, matchedText: structureName });
-          } else if (typeof structureName === 'object') {
-            Object.values(structureName).forEach((val: any) => {
-              if (typeof val === 'string' && val.trim() && val.toLowerCase().includes(q)) {
-                matches.push({ ...item, matchedText: val });
-              }
-            });
-            // Also check concatenated values
-            const concatenated = Object.values(structureName).filter((val: any) => typeof val === 'string' && val.trim()).join(' ');
-            if (concatenated && concatenated.toLowerCase().includes(q)) {
-              matches.push({ ...item, matchedText: concatenated });
-            }
-          }
+      } else if (category === "innName") {
+        const text = item?.PhysicalChemicalProperties?.innName || "";
+        if (text && text.toLowerCase().includes(q)) {
+          matches.push({ ...item, matchedText: text });
         }
       }
     });
@@ -163,7 +133,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleSelect = (item: any) => {
     const searchText =
-      item.matchedText || item?.marketInformation?.drugName || item?.marketInformation?.brandName || item?.drugName || item?.cid || "";
+      item.matchedText || item?.ProductOverview?.drugName || item?.ProductOverview?.brandName || item?.cid || "";
     navigate(`/${category}/${encodeURIComponent(searchText)}`);
     setSearch(searchText);
     setShowSuggestions(false);
@@ -215,8 +185,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
               <option value="all">All</option>
               <option value="drugName">Drug Name</option>
               <option value="apiName">API Name</option>
-              <option value="chemicalName">Chemical</option>
-              <option value="structureName">Structure</option>
+              <option value="iupacName">IUPAC Name</option>
+              <option value="innName">INN Name</option>
             </select>
             <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600">
               ▼
@@ -233,9 +203,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
               suggestions.map((item, index) => {
                 const displayText =
                   item.matchedText ||
-                  item?.marketInformation?.drugName ||
-                  item?.marketInformation?.brandName ||
-                  item?.drugName ||
+                  item?.ProductOverview?.drugName ||
+                  item?.ProductOverview?.brandName ||
                   item?.cid ||
                   "";
                 return (

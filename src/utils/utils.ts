@@ -131,9 +131,9 @@ export const processDrugData = (data: any): any => {
   // First, formalize by removing empty strings
   const formalized = formalizeData(data);
   // Then, map to detailed structure
-  const { marketInformation, ...rest } = formalized;
-  const { version, ...marketInfo } = marketInformation;
-  return { version, marketInformation: marketInfo, ...rest };
+  const { productOverview, ...rest } = formalized;
+  const { version, ...productInfo } = productOverview;
+  return { version, productOverview: productInfo, ...rest };
 };
 
 // Helper function to remove empty strings recursively

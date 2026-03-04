@@ -1,58 +1,62 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DynamicFormBuilder from "../shared";
-import { addMarketInformation, addPhysicalChemicalProperties, addProcessDevelopment, addAnalyticalDevelopment, addDrugProductInformation, addAppendices } from "./columns";
+import { addExecutiveSummary, addProductOverview, addPhysicalChemicalProperties, addDrugSubstance, addDrugProductInformation, addAppendices, addRegulatoryInsights, addLabelingInformation, addGenericEntrants, addBaBeStudies, addSources, addGlossary } from "./columns";
 import { formatCreatedDrug } from "./helper";
 import usePost from "../../hooks/usePost";
 import DrugService from "../../services/DrugService";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import useDraft from "../../hooks/useDraft";
+import { useUser } from "../../context/UserContext";
 
 const drugService = new DrugService();
 
 const DrugForm = () => {
     const navigate = useNavigate();
     const { postData } = usePost();
+    const { saveDraft, loadDraft, clearDraft } = useDraft();
+    const { refetchDrugs } = useUser();
 
-    // Initialize state from localStorage once
-    const [formData, setFormData] = useState<any>(() => {
-        try {
-            const saved = localStorage.getItem("DRUG_FORM_DATA");
-            return saved ? JSON.parse(saved) : {};
-        } catch (e) {
-            console.error("Failed to parse form data from localStorage", e);
-            return {};
-        }
-    });
+    const [formData, setFormData] = useState<any>({});
+    const [currentStep, setCurrentStep] = useState(0);
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-    const [currentStep, setCurrentStep] = useState(() => {
-        const saved = localStorage.getItem("DRUG_FORM_STEP");
-        const step = saved ? parseInt(saved, 10) : 0;
-        return isNaN(step) ? 0 : step;
-    });
+    // Draft restore state
+    const [draftRestored, setDraftRestored] = useState(false);
+    const [isSavingDraft, setIsSavingDraft] = useState(false);
 
     const formDataRef = useRef<any>(formData);
-    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     // Keep ref in sync with state
     useEffect(() => {
         formDataRef.current = formData;
     }, [formData]);
 
-    // Save to localStorage on change
+    // ── On mount: restore draft if one exists ─────────────────────────────────
     useEffect(() => {
-        if (Object.keys(formData).length > 0 || currentStep > 0) {
-            localStorage.setItem("DRUG_FORM_DATA", JSON.stringify(formData));
-            localStorage.setItem("DRUG_FORM_STEP", currentStep.toString());
+        const draft = loadDraft();
+        if (draft && draft.formData && Object.keys(draft.formData).length > 0) {
+            formDataRef.current = draft.formData;
+            setFormData(draft.formData);
+            setCurrentStep(draft.currentStep ?? 0);
+            setDraftRestored(true);
         }
-    }, [formData, currentStep]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const steps = [
-        { title: "Market Information", fields: addMarketInformation },
+        { title: "Executive Summary", fields: addExecutiveSummary },
+        { title: "Product Overview", fields: addProductOverview },
+        { title: "Regulatory Insights", fields: addRegulatoryInsights },
+        { title: "Generic Entrants", fields: addGenericEntrants },
         { title: "Physical & Chemical Properties", fields: addPhysicalChemicalProperties },
-        { title: "Process Development", fields: addProcessDevelopment },
-        { title: "Analytical Development", fields: addAnalyticalDevelopment },
+        { title: "Drug Substance", fields: addDrugSubstance },
         { title: "Drug Product Information", fields: addDrugProductInformation },
+        { title: "Labeling Information", fields: addLabelingInformation },
+        { title: "BA/BE Studies", fields: addBaBeStudies },
+        { title: "Sources", fields: addSources },
+        { title: "Glossary", fields: addGlossary },
         { title: "Appendices", fields: addAppendices },
     ];
 
@@ -75,14 +79,27 @@ const DrugForm = () => {
         return isValid;
     };
 
+    // ── Save Section (explicit save button) ───────────────────────────────────
+    const handleSaveDraft = async () => {
+        setIsSavingDraft(true);
+        try {
+            saveDraft(formDataRef.current, currentStep);
+            setDraftRestored(true);
+            toast.success("✅ Section saved! Your progress is safe.", { autoClose: 2500 });
+        } finally {
+            setIsSavingDraft(false);
+        }
+    };
+
+
+
     const handleNext = () => {
         if (validateCurrentStep()) {
             if (currentStep < steps.length - 1) {
                 setCurrentStep(currentStep + 1);
-                setErrors({}); // Clear errors when moving to next step
+                setErrors({});
             }
         } else {
-            // Scroll to top to show errors
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
@@ -90,7 +107,7 @@ const DrugForm = () => {
     const handleBack = () => {
         if (currentStep > 0) {
             setCurrentStep(currentStep - 1);
-            setErrors({}); // Clear errors when going back
+            setErrors({});
         }
     };
 
@@ -99,9 +116,9 @@ const DrugForm = () => {
             try {
                 const formattedData = formatCreatedDrug(formDataRef.current);
                 await postData(drugService.createDrug(), formattedData);
+                clearDraft();
+                await refetchDrugs(); // refresh so new drug appears in search immediately
                 toast.success("Drug Entry successfully submitted");
-                localStorage.removeItem("DRUG_FORM_DATA");
-                localStorage.removeItem("DRUG_FORM_STEP");
                 navigate("/home");
             } catch (error) {
                 console.error(error);
@@ -112,7 +129,7 @@ const DrugForm = () => {
         }
     };
 
-    // Create a form object with error support
+
     const formWithErrors = {
         ...formData,
         getFieldValue: (key: string) => formDataRef.current[key],
@@ -126,30 +143,54 @@ const DrugForm = () => {
 
     return (
         <div className="mt-5 max-w-7xl mx-auto px-4">
-            {/* Progress Indicator */}
-            <div className="mb-8">
-                <div className="flex justify-between items-center mb-4">
-                    {steps.map((step, index) => (
-                        <div key={index} className="flex items-center">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${index <= currentStep ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'
-                                }`}>
-                                {index + 1}
-                            </div>
-                            <span className={`ml-2 text-sm ${index <= currentStep ? 'text-blue-600' : 'text-gray-600'}`}>
-                                {step.title}
-                            </span>
-                            {index < steps.length - 1 && <div className="w-12 h-0.5 bg-gray-300 mx-4"></div>}
-                        </div>
-                    ))}
+
+            {draftRestored && (
+                <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800 shadow-sm">
+                    ✅ <strong>Draft restored</strong>
                 </div>
-            </div>
+            )}
+
+            {/* Progress Indicator - Tab Style */}
+            <header className="mb-8 border-b border-gray-200">
+                <nav className="flex flex-wrap gap-1 pb-0">
+                    {steps.map((step, index) => {
+                        const isActive = index === currentStep;
+                        const isCompleted = index < currentStep;
+                        return (
+                            <button
+                                key={index}
+                                type="button"
+                                onClick={() => {
+                                    if (index < currentStep || validateCurrentStep()) {
+                                        setCurrentStep(index);
+                                        setErrors({});
+                                    } else {
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    }
+                                }}
+                                className={`px-3 py-2 text-sm font-medium rounded-t-lg transition-all duration-150 whitespace-nowrap border-b-2 flex items-center gap-2 ${isActive
+                                    ? 'border-blue-500 text-blue-600 bg-blue-50/50'
+                                    : isCompleted
+                                        ? 'border-transparent text-blue-500 hover:text-blue-700 hover:bg-blue-50/30'
+                                        : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-200 hover:bg-gray-50'
+                                    }`}
+                            >
+                                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${isActive ? 'bg-blue-600 text-white' : isCompleted ? 'bg-blue-200 text-blue-700' : 'bg-gray-200 text-gray-600'}`}>
+                                    {index + 1}
+                                </span>
+                                {step.title}
+                            </button>
+                        );
+                    })}
+                </nav>
+            </header>
 
             {/* Form Content */}
             <form className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <DynamicFormBuilder
                     fields={steps[currentStep].fields}
                     form={formWithErrors}
-                    columns={3}
+                    columns={5}
                 />
 
                 {/* Navigation Buttons */}
@@ -164,6 +205,17 @@ const DrugForm = () => {
                             }`}
                     >
                         Back
+                    </button>
+
+                    {/* ── Save Section Button ── */}
+                    <button
+                        type="button"
+                        onClick={handleSaveDraft}
+                        disabled={isSavingDraft}
+                        className="px-5 py-2 rounded-md font-medium border border-amber-400 bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors flex items-center gap-2 disabled:opacity-50"
+                        title="Save your progress for this section"
+                    >
+                        💾 {isSavingDraft ? "Saving…" : "Save Section"}
                     </button>
 
                     {currentStep < steps.length - 1 ? (

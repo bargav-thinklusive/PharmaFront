@@ -19,20 +19,29 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const { fetchData: fetchUser, data: user, loading: userLoading } = useGet();
   const { fetchData: fetchDrugs, data: drugsData, loading: drugsLoading } = useGet();
 
-  const checkTokenAndGetUser = async () => {
-    const token = tokenService.getToken();
-    if (token) {
-      const id = tokenService.decodeToken()?.sub
-      if (id) {
-        const userService = new UserService()
-        await fetchUser(userService.getUserById(id))
-      }
-    } else {
-      const publicPaths = ['/login', '/register', '/home1', '/', '/what-we-do', '/areas-served', '/about', '/contacts'];
-      if (!publicPaths.includes(location.pathname)) {
-        navigate(LOGIN_URL)
-      }
+  const checkTokenAndGetUser = async (): Promise<boolean> => {
+    let token = tokenService.getToken();
+
+    // No access token — try to silently refresh before giving up
+    if (!token) {
+      token = await tokenService.refreshToken();
     }
+
+    if (token) {
+      const id = tokenService.decodeToken()?.sub;
+      if (id) {
+        const userService = new UserService();
+        await fetchUser(userService.getUserById(id));
+      }
+      return true;
+    }
+
+    const publicPaths = ['/login', '/register', '/home1', '/', '/what-we-do', '/areas-served', '/about', '/contacts'];
+    if (!publicPaths.includes(location.pathname)) {
+      // Save where the user was so LoginPage can send them back after login
+      navigate(LOGIN_URL, { state: { from: location.pathname + location.search } });
+    }
+    return false;
   }
 
   const getDrugs = async () => {
@@ -42,9 +51,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     const init = async () => {
-      const hasToken = !!tokenService.getToken();
-      await checkTokenAndGetUser();
-      if (hasToken) {
+      const isAuthenticated = await checkTokenAndGetUser();
+      if (isAuthenticated) {
         await getDrugs();
       }
     };

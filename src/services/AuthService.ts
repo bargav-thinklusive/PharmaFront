@@ -9,21 +9,26 @@ class AuthService {
   }
 
   async login(email: string, password: string) {
-    const payload = { email: email, password };
-
+    const payload = { email, password };
     try {
       const resp: any = await axios.post(`${this.baseUrl}/login`, payload);
-      const newToken = resp.data.access_token;
-      TokenService.setToken(newToken);
-      return newToken;
+      const { access_token, refresh_token } = resp.data;
+
+      // Save both tokens as cookies
+      TokenService.setToken(access_token);
+      if (refresh_token) {
+        TokenService.setRefreshToken(refresh_token);
+      }
+
+      return resp.data;
     } catch (error) {
-      console.error("Something went wrong while log in", error);
+      console.error("Something went wrong while logging in", error);
       throw error;
     }
   }
 
   async forgotPassword(email: string, newPassword: string) {
-    const payload = { email, new_password: newPassword }
+    const payload = { email, new_password: newPassword };
     try {
       const resp = await axios.post(`${this.baseUrl}/forgot-password`, payload);
       return resp.data;
@@ -34,14 +39,12 @@ class AuthService {
   }
 
   static logout() {
-    TokenService.deleteToken();
-    localStorage.removeItem('user');
-    return true;
+    TokenService.clearAll();
+    localStorage.removeItem("user");
   }
 
   isAuthenticated() {
-    const token = TokenService.getToken();
-    return !!token;
+    return !!TokenService.getToken();
   }
 }
 

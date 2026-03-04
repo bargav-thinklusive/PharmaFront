@@ -1,7 +1,17 @@
 import { CustomForm, type FieldConfig } from "../shared";
 
-// Step 1: Market Information & Basic Details
-export const addMarketInformation: FieldConfig[] = [
+// Step 1: Executive Summary
+export const addExecutiveSummary: FieldConfig[] = [
+    {
+        key: "executiveSummary",
+        label: "Executive Summary",
+        type: "textarea",
+        required: false,
+        placeholder: "Enter Executive Summary",
+    },
+];
+// Step 2: Product Overview & Basic Details
+export const addProductOverview: FieldConfig[] = [
     {
         key: "version",
         label: "Version",
@@ -39,6 +49,13 @@ export const addMarketInformation: FieldConfig[] = [
         placeholder: "Enter Company Name",
     },
     {
+        key: "approvedIndications",
+        label: "Approved Indications",
+        type: "text",
+        required: false,
+        placeholder: "Enter Approved Indications",
+    },
+    {
         key: "firstApprovedDate",
         label: "First Approved Date",
         type: "datepicker",
@@ -51,10 +68,29 @@ export const addMarketInformation: FieldConfig[] = [
         type: "textarea",
         required: false,
         placeholder: "Enter First Approved Region",
+    }, {
+        key: "dosageForms",
+        label: "Dosage Forms",
+        type: "text",
+        required: false,
+        placeholder: "Enter Dosage Forms",
+    }, {
+        key: "lossOfExclusivity",
+        label: "Loss Of Exclusivity",
+        type: "datepicker",
+        required: false,
+        placeholder: "Enter Loss Of Exclusivity",
+    },
+    {
+        key: "globalAnnualRevenue",
+        label: "Global Annual Revenue",
+        type: "text",
+        required: false,
+        placeholder: "Enter Global Annual Revenue",
     },
 ];
 
-// Step 2: Physical & Chemical Properties
+// Step 5: Physical & Chemical Properties
 export const addPhysicalChemicalProperties: FieldConfig[] = [
     {
         key: "innName",
@@ -79,7 +115,7 @@ export const addPhysicalChemicalProperties: FieldConfig[] = [
     },
     {
         key: "molecularWeight",
-        label: "Molecular Weight",
+        label: "Molecular Weight(g/mol)",
         // type: "dropdown",
         type: "text",
         required: false,
@@ -102,14 +138,14 @@ export const addPhysicalChemicalProperties: FieldConfig[] = [
     },
     {
         key: "monoisotopicMass",
-        label: "Monoisotopic Mass",
+        label: "Monoisotopic Mass(g/mol)",
         // type: "dropdown",
         type: "text",
         required: false,
         placeholder: "Select Monoisotopic Mass",
     },
     {
-        key: "structureName",
+        key: "structure",
         label: "Structure",
         type: "file",
         required: false,
@@ -144,26 +180,60 @@ export const addPhysicalChemicalProperties: FieldConfig[] = [
         type: "text",
         required: false,
         placeholder: "Select logP",
-    },
-    {
-        key: "regulatoryInsights",
-        label: "Regulatory Insights",
+    }, {
+        key: "logd",
+        label: "logD",
         // type: "dropdown",
         type: "text",
         required: false,
-        placeholder: "Select Regulatory Insights",
+        placeholder: "Select logD",
+    }, {
+        key: "individualSolvent",
+        label: "Individual Solvent",
+        type: "dynamic",
+        required: false,
+        singleFieldInRow: true,
+        dynamicComponent: (key: string, field: any, form: any) => (
+            <CustomForm key={key} field={field} form={form} />
+        ),
+        dynamicFields: [
+            {
+                key: "solvent",
+                label: "Solvent",
+                type: "text",
+                required: false,
+                placeholder: "Enter Solvent",
+            },
+            {
+                key: "solubility",
+                label: "Solubility(mg/mL)",
+                type: "text",
+                required: false,
+                placeholder: "Enter Solubility",
+            },
+        ],
+    },
+];
+
+// Step 3: Regulatory Insights
+export const addRegulatoryInsights: FieldConfig[] = [
+    {
+        key: "regulatoryInsights",
+        label: "Regulatory Insights",
+        type: "text",
+        required: false,
+        placeholder: "Enter Regulatory Insights",
     },
     {
         key: "regionalApproval",
         label: "Regional Approval",
-        // type: "dropdown",
         type: "text",
         required: false,
-        placeholder: "Select Regional Approval",
+        placeholder: "Enter Regional Approval",
     },
     {
-        key: "additionalInfo",
-        label: "Additional Info",
+        key: "approvalDetails",
+        label: "Approval Details",
         type: "dynamic",
         required: false,
         singleFieldInRow: true,
@@ -174,50 +244,44 @@ export const addPhysicalChemicalProperties: FieldConfig[] = [
             {
                 key: "drugName",
                 label: "Drug Name",
-                // type: "dropdown",
                 type: "text",
                 required: false,
-                placeholder: "Select Drug Name",
+                placeholder: "Enter Drug Name",
             },
             {
                 key: "region",
                 label: "Region",
-                // type: "dropdown",
                 type: "text",
                 required: false,
-                placeholder: "Select Region",
+                placeholder: "Enter Region",
             },
             {
                 key: "indication",
                 label: "Indication",
-                // type: "dropdown",
                 type: "text",
                 required: false,
-                placeholder: "Select Indication",
+                placeholder: "Enter Indication",
             },
             {
                 key: "patientSegments",
                 label: "Patient Segments",
-                // type: "dropdown",
                 type: "text",
                 required: false,
-                placeholder: "Select Patient Segments",
+                placeholder: "Enter Patient Segments",
             },
             {
                 key: "dosageForm",
                 label: "Dosage Form",
-                // type: "dropdown",
                 type: "text",
                 required: false,
-                placeholder: "Select Dosage Form",
+                placeholder: "Enter Dosage Form",
             },
             {
-                key: "strength",
-                label: "Strength",
-                // type: "dropdown",
+                key: "dose",
+                label: "Dose or Strength",
                 type: "text",
                 required: false,
-                placeholder: "Select Strength",
+                placeholder: "Enter Dose or Strength",
             },
             {
                 key: "approvedDate",
@@ -229,10 +293,49 @@ export const addPhysicalChemicalProperties: FieldConfig[] = [
             {
                 key: "regulatoryBodies",
                 label: "Regulatory Bodies",
-                // type: "dropdown",
                 type: "text",
                 required: false,
-                placeholder: "Select Regulatory Bodies",
+                placeholder: "Enter Regulatory Bodies",
+            },
+        ],
+    },
+    {
+        key: "specialDesignations",
+        label: "Special Designations",
+        type: "dynamic",
+        required: false,
+        singleFieldInRow: true,
+        dynamicComponent: (key: string, field: any, form: any) => (
+            <CustomForm key={key} field={field} form={form} />
+        ),
+        dynamicFields: [
+            {
+                key: "designationType",
+                label: "Designation Type",
+                type: "text",
+                required: false,
+                placeholder: "Enter Designation Type",
+            },
+            {
+                key: "regulatorBody",
+                label: "Regulator Body",
+                type: "text",
+                required: false,
+                placeholder: "Enter Regulator Body",
+            },
+            {
+                key: "indication",
+                label: "Indication",
+                type: "text",
+                required: false,
+                placeholder: "Enter Indication",
+            },
+            {
+                key: "dateGranted",
+                label: "Date Granted",
+                type: "datepicker",
+                required: false,
+                placeholder: "Enter Date Granted",
             },
         ],
     },
@@ -255,25 +358,29 @@ export const addPhysicalChemicalProperties: FieldConfig[] = [
             },
             {
                 key: "expiryDate",
-                label: "Expiry Date",
+                label: "Expiry Date/Regulator Body",
                 type: "datepicker",
                 required: false,
                 placeholder: "Enter Expiry Date",
             },
+        ],
+    },
+    {
+        key: "additionalInfo",
+        label: "Additional Information",
+        type: "dynamic",
+        required: false,
+        singleFieldInRow: true,
+        dynamicComponent: (key: string, field: any, form: any) => (
+            <CustomForm key={key} field={field} form={form} />
+        ),
+        dynamicFields: [
             {
-                key: "regulatoryBody",
-                label: "Regulatory Body",
-                // type: "dropdown",
+                key: "consideration",
+                label: "Consideration",
                 type: "text",
                 required: false,
-                placeholder: "Select Regulatory Body",
-            },
-            {
-                key: "exclusivityConsideration",
-                label: "Exclusivity Consideration",
-                type: "text",
-                required: false,
-                placeholder: "Enter Exclusivity Consideration",
+                placeholder: "Enter Consideration",
             },
             {
                 key: "impactForGenericFilers",
@@ -284,9 +391,13 @@ export const addPhysicalChemicalProperties: FieldConfig[] = [
             },
         ],
     },
+];
+
+// Step 4: Generic Entrants
+export const addGenericEntrants: FieldConfig[] = [
     {
         key: "genericEntrants",
-        label: "Generic Entrants(ANDAs Approved by the US FDA)",
+        label: "Generic Entrants (ANDAs Approved by the US FDA)",
         type: "dynamic",
         required: false,
         singleFieldInRow: true,
@@ -318,10 +429,9 @@ export const addPhysicalChemicalProperties: FieldConfig[] = [
             {
                 key: "approvalType",
                 label: "Approval Type",
-                // type: "dropdown",
                 type: "text",
                 required: false,
-                placeholder: "Select Approval Type",
+                placeholder: "Enter Approval Type",
             },
             {
                 key: "andaSubmissionDate",
@@ -347,10 +457,9 @@ export const addPhysicalChemicalProperties: FieldConfig[] = [
             {
                 key: "ftfExclusivity",
                 label: "FTF Exclusivity",
-                // type: "dropdown",
                 type: "text",
                 required: false,
-                placeholder: "Select FTF Exclusivity",
+                placeholder: "Enter FTF Exclusivity",
             },
         ],
     },
@@ -388,18 +497,16 @@ export const addPhysicalChemicalProperties: FieldConfig[] = [
             {
                 key: "chmpOpinion",
                 label: "CHMP Opinion",
-                // type: "dropdown",
                 type: "text",
                 required: false,
-                placeholder: "Select CHMP Opinion",
+                placeholder: "Enter CHMP Opinion",
             },
             {
                 key: "ecDecision",
                 label: "EC Decision",
-                // type: "dropdown",
                 type: "text",
                 required: false,
-                placeholder: "Select EC Decision",
+                placeholder: "Enter EC Decision",
             },
             {
                 key: "ecApprovalDate",
@@ -412,8 +519,8 @@ export const addPhysicalChemicalProperties: FieldConfig[] = [
     },
 ];
 
-// Step 3: Process Development & Manufacturing
-export const addProcessDevelopment: FieldConfig[] = [
+// Step 6: Drug Substance
+export const addDrugSubstance: FieldConfig[] = [
     {
         key: "availableDmfVendors",
         label: "Available DMF Vendors",
@@ -491,7 +598,7 @@ export const addProcessDevelopment: FieldConfig[] = [
             {
                 key: "step",
                 label: "Step",
-                type: "text",
+                type: "textarea",
                 required: false,
                 placeholder: "Enter Step",
             },
@@ -509,35 +616,26 @@ export const addProcessDevelopment: FieldConfig[] = [
         ),
         dynamicFields: [
             {
-                key: "impurities",
+                key: "nameOfImpurities",
                 label: "Impurities",
                 type: "text",
                 required: false,
                 placeholder: "Enter Impurities",
             },
             {
-                key: "knownImpurities",
-                label: "Known Impurities",
+                key: "specifiedUnspecifiedImpurities",
+                label: "Specified/Unspecified Impurities",
                 // type: "dropdown",
                 type: "text",
                 required: false,
-                placeholder: "Select Known Impurities",
+                placeholder: "Select Specified/Unspecified Impurities",
             },
             {
-                key: "specified",
-                label: "Specified",
-                // type: "dropdown",
-                type: "text",
+                key: "image",
+                label: "Image",
+                type: "file",
                 required: false,
-                placeholder: "Select Specified",
-            },
-            {
-                key: "unknownImpurities",
-                label: "Unknown Impurities/Unspecified Impurities",
-                // type: "dropdown",
-                type: "text",
-                required: false,
-                placeholder: "Select Unknown Impurities/Unspecified",
+                placeholder: "Select Image",
             },
         ],
     },
@@ -603,11 +701,18 @@ export const addProcessDevelopment: FieldConfig[] = [
         type: "textarea",
         required: false,
         placeholder: "Enter Drug Substance Specifications",
+    }, {
+        key: "stableAndCommerciallyUsedPolymorphicForm",
+        label: "Stable and Commercially Used Polymorphic Form",
+        type: "text",
+        required: false,
+        placeholder: "Enter Stable and Commercially Used Polymorphic Form",
     },
 ];
 
-// Step 4: Analytical Development & Drug Substance
-export const addAnalyticalDevelopment: FieldConfig[] = [
+
+// Step 5: Drug Product Information
+export const addDrugProductInformation: FieldConfig[] = [
     {
         key: "dosageFormAndStrength",
         label: "Dosage Form and Strength",
@@ -693,14 +798,7 @@ export const addAnalyticalDevelopment: FieldConfig[] = [
         dynamicComponent: (key: string, field: any, form: any) => (
             <CustomForm key={key} field={field} form={form} />
         ),
-        initialValues: [
-            { apiManufacturingAndAnalysis: "Analysis", company: "", location: "", reference: "", phaseOfProgram: "" },
-            { apiManufacturingAndAnalysis: "Manufacturing (Capsules)", company: "", location: "", reference: "", phaseOfProgram: "" },
-            { apiManufacturingAndAnalysis: "Manufacturing (Tablets)", company: "", location: "", reference: "", phaseOfProgram: "" },
-            { apiManufacturingAndAnalysis: "Packaging", company: "", location: "", reference: "", phaseOfProgram: "" },
-            { apiManufacturingAndAnalysis: "Labeling", company: "", location: "", reference: "", phaseOfProgram: "" },
-            { apiManufacturingAndAnalysis: "Distribution", company: "", location: "", reference: "" },
-        ],
+
         dynamicFields: [
             {
                 key: "apiManufacturingAndAnalysis",
@@ -737,6 +835,39 @@ export const addAnalyticalDevelopment: FieldConfig[] = [
                 type: "text",
                 required: false,
                 placeholder: "Select Phase of Program",
+            },
+        ],
+    },
+    {
+        key: "shelfLife",
+        label: "Shelf Life",
+        type: "dynamic",
+        required: false,
+        singleFieldInRow: true,
+        dynamicComponent: (key: string, field: any, form: any) => (
+            <CustomForm key={key} field={field} form={form} />
+        ),
+        dynamicFields: [
+            {
+                key: "currentExpirationDate",
+                label: "Current Expiration Date",
+                type: "datepicker",
+                required: false,
+                placeholder: "Select Current Expiration Date",
+            },
+            {
+                key: "strength",
+                label: "Strength",
+                type: "text",
+                required: false,
+                placeholder: "Enter Strength",
+            },
+            {
+                key: "expiryDate",
+                label: "Expiry Date",
+                type: "datepicker",
+                required: false,
+                placeholder: "Enter Expiry Date",
             },
         ],
     },
@@ -783,7 +914,204 @@ export const addAnalyticalDevelopment: FieldConfig[] = [
             },
         ],
     },
+    {
+        key: "dissolutionStudies",
+        label: "Dissolution Studies",
+        type: "dynamic",
+        required: false,
+        singleFieldInRow: true,
+        dynamicComponent: (key: string, field: any, form: any) => (
+            <CustomForm key={key} field={field} form={form} />
+        ),
+        dynamicFields: [
+            {
+                key: "studyType",
+                label: "Study Type",
+                type: "text",
+                required: false,
+                placeholder: "Enter Study Type",
+            },
+            {
+                key: "uspApparatus",
+                label: "USP Apparatus",
+                // type: "dropdown",
+                type: "text",
+                required: false,
+                placeholder: "Select USP Apparatus",
+            },
+            {
+                key: "rotationSpeed",
+                label: "Rotation Speed",
+                // type: "dropdown",
+                type: "text",
+                required: false,
+                placeholder: "Select Rotation Speed",
+            },
+            {
+                key: "dissolutionMedium",
+                label: "Dissolution Medium",
+                // type: "dropdown",
+                type: "text",
+                required: false,
+                placeholder: "Select Dissolution Medium",
+            },
+            {
+                key: "temperature",
+                label: "Temperature",
+                // type: "dropdown",
+                type: "text",
+                required: false,
+                placeholder: "Select Temperature",
+            },
+            {
+                key: "acceptanceCriteria",
+                label: "Acceptance Criteria",
+                // type: "dropdown",
+                type: "text",
+                required: false,
+                placeholder: "Select Acceptance Criteria",
+            },
+        ],
+    },
+    {
+        key: "pharmacokinetics",
+        label: "Pharmacokinetics",
+        type: "dynamic",
+        required: false,
+        singleFieldInRow: true,
+        dynamicComponent: (key: string, field: any, form: any) => (
+            <CustomForm key={key} field={field} form={form} />
+        ),
+        dynamicFields: [
+            {
+                key: "absorption",
+                label: "Absorption (Tmax)",
+                type: "text",
+                required: false,
+                placeholder: "Enter Absorption (Tmax)",
+            },
+            {
+                key: "volumeOfDistribution",
+                label: "Volume of Distribution",
+                // type: "dropdown",
+                type: "text",
+                required: false,
+                placeholder: "Select Known Impurities",
+            },
+            {
+                key: "metabolism",
+                label: "Metabolism",
+                // type: "dropdown",
+                type: "text",
+                required: false,
+                placeholder: "Select Metabolism",
+            },
+            {
+                key: "excretion",
+                label: "Excretion",
+                type: "text",
+                required: false,
+                placeholder: "Select Excretion",
+            },
+            {
+                key: "halfLife",
+                label: "Half Life",
+                type: "text",
+                required: false,
+                placeholder: "Select Half Life",
+            },
+            {
+                key: "steadyState",
+                label: "Steady State",
+                type: "text",
+                required: false,
+                placeholder: "Select Steady State",
+            },
+            {
+                key: "foodInteractions",
+                label: "Food Interactions",
+                type: "textarea",
+                required: false,
+                placeholder: "Enter Food Interactions",
+            },
+            {
+                key: "drugInteractions",
+                label: "Drug Interactions",
+                type: "textarea",
+                required: false,
+                placeholder: "Enter Drug Interactions",
+            },
+        ],
+    },
+    {
+        key: "formulationChallenges",
+        label: "Formulation Challenges",
+        type: "textarea",
+        required: false,
+        placeholder: "Enter Formulation Challenges",
+    },
+    {
+        key: "stabilityStudies",
+        label: "Stability Studies",
+        // type: "dropdown",
+        type: "text",
+        required: false,
+        placeholder: "Select Stability Studies",
+    },
+    {
+        key: "maximumDailyDose",
+        label: "Maximum Daily Dose",
+        type: "textarea",
+        required: false,
+        placeholder: "Enter Maximum Daily Dose",
+    }, {
+        key: "excipientsGrade",
+        label: "Excipients Grade",
+        type: "text",
+        required: false,
+        placeholder: "Enter Excipients Grade",
+    },
+    {
+        key: "storageAndShippingConditions",
+        label: "Storage and Shipping Conditions",
+        type: "textarea",
+        required: false,
+        placeholder: "Enter Storage and Shipping Conditions",
+    },
+    {
+        key: "unmetClinicalNeed",
+        label: "Unmet Clinical Need",
+        type: "textarea",
+        required: false,
+        placeholder: "Enter Unmet Clinical Need",
+    },
+];
 
+// Labeling Information (separate section)
+export const addLabelingInformation: FieldConfig[] = [
+    {
+        key: "labelingInformation",
+        label: "Labeling Information",
+        type: "dynamic",
+        required: false,
+        singleFieldInRow: true,
+        dynamicComponent: (key: string, field: any, form: any) => (
+            <CustomForm key={key} field={field} form={form} />
+        ),
+        dynamicFields: [
+            {
+                key: "image",
+                label: "Image",
+                type: "file",
+                required: false,
+                placeholder: "Upload Label Image",
+            },
+        ],
+    },
+];
+
+// BA/BE Studies (separate section)
+export const addBaBeStudies: FieldConfig[] = [
     {
         key: "baBeStudies",
         label: "BA/BE Studies",
@@ -804,10 +1132,9 @@ export const addAnalyticalDevelopment: FieldConfig[] = [
             {
                 key: "dosageForm",
                 label: "Dosage Form",
-                // type: "dropdown",
                 type: "text",
                 required: false,
-                placeholder: "Select Dosage Form",
+                placeholder: "Enter Dosage Form",
             },
             {
                 key: "dosageStrength",
@@ -847,47 +1174,6 @@ export const addAnalyticalDevelopment: FieldConfig[] = [
         ],
     },
     {
-        key: "shelfLife",
-        label: "Shelf Life",
-        type: "dynamic",
-        required: false,
-        singleFieldInRow: true,
-        dynamicComponent: (key: string, field: any, form: any) => (
-            <CustomForm key={key} field={field} form={form} />
-        ),
-        dynamicFields: [
-            {
-                key: "currentExpirationDate",
-                label: "Current Expiration Date",
-                type: "datepicker",
-                required: false,
-                placeholder: "Select Current Expiration Date",
-            },
-            {
-                key: "strength",
-                label: "Strength",
-                type: "text",
-                required: false,
-                placeholder: "Enter Strength",
-            },
-            {
-                key: "expiryDate",
-                label: "Expiry Date",
-                type: "datepicker",
-                required: false,
-                placeholder: "Enter Expiry Date",
-            },
-        ],
-    },
-    {
-        key: "stabilityStudies",
-        label: "Stability Studies",
-        // type: "dropdown",
-        type: "text",
-        required: false,
-        placeholder: "Select Stability Studies",
-    },
-    {
         key: "biowaiverRequest",
         label: "Biowaiver Request",
         type: "text",
@@ -901,43 +1187,21 @@ export const addAnalyticalDevelopment: FieldConfig[] = [
         required: false,
         placeholder: "Enter Dissolution Test Method and Sampling Times",
     },
+];
+
+// Sources (separate section)
+export const addSources: FieldConfig[] = [
     {
-        key: "formulationChallenges",
-        label: "Formulation Challenges",
+        key: "sources",
+        label: "Sources",
         type: "textarea",
         required: false,
-        placeholder: "Enter Formulation Challenges",
+        placeholder: "Enter Sources",
     },
 ];
 
-// Step 5: Drug Product Information
-export const addDrugProductInformation: FieldConfig[] = [
-    {
-        key: "labelingInformation",
-        label: "Labeling Information",
-        type: "dynamic",
-        required: false,
-        singleFieldInRow: true,
-        dynamicComponent: (key: string, field: any, form: any) => (
-            <CustomForm key={key} field={field} form={form} />
-        ),
-        dynamicFields: [
-            {
-                key: "image",
-                label: "Image",
-                type: "file",
-                required: false,
-                placeholder: "Enter Image",
-            },
-        ],
-    },
-    {
-        key: "unmetClinicalNeed",
-        label: "Unmet Clinical Need",
-        type: "textarea",
-        required: false,
-        placeholder: "Enter Unmet Clinical Need",
-    },
+// Glossary (separate section)
+export const addGlossary: FieldConfig[] = [
     {
         key: "glossary",
         label: "Glossary",

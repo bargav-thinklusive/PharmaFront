@@ -1,22 +1,39 @@
 
+interface Section {
+    id: number;
+    key: string;
+    title: string;
+}
+
 interface SectionHeaderProps {
+    sections: Section[];
     currentStep: number;
-    totalSteps: number;
-    title?: string;
+    onNavigate: (id: number) => void;
 }
 
 /**
- * Header component for each section showing progress and title.
+ * Header component showing all section names as clickable navigation tabs.
  */
-const SectionHeader = ({ currentStep, totalSteps, title }: SectionHeaderProps) => {
+const SectionHeader = ({ sections, currentStep, onNavigate }: SectionHeaderProps) => {
     return (
-        <header className="mb-8 flex justify-between items-center border-b pb-4">
-            <h1 className="text-xl font-bold text-gray-500">
-                Section {currentStep} <span className="text-gray-300 mx-1">/</span> {totalSteps}
-            </h1>
-            <div className="text-sm font-bold text-blue-600 bg-blue-50 px-4 py-1.5 rounded-full border border-blue-100 shadow-sm">
-                {title}
-            </div>
+        <header className="mb-6 border-b border-gray-200">
+            <nav className="flex flex-wrap gap-1 pb-0">
+                {sections.map((section) => {
+                    const isActive = section.id === currentStep;
+                    return (
+                        <button
+                            key={section.id}
+                            onClick={() => onNavigate(section.id)}
+                            className={`px-3 py-2 text-sm font-medium rounded-t-md transition-all duration-150 whitespace-nowrap border-b-2 ${isActive
+                                    ? 'border-blue-500 text-blue-600 bg-blue-50'
+                                    : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
+                                }`}
+                        >
+                            {section.title}
+                        </button>
+                    );
+                })}
+            </nav>
         </header>
     );
 };

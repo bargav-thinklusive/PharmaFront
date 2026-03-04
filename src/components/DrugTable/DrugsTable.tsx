@@ -69,47 +69,30 @@ const DrugsTable: React.FC = () => {
   }, []);
 
 
-  // Remove duplicates by cid and version
+  // Remove duplicates by _id (or cid as fallback)
   const uniqueCategoryArr = Array.isArray(categoryArr)
     ? categoryArr.filter((item, idx, arr) =>
-      arr.findIndex((i) => i.cid === item.cid && i.version === item.version) === idx
+      arr.findIndex((i) => i._id === item._id || i.cid === item.cid) === idx
     )
     : [];
 
   // Helper to extract all searchable fields from a record
   function getAllSearchableStrings(item: any): string[] {
     const arr: string[] = [];
-    if (item?.marketInformation?.drugName) arr.push(item.marketInformation.drugName);
-    if (item?.drugName) arr.push(item.drugName);
-    if (item?.marketInformation?.apiName) arr.push(item.marketInformation.apiName);
-    if (item?.apiName) arr.push(item.apiName);
+    // Drug name
+    const drugName = item?.ProductOverview?.drugName || item?.ProductOverview?.brandName || item?.drugName;
+    if (drugName) arr.push(drugName);
 
-    // Handle nested chemicalName object
-    const chemicalName = item?.drugSubstance?.physicalAndChemicalProperties?.chemicalName;
-    if (chemicalName) {
-      if (typeof chemicalName === 'string') {
-        arr.push(chemicalName);
-      } else if (typeof chemicalName === 'object') {
-        Object.values(chemicalName).forEach((val: any) => {
-          if (typeof val === 'string' && val.trim()) arr.push(val);
-        });
-      }
-    }
+    // API name
+    const apiName = item?.ProductOverview?.apiName || item?.apiName;
+    if (apiName) arr.push(apiName);
 
-    // Handle nested structureName object
-    const structureName = item?.drugSubstance?.physicalAndChemicalProperties?.structureName;
-    if (structureName) {
-      if (typeof structureName === 'string') {
-        arr.push(structureName);
-      } else if (typeof structureName === 'object') {
-        Object.values(structureName).forEach((val: any) => {
-          if (typeof val === 'string' && val.trim()) arr.push(val);
-        });
-        // Also add concatenated values for searching the full structure text
-        const concatenated = Object.values(structureName).filter((val: any) => typeof val === 'string' && val.trim()).join(' ');
-        if (concatenated) arr.push(concatenated);
-      }
-    }
+    // PhysicalChemicalProperties
+    const iupacName = item?.PhysicalChemicalProperties?.iupacName;
+    if (iupacName) arr.push(iupacName);
+
+    const innName = item?.PhysicalChemicalProperties?.innName;
+    if (innName) arr.push(innName);
 
     if (item?.cid) arr.push(item.cid);
     return arr;
