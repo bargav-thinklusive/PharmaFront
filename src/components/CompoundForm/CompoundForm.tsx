@@ -114,7 +114,7 @@ const DrugForm = () => {
     const handleDone = async () => {
         if (validateCurrentStep()) {
             try {
-                const formattedData = formatCreatedDrug(formDataRef.current);
+                const formattedData = await formatCreatedDrug(formDataRef.current);
                 await postData(drugService.createDrug(), formattedData);
                 clearDraft();
                 await refetchDrugs(); // refresh so new drug appears in search immediately

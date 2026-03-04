@@ -7,13 +7,47 @@ interface SectionContentProps {
 }
 
 /**
+ * Helper to detect if an object matches the ImageObject pattern (has imageData)
+ * or contains a nested image property.
+ */
+const isImageObject = (obj: any): boolean => {
+    if (!obj || typeof obj !== 'object') return false;
+    if (typeof obj.imageData === 'string' || typeof obj.url === 'string') return true;
+    if (obj.image) {
+        if (typeof obj.image === 'string') return true;
+        if (typeof obj.image === 'object' && (obj.image.imageData || obj.image.url)) return true;
+    }
+    return false;
+};
+
+const getImgSrc = (item: any): string | null => {
+    if (typeof item === 'string') return item;
+    if (!item || typeof item !== 'object') return null;
+
+    if (typeof item.imageData === 'string') return item.imageData;
+    if (typeof item.url === 'string') return item.url;
+
+    if (item.image) {
+        if (typeof item.image === 'string') return item.image;
+        if (typeof item.image === 'object') return item.image.imageData || item.image.url || null;
+    }
+
+    return null;
+};
+
+/**
  * SubsectionRenderer component to handle specific data types (labels, appendices, tables, etc.)
  */
 function SubsectionRenderer({ title, data, index }: { title: string; data: any; index: string }) {
     const normalizedTitle = title.toLowerCase();
 
-    // Image/Label rendering
-    if (normalizedTitle.includes('labeling') || normalizedTitle.includes('label')) {
+    // Check if data is an image or contains images
+    const isImageField = normalizedTitle.includes('labeling') ||
+        normalizedTitle.includes('label') ||
+        normalizedTitle.includes('structure') ||
+        normalizedTitle.includes('image');
+
+    if (isImageField || isImageObject(data) || (Array.isArray(data) && data.length > 0 && isImageObject(data[0]))) {
         const images = Array.isArray(data) ? data : [data];
         return (
             <div className="space-y-4">
@@ -22,17 +56,25 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {images.map((item, i) => {
-                        const imgSource = item.image || item.url || (typeof item === 'string' ? item : null);
+                        const imgSource = getImgSrc(item);
                         if (!imgSource) return null;
                         return (
-                            <div key={i} className="border p-2 rounded bg-white shadow-sm">
+                            <div key={i} className="border p-2 rounded bg-white shadow-sm overflow-hidden flex flex-col items-center">
                                 <img
                                     src={imgSource}
-                                    alt={item.title || `Label ${i + 1}`}
-                                    className="w-full h-auto object-contain cursor-pointer hover:scale-[1.02] transition-transform"
+                                    alt={item.fileName || item.name || item.title || `Image ${i + 1}`}
+                                    className="max-w-full h-auto max-h-[400px] object-contain cursor-pointer hover:scale-[1.02] transition-transform"
                                     onClick={() => window.open(imgSource, '_blank')}
+                                    onError={(e: any) => {
+                                        console.error("Image load failed:", imgSource);
+                                        e.target.src = 'https://placehold.co/400x300?text=Image+Not+Found';
+                                    }}
                                 />
-                                {item.title && <p className="mt-2 text-center text-sm font-medium text-gray-600">{item.title}</p>}
+                                {(item.fileName || item.name || item.title) && (
+                                    <p className="mt-2 text-center text-sm font-medium text-gray-600">
+                                        {item.fileName || item.name || item.title}
+                                    </p>
+                                )}
                             </div>
                         );
                     })}
@@ -106,6 +148,7 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
         );
     }
 
+    // Generic object but might contain metadata we want to skip or images
     return (
         <div className="space-y-4">
             <h2 className="text-lg font-bold text-gray-800 border-blue-400 border-b-2 pb-1">{index} {toTitleCase(title)}</h2>
@@ -127,15 +170,32 @@ export default function SectionContent({ data, sectionIndex }: SectionContentPro
             </div>
         );
     }
-    if (typeof data !== 'object') return <div>{normalizeValue(data)}</div>;
+    if (typeof data !== 'object') return <div className="text-gray-700 p-2">{normalizeValue(data)}</div>;
 
     const entries = Object.entries(data);
     const simpleFields: Record<string, any> = {};
     const complexFields: [string, any][] = [];
 
     entries.forEach(([key, value]) => {
-        if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
+        // Skip metadata fields in the nested views
+        if (['_id', 'cid', 'version'].includes(key)) return;
+
+        if (Array.isArray(value)) {
             complexFields.push([key, value]);
+        } else if (typeof value === 'object' && value !== null) {
+            // If it's a single ImageObject, treat it as complex to get the Renderer's image handling
+            if (isImageObject(value)) {
+                complexFields.push([key, value]);
+            } else {
+                // Check if the object has any nested complex data
+                const hasNestedComplex = Object.values(value).some(v => Array.isArray(v) || (typeof v === 'object' && v !== null));
+                if (hasNestedComplex) {
+                    complexFields.push([key, value]);
+                } else {
+                    // It's a simple flat object
+                    complexFields.push([key, value]);
+                }
+            }
         } else {
             simpleFields[key] = value;
         }
