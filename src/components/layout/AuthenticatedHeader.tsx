@@ -4,6 +4,7 @@ import CompanyLogo from "../../assets/CMCINTELLOGO.png";
 import SearchBar from "../SearchBar";
 import AuthService from "../../services/AuthService";
 import { useUser } from "../../context/UserContext";
+import { getDraftData } from "../../hooks/useDraft";
 
 interface AuthenticatedHeaderProps {
   isLoginPage?: boolean;
@@ -46,6 +47,10 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
     setDropdownOpen(false);
     navigate("/login");
   };
+
+  // ── Draft badge data ──────────────────────────────────────────────────────
+  const draft = getDraftData();
+  const draftLabel = draft?.drugName ? `Resume: ${draft.drugName}` : "Resume Draft";
 
   return (
     <header className={`flex items-center bg-[#36b669] text-white px-6 py-3 fixed top-0 left-0 w-full z-[1000] ${showSearchBar ? 'justify-between' : 'justify-between'}`}>
@@ -105,6 +110,33 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
             <Link to="/drugslist" className="text-white no-underline">
               Drugs List
             </Link>
+
+            {/* ── Draft Resume Badge ── */}
+            {draft && (
+              <button
+                onClick={() => navigate("/drug-form")}
+                title="Click to continue editing your draft"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "4px 12px",
+                  borderRadius: "999px",
+                  backgroundColor: "#f59e0b",
+                  color: "#1c1917",
+                  fontWeight: 600,
+                  fontSize: "13px",
+                  border: "none",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  boxShadow: "0 0 0 3px rgba(245,158,11,0.35)",
+                  animation: "draftPulse 2s ease-in-out infinite",
+                }}
+              >
+                <span style={{ fontSize: "15px" }}>💾</span>
+                {draftLabel}
+              </button>
+            )}
 
             {/* User Dropdown */}
             <div ref={dropdownRef} className="ml-8 relative">

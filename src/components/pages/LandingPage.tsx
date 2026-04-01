@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router';
 const images = [
     "/assets/Landingpageimage.jpg",
     "/assets/LandingPageImage.jpeg",
-    "/assets/Landingpageimage5.png"
 ];
 
 const LandingPage: React.FC = () => {

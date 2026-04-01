@@ -6,11 +6,15 @@ const DRAFT_PREFIX = "drug_form_draft_";
 
 /**
  * Returns a sessionStorage key scoped to the currently logged-in user.
+ * Falls back to "anonymous" when the access token is not yet available.
+ * The real userId is also embedded inside the draft payload so we can
+ * recover it even when the key resolves to the wrong value.
  *
- * Falls back to "anonymous" when the access token is not yet available
- * (e.g. during the silent-refresh window on page load).  The real userId
- * is also embedded inside the draft payload so we can recover it even when
- * the key resolves to the wrong value – see loadDraft() below.
+ * WHY sessionStorage (not localStorage)?
+ *  - sessionStorage is tab-scoped and cleared automatically when the
+ *    tab/browser closes → draft data never outlives the user's session.
+ *  - Unlike localStorage, sessionStorage is NOT shared across tabs or
+ *    accessible to other origins, reducing XSS exposure.
  */
 function getDraftKey(): string {
     const userId = TokenService.decodeToken()?.sub ?? "anonymous";
@@ -20,8 +24,8 @@ function getDraftKey(): string {
 export interface DraftState {
     formData: any;
     currentStep: number;
-    savedAt: string;   // ISO-8601 – shown in the "Draft restored" banner
     userId?: string;   // embedded so we can find the draft even without a token
+    drugName?: string; // human-readable label shown in the header/home banner
 }
 
 /**
@@ -45,15 +49,50 @@ function findDraftByUserId(userId: string): DraftState | null {
     return null;
 }
 
+/**
+ * Standalone helper – reads the draft from sessionStorage without needing
+ * the hook. Safe to call from any component (e.g. Header, Home page).
+ * Because sessionStorage is synchronous there is no performance concern.
+ */
+export function getDraftData(): DraftState | null {
+    try {
+        const key = getDraftKey();
+        const raw = sessionStorage.getItem(key);
+        if (raw) return JSON.parse(raw) as DraftState;
+
+        const refreshToken = TokenService.getRefreshToken();
+        if (refreshToken) {
+            try {
+                const decoded: any = jwtDecode(refreshToken);
+                const userId = decoded?.sub;
+                if (userId) {
+                    const directRaw = sessionStorage.getItem(`${DRAFT_PREFIX}${userId}`);
+                    if (directRaw) return JSON.parse(directRaw) as DraftState;
+                    return findDraftByUserId(String(userId));
+                }
+            } catch { /* ignore */ }
+        }
+        return null;
+    } catch {
+        return null;
+    }
+}
+
 const useDraft = () => {
-    /** Persist current form state to sessionStorage */
+    /** Persist current form state to sessionStorage (secure – tab-scoped) */
     const saveDraft = useCallback((formData: any, currentStep: number) => {
         const userId = TokenService.decodeToken()?.sub ?? "anonymous";
+        // Extract a human-readable drug name for display in the header/home
+        const drugName =
+            formData?.brandName ||
+            formData?.drugName ||
+            formData?.genericName ||
+            "";
         const draft: DraftState = {
             formData,
             currentStep,
-            savedAt: new Date().toISOString(),
-            userId,   // <-- embed so we can recover without a token
+            userId,
+            drugName,
         };
         try {
             sessionStorage.setItem(`${DRAFT_PREFIX}${userId}`, JSON.stringify(draft));
@@ -64,41 +103,30 @@ const useDraft = () => {
 
     /**
      * Load a previously saved draft.
-     *
      * Strategy:
      *  1. Try the normal key (token is valid → works immediately).
-     *  2. If the key resolves to "anonymous" (token expired / not yet
-     *     refreshed), scan sessionStorage for a draft whose embedded
-     *     userId matches the refresh-token payload so the data is not lost.
-     *  Returns null when no draft exists.
+     *  2. If key resolves to "anonymous" (token expired / not yet refreshed),
+     *     scan sessionStorage for a draft whose embedded userId matches the
+     *     refresh-token payload so the data is not lost.
      */
     const loadDraft = useCallback((): DraftState | null => {
         try {
-            // Attempt 1 – token is available
             const key = getDraftKey();
             const raw = sessionStorage.getItem(key);
             if (raw) return JSON.parse(raw) as DraftState;
 
-            // Attempt 2 – token absent; try to get userId from refresh token
-            //   (refresh token is a JWT too, so we can decode it client-side
-            //    just for the sub claim without trusting it for auth)
             const refreshToken = TokenService.getRefreshToken();
             if (refreshToken) {
                 try {
                     const decoded: any = jwtDecode(refreshToken);
                     const userId = decoded?.sub;
                     if (userId) {
-                        // First try the exact key
                         const directRaw = sessionStorage.getItem(`${DRAFT_PREFIX}${userId}`);
                         if (directRaw) return JSON.parse(directRaw) as DraftState;
-                        // Then scan (handles edge cases like key collisions)
                         return findDraftByUserId(String(userId));
                     }
-                } catch {
-                    // refresh token not a JWT or decode failed – fall through
-                }
+                } catch { /* ignore */ }
             }
-
             return null;
         } catch (e) {
             console.warn("[useDraft] Could not load draft:", e);
@@ -106,32 +134,32 @@ const useDraft = () => {
         }
     }, []);
 
+    /** Quick boolean check – no need to parse the full payload */
+    const hasDraft = useCallback((): boolean => {
+        return getDraftData() !== null;
+    }, []);
+
     /**
-     * Remove the draft.
-     * Call this after a successful final submission so that opening the
-     * drug form next time starts with a completely blank slate.
+     * Remove the draft after a successful final submission so that opening
+     * the drug form next time starts with a completely blank slate.
      */
     const clearDraft = useCallback(() => {
         try {
-            // Clear by exact key first
             sessionStorage.removeItem(getDraftKey());
-            // Also clear any orphan draft for this user (token-less save scenario)
             const refreshToken = TokenService.getRefreshToken();
             if (refreshToken) {
                 try {
                     const decoded: any = jwtDecode(refreshToken);
                     const userId = decoded?.sub;
                     if (userId) sessionStorage.removeItem(`${DRAFT_PREFIX}${userId}`);
-                } catch {
-                    // ignore
-                }
+                } catch { /* ignore */ }
             }
         } catch (e) {
             console.warn("[useDraft] Could not clear draft:", e);
         }
     }, []);
 
-    return { saveDraft, loadDraft, clearDraft };
+    return { saveDraft, loadDraft, hasDraft, clearDraft };
 };
 
 export default useDraft;
