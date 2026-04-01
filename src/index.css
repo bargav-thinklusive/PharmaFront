@@ -24,3 +24,9 @@ html, body {
   padding: 0;
   /* font-family: 'Roboto',sans-serif; */
 }
+
+/* Draft badge pulse animation */
+@keyframes draftPulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.35); }
+  50%       { box-shadow: 0 0 0 7px rgba(245, 158, 11, 0.1); }
+}
