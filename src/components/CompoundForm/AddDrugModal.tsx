@@ -11,7 +11,7 @@ interface AddDrugModalProps {
 const AddDrugModal: React.FC<AddDrugModalProps> = ({ onClose }) => {
     const navigate = useNavigate();
     const { drugsData } = useUser();
-    const { saveDraft, clearDraft } = useDraft();
+    const { saveDraft } = useDraft();
 
     const [step, setStep] = useState<"choice" | "existing">("choice");
     const [query, setQuery] = useState("");
@@ -43,7 +43,7 @@ const AddDrugModal: React.FC<AddDrugModalProps> = ({ onClose }) => {
     );
 
     const handleNewDrug = () => {
-        clearDraft();   // wipe any pre-filled data from a previous "Existing Drug" selection
+        // no need to clear drafts, a blank form generates a new draftId on its first save.
         onClose();
         navigate("/drug-form");
     };
@@ -53,9 +53,9 @@ const AddDrugModal: React.FC<AddDrugModalProps> = ({ onClose }) => {
         // Flatten raw API record into the flat shape the form expects
         const flatData = flattenDrug(drug);
         // Save as draft so CompoundForm restores it on mount
-        saveDraft(flatData, 0);
+        const newDraftId = saveDraft(flatData, 0);
         onClose();
-        navigate("/drug-form");
+        navigate(`/drug-form?draftId=${newDraftId}`);
     };
 
     const handleOk = () => {
