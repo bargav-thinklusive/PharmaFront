@@ -16,6 +16,7 @@ const DrugForm = lazy(() => import("../components/CompoundForm/CompoundForm"));
 const SectionedViewDrug = lazy(() => import("../components/Compound/SectionedViewDrug"));
 const BookMark = lazy(() => import("../components/Bookmark/BookMark"));
 const DrugsList = lazy(() => import("../components/DrugsList/DrugsList"));
+const DrugPreview = lazy(() => import("../components/DrugPreview/DrugPreview"));
 
 // Helper to wrap with ProtectedRoute
 const protect = (element: React.ReactNode) => (
@@ -35,6 +36,7 @@ export const routesConfig = [
     // ── Protected routes (login required) ─────────────────────────────────────
     { path: "/home",                                    element: protect(<Home />) },
     { path: "/drug-form",                               element: protect(<DrugForm />) },
+    { path: "/drug-preview",                            element: protect(<DrugPreview />) },
     { path: "/bookmark",                                element: protect(<BookMark />) },
     { path: "/drugsList",                               element: protect(<DrugsList />) },
     { path: ":ccategory/:searchtext",                   element: protect(<DrugsTable />) },

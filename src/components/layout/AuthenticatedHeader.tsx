@@ -135,14 +135,15 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
 
               {/* User Dropdown */}
               <div ref={dropdownRef} className="ml-4 relative">
-                <span className="cursor-pointer font-bold" onClick={() => setDropdownOpen((p) => !p)}>
+                <span className="font-bold" style={{ cursor: 'pointer' }} onClick={() => setDropdownOpen((p) => !p)}>
                   👤 {user?.data?.name || "User"}
                 </span>
                 {dropdownOpen && (
                   <div className="absolute top-full right-0 bg-white border border-gray-300 rounded-md shadow-md mt-2 min-w-[100px] overflow-hidden">
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-black hover:bg-[#3678f4ff] hover:text-white transition-colors duration-200 cursor-pointer"
+                      style={{ cursor: 'pointer' }}
+                      className="w-full text-left px-4 py-2 text-black hover:bg-[#3678f4ff] hover:text-white transition-colors duration-200"
                     >
                       Logout
                     </button>
@@ -156,6 +157,7 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
         {/* Hamburger button — mobile only */}
         <button
           className="md:hidden flex flex-col gap-1.5 p-2 focus:outline-none"
+          style={{ cursor: 'pointer' }}
           onClick={() => setMobileMenuOpen((o) => !o)}
           aria-label="Toggle menu"
         >
@@ -191,7 +193,7 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
                   💾 My Drafts ({drafts.length})
                 </span>
               )}
-              <button onClick={handleLogout} className="text-left text-white font-semibold">
+              <button onClick={handleLogout} className="text-left text-white font-semibold cursor-pointer">
                 👤 {user?.data?.name || "User"} — Logout
               </button>
             </>

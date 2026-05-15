@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
-import { flattenDrug } from "./helper";
-import useDraft from "../../hooks/useDraft";
 
 interface AddDrugModalProps {
     onClose: () => void;
@@ -11,10 +9,10 @@ interface AddDrugModalProps {
 const AddDrugModal: React.FC<AddDrugModalProps> = ({ onClose }) => {
     const navigate = useNavigate();
     const { drugsData } = useUser();
-    const { saveDraft } = useDraft();
 
     const [step, setStep] = useState<"choice" | "existing">("choice");
     const [query, setQuery] = useState("");
+    const [category, setCategory] = useState("all");
     const [error, setError] = useState("");
 
     // Extract drug name — API returns lowercase keys, local format uses uppercase
@@ -24,7 +22,6 @@ const AddDrugModal: React.FC<AddDrugModalProps> = ({ onClose }) => {
         "";
 
     // Fuzzy match: all chars of query appear in order inside name (case-insensitive)
-    // "aspiran" → "Aspirin Gold" ✓  |  "ASPIRIN" ✓  |  "aspirin gold" ✓
     const fuzzyMatch = (name: string, q: string): boolean => {
         const n = name.toLowerCase();
         const query = q.toLowerCase().trim();
@@ -37,40 +34,56 @@ const AddDrugModal: React.FC<AddDrugModalProps> = ({ onClose }) => {
         return qi === query.length;
     };
 
-    // Filter using fuzzy match
-    const suggestions: any[] = (drugsData || []).filter((d: any) =>
-        fuzzyMatch(getDrugName(d), query)
-    );
+    const q = query.toLowerCase().trim();
+    const suggestions: any[] = [];
+    if (q) {
+        (drugsData || []).forEach((d: any) => {
+            if (category === "all") {
+                const text = [
+                    d?.ProductOverview?.drugName,
+                    d?.ProductOverview?.brandName,
+                    d?.ProductOverview?.apiName,
+                    d?.PhysicalChemicalProperties?.iupacName,
+                    d?.PhysicalChemicalProperties?.innName,
+                    d?.cid
+                ].filter(Boolean).join(" ");
+                if (fuzzyMatch(text, q)) suggestions.push(d);
+            } else if (category === "drugName") {
+                const text = [d?.ProductOverview?.drugName, d?.ProductOverview?.brandName].filter(Boolean).join(" ");
+                if (fuzzyMatch(text, q)) suggestions.push(d);
+            } else if (category === "apiName") {
+                const text = d?.ProductOverview?.apiName || "";
+                if (fuzzyMatch(text, q)) suggestions.push(d);
+            } else if (category === "iupacName") {
+                const text = d?.PhysicalChemicalProperties?.iupacName || "";
+                if (fuzzyMatch(text, q)) suggestions.push(d);
+            } else if (category === "innName") {
+                const text = d?.PhysicalChemicalProperties?.innName || "";
+                if (fuzzyMatch(text, q)) suggestions.push(d);
+            }
+        });
+    }
 
     const handleNewDrug = () => {
-        // no need to clear drafts, a blank form generates a new draftId on its first save.
         onClose();
         navigate("/drug-form");
     };
 
     const handleSelectDrug = (drug: any) => {
-        if (!drug?.cid) return;
-        // Flatten raw API record into the flat shape the form expects
-        const flatData = flattenDrug(drug);
-        // Save as draft so CompoundForm restores it on mount
-        const newDraftId = saveDraft(flatData, 0);
         onClose();
-        navigate(`/drug-form?draftId=${newDraftId}`);
+        navigate("/drug-preview", { state: { drug } });
     };
 
     const handleOk = () => {
         if (!query.trim()) {
-            setError("Please enter a drug name.");
+            setError("Please enter a search query.");
             return;
         }
-        const match = (drugsData || []).find((d: any) =>
-            fuzzyMatch(getDrugName(d), query)
-        );
-        if (!match) {
-            setError(`No drug found with name "${query}". Try selecting from the suggestions.`);
+        if (suggestions.length === 0) {
+            setError(`No drug found matching "${query}" in ${category === 'all' ? 'any category' : category}.`);
             return;
         }
-        handleSelectDrug(match);
+        handleSelectDrug(suggestions[0]);
     };
 
     return (
@@ -79,7 +92,7 @@ const AddDrugModal: React.FC<AddDrugModalProps> = ({ onClose }) => {
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
             onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden animate-fadeIn">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-fadeIn">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-blue-700 to-blue-500 px-6 py-4 flex items-center justify-between">
                     <h2 className="text-white text-lg font-bold tracking-wide">Add Drug</h2>
@@ -127,21 +140,37 @@ const AddDrugModal: React.FC<AddDrugModalProps> = ({ onClose }) => {
                                 ← Back
                             </button>
                             <label className="text-sm font-medium text-gray-700">
-                                Enter Drug Name
+                                Search By
                             </label>
-                            <div className="relative">
+                            <div className="flex w-full bg-white border border-gray-300 rounded-lg shadow-sm overflow-visible relative focus-within:ring-2 focus-within:ring-blue-500 z-10">
                                 <input
                                     type="text"
                                     value={query}
                                     onChange={(e) => { setQuery(e.target.value); setError(""); }}
                                     onKeyDown={(e) => e.key === "Enter" && handleOk()}
-                                    placeholder="e.g. Aspirin"
+                                    placeholder="Search..."
                                     autoFocus
-                                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    className="flex-1 px-4 py-2.5 border-0 focus:ring-0 focus:outline-none text-sm rounded-l-lg"
                                 />
+                                <div className="relative border-l border-gray-300 bg-gray-50 rounded-r-lg flex items-center">
+                                    <select
+                                        className="h-full px-3 py-2.5 text-sm bg-transparent border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium appearance-none pr-8 cursor-pointer"
+                                        value={category}
+                                        onChange={(e) => { setCategory(e.target.value); setQuery(""); setError(""); }}
+                                    >
+                                        <option value="all">All</option>
+                                        <option value="drugName">Drug Name</option>
+                                        <option value="apiName">API Name</option>
+                                        <option value="iupacName">IUPAC Name</option>
+                                        <option value="innName">INN Name</option>
+                                    </select>
+                                    <span className="absolute right-2 pointer-events-none text-gray-600 text-xs">
+                                        ▼
+                                    </span>
+                                </div>
                                 {/* Dropdown suggestions */}
                                 {suggestions.length > 0 && (
-                                    <ul className="absolute z-10 top-full mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                                    <ul className="absolute z-20 top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
                                         {suggestions.map((drug: any, i: number) => {
                                             const name = getDrugName(drug) || "Unknown";
                                             return (
@@ -157,13 +186,7 @@ const AddDrugModal: React.FC<AddDrugModalProps> = ({ onClose }) => {
                                     </ul>
                                 )}
                             </div>
-                            {error && <p className="text-xs text-red-500">{error}</p>}
-                            <button
-                                onClick={handleOk}
-                                className="mt-1 w-full py-2.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm"
-                            >
-                                OK – Pre-fill Form
-                            </button>
+                            {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
                         </div>
                     )}
                 </div>
