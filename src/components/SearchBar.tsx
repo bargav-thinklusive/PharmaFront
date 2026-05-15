@@ -159,7 +159,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <div className="flex w-full max-w-2xl bg-white rounded shadow overflow-hidden">
           <div className="flex-1 relative">
             <input
-              className="w-full px-6 py-4 text-lg border-0 focus:ring-0 focus:outline-none text-black caret-blue-700 bg-white placeholder-gray-400 pr-12"
+              className="w-full px-3 sm:px-6 py-2 sm:py-4 text-base sm:text-lg border-0 focus:ring-0 focus:outline-none text-black caret-blue-700 bg-white placeholder-gray-400 pr-12"
               type="text"
               placeholder="Search..."
               value={search}
@@ -178,7 +178,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           </div>
           <div className="relative">
             <select
-              className="px-6 py-4 text-lg bg-gray-100 border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium border-l appearance-none pr-10"
+              className="px-2 sm:px-6 py-2 sm:py-4 text-sm sm:text-lg bg-gray-100 border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium border-l appearance-none pr-8"
               value={category}
               onChange={handleCategoryChange}
             >

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import DynamicFormBuilder from "../shared";
 import { addExecutiveSummary, addProductOverview, addPhysicalChemicalProperties, addDrugSubstance, addDrugProductInformation, addAppendices, addRegulatoryInsights, addLabelingInformation, addGenericEntrants, addBaBeStudies, addSources, addGlossary } from "./columns";
 import { formatCreatedDrug } from "./helper";
@@ -14,9 +14,12 @@ const drugService = new DrugService();
 
 const DrugForm = () => {
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const { postData } = usePost();
     const { saveDraft, loadDraft, clearDraft } = useDraft();
     const { refetchDrugs } = useUser();
+
+    const draftId = searchParams.get("draftId");
 
     const [formData, setFormData] = useState<any>({});
     const [currentStep, setCurrentStep] = useState(0);
@@ -35,15 +38,20 @@ const DrugForm = () => {
 
     // ── On mount: restore draft if one exists ─────────────────────────────────
     useEffect(() => {
-        const draft = loadDraft();
-        if (draft && draft.formData && Object.keys(draft.formData).length > 0) {
-            formDataRef.current = draft.formData;
-            setFormData(draft.formData);
-            setCurrentStep(draft.currentStep ?? 0);
-            setDraftRestored(true);
+        if (draftId) {
+            const draft = loadDraft(draftId);
+            if (draft && draft.formData && Object.keys(draft.formData).length > 0) {
+                formDataRef.current = draft.formData;
+                setFormData(draft.formData);
+                setCurrentStep(draft.currentStep ?? 0);
+                setDraftRestored(true);
+            } else {
+                // Draft not found, clear URL params
+                setSearchParams({}, { replace: true });
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [draftId]);
 
     const steps = [
         { title: "Executive Summary", fields: addExecutiveSummary },
@@ -83,15 +91,16 @@ const DrugForm = () => {
     const handleSaveDraft = async () => {
         setIsSavingDraft(true);
         try {
-            saveDraft(formDataRef.current, currentStep);
+            const newDraftId = saveDraft(formDataRef.current, currentStep, draftId);
+            if (!draftId) {
+                setSearchParams({ draftId: newDraftId }, { replace: true });
+            }
             setDraftRestored(true);
             toast.success("✅ Section saved! Your progress is safe.", { autoClose: 2500 });
         } finally {
             setIsSavingDraft(false);
         }
     };
-
-
 
     const handleNext = () => {
         if (validateCurrentStep()) {
@@ -116,7 +125,9 @@ const DrugForm = () => {
             try {
                 const formattedData = await formatCreatedDrug(formDataRef.current);
                 await postData(drugService.createDrug(), formattedData);
-                clearDraft();
+                if (draftId) {
+                    clearDraft(draftId);
+                }
                 await refetchDrugs(); // refresh so new drug appears in search immediately
                 toast.success("Drug Entry successfully submitted");
                 navigate("/home");
@@ -128,7 +139,6 @@ const DrugForm = () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
-
 
     const formWithErrors = {
         ...formData,

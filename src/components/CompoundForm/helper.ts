@@ -20,7 +20,7 @@ export const flattenDrug = (drug: any): any => {
         firstApprovedDate: drug.ProductOverview?.firstApprovedDate ?? "",
         firstApprovedRegion: drug.ProductOverview?.firstApprovedRegion ?? "",
         dosageForms: drug.ProductOverview?.dosageForms ?? "",
-        lossOfExclusivity: drug.ProductOverview?.lossOfExclusivity ?? "",
+        lossOfExclusivity: drug.ProductOverview?.lossOfExclusivity ?? [],
         globalAnnualRevenue: drug.ProductOverview?.globalAnnualRevenue ?? "",
 
         // Regulatory Insights
@@ -56,7 +56,7 @@ export const flattenDrug = (drug: any): any => {
         manufacturingRoutes: drug.DrugSubstance?.manufacturingRoutes ?? [],
         dsImpurities: drug.DrugSubstance?.dsImpurities ?? [],
         genotoxicImpurities: drug.DrugSubstance?.genotoxicImpurities ?? [],
-        stability: drug.DrugSubstance?.stability ?? "",
+        stability: drug.DrugSubstance?.stability ?? [],
         nitrosaminesAssessment: drug.DrugSubstance?.nitrosaminesAssessment ?? "",
         otherInformation: drug.DrugSubstance?.otherInformation ?? "",
         regulatoryStartingMaterials: drug.DrugSubstance?.regulatoryStartingMaterials ?? "",
@@ -71,7 +71,7 @@ export const flattenDrug = (drug: any): any => {
         dissolutionStudies: drug.DrugProductInformation?.dissolutionStudies ?? [],
         pharmacokinetics: drug.DrugProductInformation?.pharmacokinetics ?? [],
         formulationChallenges: drug.DrugProductInformation?.formulationChallenges ?? "",
-        stabilityStudies: drug.DrugProductInformation?.stabilityStudies ?? "",
+        stabilityStudies: drug.DrugProductInformation?.stabilityStudies ?? [],
         maximumDailyDose: drug.DrugProductInformation?.maximumDailyDose ?? "",
         excipientsGrade: drug.DrugProductInformation?.excipientsGrade ?? "",
         storageAndShippingConditions: drug.DrugProductInformation?.storageAndShippingConditions ?? "",

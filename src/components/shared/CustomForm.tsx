@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import PhoneInput from "react-phone-input-2";
-import { FiTrash2 } from "react-icons/fi";
+import { FiTrash2, FiEdit2, FiCopy } from "react-icons/fi";
 import type { FieldConfig } from "./index";
 
 interface CustomFormProps {
@@ -26,6 +26,9 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
     // The single "input" row being filled in
     const [inputRow, setInputRow] = useState<any>(getEmptyRow());
 
+    // Index of the row currently being edited
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
     // On mount: restore only previously saved values (e.g. from localStorage).
     // Do NOT pre-load initialValues — table stays hidden until the user adds a row.
     useEffect(() => {
@@ -49,7 +52,14 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
 
     // Commit current input row to the table, then reset the input row
     const handleAdd = () => {
-        const updatedRows = [...tableRows, { ...inputRow }];
+        let updatedRows;
+        if (editingIndex !== null) {
+            updatedRows = [...tableRows];
+            updatedRows[editingIndex] = { ...inputRow };
+            setEditingIndex(null);
+        } else {
+            updatedRows = [...tableRows, { ...inputRow }];
+        }
         setTableRows(updatedRows);
         syncToForm(updatedRows);
         setInputRow(getEmptyRow());
@@ -58,6 +68,24 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
     // Remove a row from the table by index
     const handleRemove = (index: number) => {
         const updatedRows = tableRows.filter((_, i) => i !== index);
+        setTableRows(updatedRows);
+        syncToForm(updatedRows);
+        
+        if (editingIndex === index) {
+            setEditingIndex(null);
+            setInputRow(getEmptyRow());
+        } else if (editingIndex !== null && index < editingIndex) {
+            setEditingIndex(editingIndex - 1);
+        }
+    };
+
+    const handleEdit = (index: number) => {
+        setInputRow({ ...tableRows[index] });
+        setEditingIndex(index);
+    };
+
+    const handleCopy = (index: number) => {
+        const updatedRows = [...tableRows, { ...tableRows[index] }];
         setTableRows(updatedRows);
         syncToForm(updatedRows);
     };
@@ -187,26 +215,49 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                     ))}
                 </div>
 
-                {/* Add button */}
-                <button
-                    type="button"
-                    onClick={handleAdd}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-4 h-4"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
+                {/* Add/Update button */}
+                <div className="flex gap-2">
+                    <button
+                        type="button"
+                        onClick={handleAdd}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
                     >
-                        <path
-                            fillRule="evenodd"
-                            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                            clipRule="evenodd"
-                        />
-                    </svg>
-                    Add
-                </button>
+                        {editingIndex !== null ? (
+                            <>
+                                <FiEdit2 className="w-4 h-4" />
+                                Update
+                            </>
+                        ) : (
+                            <>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="w-4 h-4"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                >
+                                    <path
+                                        fillRule="evenodd"
+                                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                                        clipRule="evenodd"
+                                    />
+                                </svg>
+                                Add
+                            </>
+                        )}
+                    </button>
+                    {editingIndex !== null && (
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setInputRow(getEmptyRow());
+                                setEditingIndex(null);
+                            }}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-500 text-white text-sm font-medium rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* ── Committed rows table ── */}
@@ -223,8 +274,8 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                                         {df.label}
                                     </th>
                                 ))}
-                                <th className="px-3 py-2 text-center text-xs font-semibold text-gray-600 w-16">
-                                    Remove
+                                <th className="px-3 py-2 text-center text-xs font-semibold text-gray-600 w-24">
+                                    Actions
                                 </th>
                             </tr>
                         </thead>
@@ -243,12 +294,31 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                                             {renderCellValue(df, row[df.key])}
                                         </td>
                                     ))}
-                                    <td className="px-3 py-2 text-center">
+                                    <td className="px-3 py-2 text-center whitespace-nowrap">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleEdit(rowIndex)}
+                                            className="inline-flex items-center justify-center p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors mr-1"
+                                            aria-label="Edit row"
+                                            title="Edit"
+                                        >
+                                            <FiEdit2 className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleCopy(rowIndex)}
+                                            className="inline-flex items-center justify-center p-1.5 text-green-500 hover:text-green-700 hover:bg-green-50 rounded transition-colors mr-1"
+                                            aria-label="Copy row"
+                                            title="Copy"
+                                        >
+                                            <FiCopy className="w-4 h-4" />
+                                        </button>
                                         <button
                                             type="button"
                                             onClick={() => handleRemove(rowIndex)}
                                             className="inline-flex items-center justify-center p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
                                             aria-label="Remove row"
+                                            title="Remove"
                                         >
                                             <FiTrash2 className="w-4 h-4" />
                                         </button>
