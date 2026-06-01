@@ -94,7 +94,7 @@ const DrugsTable: React.FC = () => {
     const innName = item?.PhysicalChemicalProperties?.innName;
     if (innName) arr.push(innName);
 
-    if (item?.cid) arr.push(item.cid);
+    if (item?.cid) arr.push(String(item.cid));
     return arr;
   }
 

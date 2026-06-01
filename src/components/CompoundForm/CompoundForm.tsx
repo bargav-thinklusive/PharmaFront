@@ -26,8 +26,8 @@ const DrugForm = () => {
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     // Draft restore state
-    const [draftRestored, setDraftRestored] = useState(false);
     const [isSavingDraft, setIsSavingDraft] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
 
     const formDataRef = useRef<any>(formData);
 
@@ -37,21 +37,21 @@ const DrugForm = () => {
     }, [formData]);
 
     // ── On mount: restore draft if one exists ─────────────────────────────────
+    const initialDraftId = useRef(searchParams.get("draftId"));
     useEffect(() => {
-        if (draftId) {
-            const draft = loadDraft(draftId);
+        if (initialDraftId.current) {
+            const draft = loadDraft(initialDraftId.current);
             if (draft && draft.formData && Object.keys(draft.formData).length > 0) {
                 formDataRef.current = draft.formData;
                 setFormData(draft.formData);
                 setCurrentStep(draft.currentStep ?? 0);
-                setDraftRestored(true);
             } else {
                 // Draft not found, clear URL params
                 setSearchParams({}, { replace: true });
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [draftId]);
+    }, []);
 
     const steps = [
         { title: "Executive Summary", fields: addExecutiveSummary },
@@ -95,8 +95,7 @@ const DrugForm = () => {
             if (!draftId) {
                 setSearchParams({ draftId: newDraftId }, { replace: true });
             }
-            setDraftRestored(true);
-            toast.success("✅ Section saved! Your progress is safe.", { autoClose: 2500 });
+            toast.success("Draft saved successfully", { autoClose: 2500 });
         } finally {
             setIsSavingDraft(false);
         }
@@ -120,21 +119,48 @@ const DrugForm = () => {
         }
     };
 
-    const handleDone = async () => {
-        if (validateCurrentStep()) {
-            try {
-                const formattedData = await formatCreatedDrug(formDataRef.current);
-                await postData(drugService.createDrug(), formattedData);
-                if (draftId) {
-                    clearDraft(draftId);
+    const submitForm = async () => {
+        try {
+            const formattedData = await formatCreatedDrug(formDataRef.current);
+            await postData(drugService.createDrug(), formattedData);
+            if (draftId) {
+                clearDraft(draftId);
+            }
+            await refetchDrugs(); // refresh so new drug appears in search immediately
+            toast.success("Drug Entry successfully submitted");
+            navigate("/home");
+        } catch (error: any) {
+            console.error(error);
+            if (error.response?.status === 400) {
+                const responseData = error.response.data;
+                let reason = "Submission Failed (400): ";
+                if (responseData) {
+                    if (typeof responseData === "string") {
+                        reason += responseData;
+                    } else if (responseData.message) {
+                        reason += Array.isArray(responseData.message)
+                            ? responseData.message.join(", ")
+                            : responseData.message;
+                    } else if (responseData.detail) {
+                        reason += responseData.detail;
+                    } else if (responseData.error) {
+                        reason += responseData.error;
+                    } else {
+                        reason += JSON.stringify(responseData);
+                    }
+                } else {
+                    reason += "Invalid input data. Please check your entries.";
                 }
-                await refetchDrugs(); // refresh so new drug appears in search immediately
-                toast.success("Drug Entry successfully submitted");
-                navigate("/home");
-            } catch (error) {
-                console.error(error);
+                toast.error(reason, { autoClose: 6000 });
+            } else {
                 toast.error("Failed to submit drug entry. Please try again.");
             }
+        }
+    };
+
+    const handleDone = () => {
+        if (validateCurrentStep()) {
+            setShowConfirm(true);
         } else {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -154,11 +180,27 @@ const DrugForm = () => {
     return (
         <div className="mt-5 max-w-7xl mx-auto px-4">
 
-            {draftRestored && (
-                <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800 shadow-sm">
-                    ✅ <strong>Draft restored</strong>
+            {/* Header with Page Title and Back button */}
+            <div className="flex justify-between items-center mb-6">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-800">
+                        {draftId ? "Edit Drug Entry" : "New Drug Entry"}
+                    </h1>
+                    <p className="text-gray-500 text-sm mt-1">
+                        {draftId ? "Modify drug details step by step." : "Fill in drug details step by step."}
+                    </p>
                 </div>
-            )}
+                <button
+                    type="button"
+                    onClick={() => navigate(-1)}
+                    className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors shadow-sm cursor-pointer"
+                >
+                    <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Cancel
+                </button>
+            </div>
 
             {/* Progress Indicator - Tab Style */}
             <header className="mb-8 border-b border-gray-200">
@@ -214,7 +256,7 @@ const DrugForm = () => {
                             : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                             }`}
                     >
-                        Back
+                        Previous
                     </button>
 
                     {/* ── Save Section Button ── */}
@@ -247,6 +289,63 @@ const DrugForm = () => {
                     )}
                 </div>
             </form>
+
+            {/* Premium Center-Aligned Submission Confirmation Modal */}
+            {showConfirm && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-md w-full overflow-hidden transform animate-scale-up p-6 relative">
+                        {/* Close button */}
+                        <button
+                            type="button"
+                            onClick={() => setShowConfirm(false)}
+                            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-full hover:bg-slate-50 cursor-pointer border-0 outline-none"
+                            aria-label="Close modal"
+                        >
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        <div className="flex items-start gap-4">
+                            {/* Animated Alert Warning Icon Wrapper */}
+                            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-amber-50 border border-amber-200 text-amber-500 flex items-center justify-center animate-pulse-slow shadow-sm">
+                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            </div>
+
+                            <div className="flex-1">
+                                <h3 className="text-lg font-bold text-slate-900 mb-1 leading-snug">
+                                    Please Review Your Items
+                                </h3>
+                                <p className="text-sm text-slate-500 leading-relaxed mb-6">
+                                    Please review your items before submitting. Are you sure you want to confirm?
+                                </p>
+
+                                <div className="flex gap-3 justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirm(false)}
+                                        className="px-4 py-2 border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl cursor-pointer transition-all duration-150 shadow-sm"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setShowConfirm(false);
+                                            submitForm();
+                                        }}
+                                        className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white text-sm font-semibold rounded-xl cursor-pointer transition-all duration-150 shadow-md shadow-emerald-100 hover:shadow-emerald-200/80"
+                                    >
+                                        Yes, Confirm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

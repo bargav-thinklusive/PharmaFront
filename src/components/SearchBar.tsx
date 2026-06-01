@@ -52,7 +52,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             text: item?.PhysicalChemicalProperties?.innName || "",
             type: "innName",
           },
-          { text: item?.cid || "", type: "cid" },
+          { text: item?.cid ? String(item.cid) : "", type: "cid" },
         ];
 
         fields.forEach((field) => {
@@ -85,6 +85,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
         }
       } else if (category === "innName") {
         const text = item?.PhysicalChemicalProperties?.innName || "";
+        if (text && text.toLowerCase().includes(q)) {
+          matches.push({ ...item, matchedText: text });
+        }
+      } else if (category === "cid") {
+        const text = item?.cid ? String(item.cid) : "";
         if (text && text.toLowerCase().includes(q)) {
           matches.push({ ...item, matchedText: text });
         }
@@ -187,6 +192,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               <option value="apiName">API Name</option>
               <option value="iupacName">IUPAC Name</option>
               <option value="innName">INN Name</option>
+              <option value="cid">CID</option>
             </select>
             <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600">
               ▼
