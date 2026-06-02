@@ -202,40 +202,61 @@ const DrugForm = () => {
                 </button>
             </div>
 
-            {/* Progress Indicator - Tab Style */}
-            <header className="mb-8 border-b border-gray-200">
-                <nav className="flex flex-wrap gap-1 pb-0">
+            {/* Stepper Progress Bar */}
+            <div className="mb-16 relative w-full mt-6 px-2">
+                {/* Background & Active Line Container */}
+                <div className="absolute top-[15px] left-[24px] right-[24px] h-[3px] bg-gray-200 rounded z-0">
+                    <div 
+                        className="h-full bg-blue-600 rounded transition-all duration-500 ease-in-out" 
+                        style={{ width: `${steps.length > 1 ? (currentStep / (steps.length - 1)) * 100 : 100}%` }}
+                    ></div>
+                </div>
+                
+                {/* Steps */}
+                <div className="flex items-start justify-between relative z-10">
                     {steps.map((step, index) => {
                         const isActive = index === currentStep;
                         const isCompleted = index < currentStep;
                         return (
-                            <button
-                                key={index}
-                                type="button"
-                                onClick={() => {
-                                    if (index < currentStep || validateCurrentStep()) {
-                                        setCurrentStep(index);
-                                        setErrors({});
-                                    } else {
-                                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                                    }
-                                }}
-                                className={`px-3 py-2 text-sm font-medium rounded-t-lg transition-all duration-150 whitespace-nowrap border-b-2 flex items-center gap-2 ${isActive
-                                    ? 'border-blue-500 text-blue-600 bg-blue-50/50'
-                                    : isCompleted
-                                        ? 'border-transparent text-blue-500 hover:text-blue-700 hover:bg-blue-50/30'
-                                        : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-200 hover:bg-gray-50'
+                            <div key={index} className="flex flex-col items-center relative w-8">
+                                <button
+                                    type="button"
+                                    title={step.title}
+                                    onClick={() => {
+                                        if (index < currentStep || validateCurrentStep()) {
+                                            setCurrentStep(index);
+                                            setErrors({});
+                                        } else {
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        }
+                                    }}
+                                    className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold transition-all duration-300 z-10 ${
+                                        isActive ? 'bg-blue-600 border-2 border-blue-600 text-white ring-4 ring-blue-100 shadow-md scale-110' :
+                                        isCompleted ? 'bg-blue-600 border-2 border-blue-600 text-white hover:bg-blue-700 shadow-sm' :
+                                        'bg-white border-2 border-gray-300 text-gray-400 hover:border-blue-400 hover:text-blue-500'
                                     }`}
-                            >
-                                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${isActive ? 'bg-blue-600 text-white' : isCompleted ? 'bg-blue-200 text-blue-700' : 'bg-gray-200 text-gray-600'}`}>
-                                    {index + 1}
-                                </span>
-                                {step.title}
-                            </button>
+                                >
+                                    {isCompleted ? (
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    ) : (
+                                        index + 1
+                                    )}
+                                </button>
+                                <div className={`mt-2 absolute top-8 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-medium text-center w-20 sm:w-24 transition-colors duration-300 ${
+                                    isActive ? 'text-blue-700 font-bold' :
+                                    isCompleted ? 'text-gray-700' :
+                                    'text-gray-400'
+                                }`}>
+                                    <span className="hidden lg:block leading-tight">{step.title}</span>
+                                    <span className="block lg:hidden leading-tight">{isActive ? step.title : ""}</span>
+                                </div>
+                            </div>
                         );
                     })}
-                </nav>
-            </header>
+                </div>
+            </div>
 
             {/* Form Content */}
             <form className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
