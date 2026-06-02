@@ -120,6 +120,32 @@ const LandingPage: React.FC = () => {
                     </p>
                 </div>
             </div>
+
+            {/* Newsletter Section */}
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+                <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-10 border border-green-100 relative overflow-hidden">
+                    {/* Background decorative blob */}
+                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#8ce1ae]/10 rounded-full blur-2xl"></div>
+                    
+                    <div className="relative z-10 text-center max-w-2xl mx-auto">
+                        <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Newsletter</h3>
+                        <p className="text-sm sm:text-base text-gray-600 mb-6">
+                            Stay updated with the latest news and insights from CMC Intel.
+                        </p>
+                        {/* Stacks vertically on mobile, row on sm+ */}
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+                            <input
+                                type="email"
+                                placeholder="Enter your email address"
+                                className="w-full sm:flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#36b669] focus:border-[#36b669] text-sm sm:text-base transition-all shadow-sm"
+                            />
+                            <button className="w-full sm:w-auto bg-[#36b669] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#2d9d58] transition-colors text-sm sm:text-base whitespace-nowrap shadow-md hover:shadow-lg active:scale-95 duration-150">
+                                Subscribe
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

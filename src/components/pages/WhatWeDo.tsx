@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Image1 from "../../../public/assets/Whatwedoimage1.png"
 import Image2 from "../../../public/assets/Whatwedoimage21.jpg"
 import Image3 from "../../../public/assets/Whatwedoimage3.png"
+import PageHeader from '../shared/PageHeader';
 
 const WhatWeDo: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -80,25 +81,14 @@ const WhatWeDo: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-          <div className="text-center">
-            <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold text-gray-900 mb-4 sm:mb-6">
-              What we do
-            </h1>
-          </div>
-        </div>
-
-        {/* Background decoration */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#36b669]/10 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl"></div>
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Our Services"
+        title="What we do"
+        subtitle="Translating complex regulatory and CMC requirements into clear, actionable, and data-driven intelligence."
+      />
 
       {/* Carousel */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1 sm:pt-2 pb-4">
         <div className="relative h-40 sm:h-64 md:h-[500px] overflow-hidden rounded-lg">
           {images.map((image, index) => (
             <div

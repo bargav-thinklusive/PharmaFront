@@ -1,6 +1,6 @@
 
 import { useState, useMemo, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import './SectionedViewDrug.css';
 
@@ -14,6 +14,7 @@ import SectionContent from './sectioned/SectionContent';
  */
 export default function SectionedViewDrug() {
     const { cid, version } = useParams();
+    const navigate = useNavigate();
     const { drugsData } = useUser();
     const [currentStep, setCurrentStep] = useState(1);
 
@@ -79,6 +80,20 @@ export default function SectionedViewDrug() {
     return (
         <div className="sectioned-view-container">
             <div className="sectioned-view-content">
+                <div className="flex justify-between items-center mb-6">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors shadow-sm cursor-pointer"
+                    >
+                        <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Back
+                    </button>
+                    <span className="text-sm text-gray-500 font-semibold bg-gray-100 px-3 py-1 rounded-full border border-gray-200">
+                        CID: {cid}
+                    </span>
+                </div>
 
                 <SectionHeader
                     sections={sections}

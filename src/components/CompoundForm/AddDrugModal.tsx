@@ -60,6 +60,9 @@ const AddDrugModal: React.FC<AddDrugModalProps> = ({ onClose }) => {
             } else if (category === "innName") {
                 const text = d?.PhysicalChemicalProperties?.innName || "";
                 if (fuzzyMatch(text, q)) suggestions.push(d);
+            } else if (category === "cid") {
+                const text = d?.cid ? String(d.cid) : "";
+                if (fuzzyMatch(text, q)) suggestions.push(d);
             }
         });
     }
@@ -163,6 +166,7 @@ const AddDrugModal: React.FC<AddDrugModalProps> = ({ onClose }) => {
                                         <option value="apiName">API Name</option>
                                         <option value="iupacName">IUPAC Name</option>
                                         <option value="innName">INN Name</option>
+                                        <option value="cid">CID</option>
                                     </select>
                                     <span className="absolute right-2 pointer-events-none text-gray-600 text-xs">
                                         ▼
