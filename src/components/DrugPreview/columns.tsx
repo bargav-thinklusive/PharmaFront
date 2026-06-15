@@ -30,6 +30,15 @@ const valueFormatter = (params: { value?: any; colDef?: any }): string => {
 
 export const columns: any = [
   {
+    headerName: 'Actions',
+    field: 'actions',
+    cellRenderer: ActionCellRenderer,
+    width: 120,
+    pinned: 'left',
+    sortable: false,
+    filter: false
+  },
+  {
     headerName: "CID",
     headerClass: "table-header",
     field: "cid",
@@ -123,14 +132,5 @@ export const columns: any = [
     sortable: true,
     filter: true,
     valueFormatter: valueFormatter
-  },
-  {
-    headerName: 'Actions',
-    field: 'actions',
-    cellRenderer: ActionCellRenderer,
-    width: 120,
-    pinned: 'right',
-    sortable: false,
-    filter: false
   }
 ];

@@ -45,7 +45,7 @@ export function AppendixLink({ text }: { text: string }) {
                         <button
                             key={index}
                             onClick={() => handleClick(part)}
-                            className="text-blue-600 underline hover:text-blue-800 cursor-pointer bg-transparent border-none p-0 inline font-medium"
+                            className="text-primary underline hover:text-primary-hover cursor-pointer bg-transparent border-none p-0 inline font-medium"
                         >
                             {part}
                         </button>
@@ -62,7 +62,7 @@ export function renderLink(text: string) {
     const urlRegex = /^https?:\/\/[^\s]+$/i;
     if (urlRegex.test(text.trim())) {
         return (
-            <a href={text.trim()} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">
+            <a href={text.trim()} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary-hover">
                 {text}
             </a>
         );
@@ -176,12 +176,12 @@ export function DataTable({ data }: { data: any[] }) {
     };
 
     return (
-        <div className="overflow-x-auto border-2 border-sky-400 rounded-lg">
+        <div className="overflow-x-auto border-2 border-primary rounded-lg">
             <table className="w-full text-sm text-left text-gray-700 border-collapse">
-                <thead className="text-xs text-blue-900 uppercase bg-blue-50 border-b-2 border-sky-400">
+                <thead className="text-xs text-primary-active uppercase bg-primary-light border-b-2 border-primary">
                     <tr>
                         {headers.map((header, idx) => (
-                            <th key={header} className={`px-6 py-3 font-bold ${idx < headers.length - 1 ? 'border-r border-sky-200' : ''}`}>
+                            <th key={header} className={`px-6 py-3 font-bold ${idx < headers.length - 1 ? 'border-r border-primary/20' : ''}`}>
                                 {formatKey(header)}
                             </th>
                         ))}
@@ -191,7 +191,7 @@ export function DataTable({ data }: { data: any[] }) {
                     {data.map((row, rowIndex) => (
                         <tr key={rowIndex} className="bg-white border-b hover:bg-gray-50">
                             {headers.map((header, idx) => (
-                                <td key={header} className={`px-6 py-4 whitespace-pre-wrap ${idx < headers.length - 1 ? 'border-r border-sky-100' : ''}`}>
+                                <td key={header} className={`px-6 py-4 whitespace-pre-wrap ${idx < headers.length - 1 ? 'border-r border-primary/10' : ''}`}>
                                     {renderCell(header, row[header])}
                                 </td>
                             ))}
@@ -208,12 +208,12 @@ export function KeyValueDisplay({ data, className = '' }: { data: Record<string,
     if (filteredData.length === 0) return null;
 
     return (
-        <div className={`border-2 border-sky-400 rounded bg-white max-w-3xl ${className}`}>
+        <div className={`border-2 border-primary rounded bg-white max-w-3xl ${className}`}>
             <table className="w-full text-sm text-black border-collapse">
                 <tbody>
                     {filteredData.map(([key, value]) => (
-                        <tr key={key} className="border-b border-blue-100">
-                            <td className="w-56 p-3 text-black font-semibold border-r border-sky-200">
+                        <tr key={key} className="border-b border-primary/10">
+                            <td className="w-56 p-3 text-black font-semibold border-r border-primary/20">
                                 {formatKey(key)}
                             </td>
                             <td className="py-2 px-4 whitespace-pre-wrap">

@@ -15,6 +15,7 @@ import {
 import { columns } from './columns';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
+import '../DrugTable/DrugsTable.css';
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
@@ -70,6 +71,7 @@ const DrugPreview: React.FC = () => {
                         rowData={[drug]}
                         columnDefs={columns}
                         rowSelection="single"
+                        headerHeight={56}
                     />
                 </div>
             </div>

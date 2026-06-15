@@ -26,11 +26,7 @@ const BrandNameCellRenderer = (params: any) => {
   return (
     <span
       onClick={handleClick}
-      style={{
-        color: "#1677ff",
-        textDecoration: "underline",
-        cursor: "pointer",
-      }}
+      className="text-[#2563EB] hover:underline cursor-pointer font-medium text-[13.5px]"
     >
       {params.value || "-"}
     </span>

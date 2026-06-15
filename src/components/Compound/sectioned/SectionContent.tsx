@@ -51,7 +51,7 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
         const images = Array.isArray(data) ? data : [data];
         return (
             <div className="space-y-4">
-                <h2 className="text-lg font-bold text-gray-800 border-blue-400 border-b-2 pb-1">
+                <h2 className="text-lg font-bold text-gray-800 border-primary border-b-2 pb-1">
                     {index} {toTitleCase(title)}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -98,8 +98,8 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
 
                     return (
                         <div key={i} className="space-y-4">
-                            <h2 className="text-lg font-bold text-gray-800 border-blue-400 border-b-2 pb-1">{subIdx} {label}</h2>
-                            <div className="p-4 border border-blue-50 rounded bg-blue-50/10 min-h-[100px] text-gray-700 whitespace-pre-wrap">
+                            <h2 className="text-lg font-bold text-gray-800 border-primary border-b-2 pb-1">{subIdx} {label}</h2>
+                            <div className="p-4 border border-primary/20 rounded bg-primary-light/50 min-h-[100px] text-gray-700 whitespace-pre-wrap">
                                 {isContentSameAsLabel ? (
                                     <span className="text-gray-400 italic">No additional content provided for this appendix.</span>
                                 ) : (
@@ -117,11 +117,11 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
         const steps = Array.isArray(data) ? data : [data];
         return (
             <div className="space-y-4">
-                <h2 className="text-lg font-bold text-gray-800 border-blue-400 border-b-2 pb-1">{index} {toTitleCase(title)}</h2>
+                <h2 className="text-lg font-bold text-gray-800 border-primary border-b-2 pb-1">{index} {toTitleCase(title)}</h2>
                 <div className="space-y-4">
                     {steps.map((item, i) => (
-                        <div key={i} className="p-4 border border-blue-100 rounded bg-blue-50/30">
-                            <h3 className="font-bold text-blue-900 mb-1 italic">Step {i + 1}</h3>
+                        <div key={i} className="p-4 border border-primary/20 rounded bg-primary-light/50">
+                            <h3 className="font-bold text-primary-hover mb-1 italic">Step {i + 1}</h3>
                             <div className="text-gray-700 whitespace-pre-wrap">{item.step || (typeof item === 'string' ? item : JSON.stringify(item))}</div>
                         </div>
                     ))}
@@ -135,15 +135,15 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
         if (data.length > 0 && typeof data[0] === 'object' && data[0] !== null) {
             return (
                 <div className="space-y-4">
-                    <h2 className="text-lg font-bold text-gray-800 border-blue-400 border-b-2 pb-1">{index} {toTitleCase(title)}</h2>
+                    <h2 className="text-lg font-bold text-gray-800 border-primary border-b-2 pb-1">{index} {toTitleCase(title)}</h2>
                     <DataTable data={data} />
                 </div>
             );
         }
         return (
             <div className="space-y-2">
-                <h2 className="text-lg font-bold text-gray-800 border-blue-400 border-b-2 pb-1">{index} {toTitleCase(title)}</h2>
-                <div className="p-2 border border-blue-100 rounded bg-blue-50/30">{data.join(', ')}</div>
+                <h2 className="text-lg font-bold text-gray-800 border-primary border-b-2 pb-1">{index} {toTitleCase(title)}</h2>
+                <div className="p-2 border border-primary/20 rounded bg-primary-light/50">{data.join(', ')}</div>
             </div>
         );
     }
@@ -151,7 +151,7 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
     // Generic object but might contain metadata we want to skip or images
     return (
         <div className="space-y-4">
-            <h2 className="text-lg font-bold text-gray-800 border-blue-400 border-b-2 pb-1">{index} {toTitleCase(title)}</h2>
+            <h2 className="text-lg font-bold text-gray-800 border-primary border-b-2 pb-1">{index} {toTitleCase(title)}</h2>
             <SectionContent data={data} sectionIndex={index} />
         </div>
     );

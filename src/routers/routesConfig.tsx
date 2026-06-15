@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import ProtectedRoute from '../components/shared/ProtectedRoute';
+import PublicOnlyRoute from '../components/shared/PublicOnlyRoute';
 
 // Lazy load all components
 const Login = lazy(() => import("../components/pages/auth/LoginPage"));
@@ -18,18 +19,25 @@ const BookMark = lazy(() => import("../components/Bookmark/BookMark"));
 const DrugsList = lazy(() => import("../components/DrugsList/DrugsList"));
 const DrugPreview = lazy(() => import("../components/DrugPreview/DrugPreview"));
 
-// Helper to wrap with ProtectedRoute
+// Helper to wrap with ProtectedRoute (authenticated users only)
 const protect = (element: React.ReactNode) => (
     <ProtectedRoute>{element}</ProtectedRoute>
 );
 
+// Helper to wrap with PublicOnlyRoute (redirects logged-in users to /home)
+const publicOnly = (element: React.ReactNode) => (
+    <PublicOnlyRoute>{element}</PublicOnlyRoute>
+);
+
 export const routesConfig = [
-    // ── Public routes ─────────────────────────────────────────────────────────
-    { path: "/",              element: <LandingPage /> },
-    { path: "/register",      element: <Register /> },
-    { path: "/login",         element: <Login /> },
-    { path: "/what-we-do",    element: <WhatWeDo /> },
-    { path: "/areas-served",  element: <AreasServed /> },
+    // ── Pre-login only routes (logged-in users → redirected to /home) ──────────
+    { path: "/",              element: publicOnly(<LandingPage />) },
+    { path: "/register",      element: publicOnly(<Register />) },
+    { path: "/login",         element: publicOnly(<Login />) },
+    { path: "/what-we-do",    element: publicOnly(<WhatWeDo />) },
+    { path: "/areas-served",  element: publicOnly(<AreasServed />) },
+
+    // ── Open routes – accessible to everyone (before AND after login) ───────────
     { path: "/about",         element: <About /> },
     { path: "/contacts",      element: <Contacts /> },
 

@@ -6,6 +6,7 @@ import { CellStyleModule, ClientSideRowModelModule, ModuleRegistry, NumberFilter
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import '../../components/AgGridHeaderStyle/AgGridHeaderStyle.css';
+import '../DrugTable/DrugsTable.css';
 import { ColumnsToolPanelModule, ExcelExportModule, ServerSideRowModelApiModule } from 'ag-grid-enterprise';
 import Loader from '../Loader';
 import { sampleRawData } from '../../sampleData/data';
@@ -46,6 +47,7 @@ const DrugsList = () => {
               filter: true,
             }}
             rowSelection="single"
+            headerHeight={56}
           />
         </div>
       </div>

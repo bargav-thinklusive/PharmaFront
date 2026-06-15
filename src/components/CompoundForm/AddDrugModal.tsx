@@ -97,8 +97,8 @@ const AddDrugModal: React.FC<AddDrugModalProps> = ({ onClose }) => {
         >
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-visible animate-fadeIn">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-blue-700 to-blue-500 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-                    <h2 className="text-white text-lg font-bold tracking-wide">Add Drug</h2>
+                <div className="bg-gradient-to-r from-navy to-slate px-6 py-4 flex items-center justify-between rounded-t-2xl">
+                    <h2 className="text-white text-lg font-bold tracking-wide font-display">Add Drug</h2>
                     <button
                         onClick={onClose}
                         className="text-white/70 hover:text-white text-2xl leading-none"

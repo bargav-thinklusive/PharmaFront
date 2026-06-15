@@ -1,6 +1,8 @@
+/* AG Grid column header — clean brand style */
 .table-header {
-    font-weight: 600;
-    border: #3a3b3b solid 2px;
-    border-top:none;
-    border-bottom:none;
-  }
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #0F172A;
+}

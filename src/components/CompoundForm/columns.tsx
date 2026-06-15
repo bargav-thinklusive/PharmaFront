@@ -8,45 +8,48 @@ export const addExecutiveSummary: FieldConfig[] = [
         type: "textarea",
         required: false,
         placeholder: "Enter Executive Summary",
+        fullRowWidth: true,
     },
 ];
 // Step 2: Product Overview & Basic Details
 export const addProductOverview: FieldConfig[] = [
     {
-        key: "version",
-        label: "Version",
-        type: "text",
-        required: false,
-        placeholder: "Enter Version",
+        key: "drugInfoSectionHeader",
+        label: "Drug Information",
+        type: "header",
     },
     {
         key: "drugName",
         label: "Drug Name",
         type: "text",
-        required: false,
-        placeholder: "Enter Drug Name",
+        required: true,
+        placeholder: "Enter drug name",
     },
     {
         key: "apiName",
         label: "API Name",
         type: "text",
-        required: false,
-        placeholder: "Enter API Name",
+        required: true,
+        placeholder: "Enter API name",
     },
     {
         key: "mechanismOfAction",
         label: "Mechanism of Action",
-        // type: "dropdown",
         type: "text",
         required: false,
-        placeholder: "Select Mechanism of Action",
+        placeholder: "Select mechanism",
     },
     {
         key: "companyName",
         label: "Company Name",
         type: "text",
         required: false,
-        placeholder: "Enter Company Name",
+        placeholder: "Enter company name",
+    },
+    {
+        key: "regulatoryInfoSectionHeader",
+        label: "Regulatory Information",
+        type: "header",
     },
     {
         key: "approvedIndications",
@@ -68,12 +71,11 @@ export const addProductOverview: FieldConfig[] = [
         type: "textarea",
         required: false,
         placeholder: "Enter First Approved Region",
-    }, {
-        key: "dosageForms",
-        label: "Dosage Forms",
-        type: "text",
-        required: false,
-        placeholder: "Enter Dosage Forms",
+    },
+    {
+        key: "commercialInfoSectionHeader",
+        label: "Commercial Information",
+        type: "header",
     },
     {
         key: "globalAnnualRevenue",
@@ -81,6 +83,11 @@ export const addProductOverview: FieldConfig[] = [
         type: "text",
         required: false,
         placeholder: "Enter Global Annual Revenue",
+    },
+    {
+        key: "lossOfExclusivitySectionHeader",
+        label: "Loss Of Exclusivity",
+        type: "header",
     },
     {
         key: "lossOfExclusivity",
@@ -114,6 +121,30 @@ export const addProductOverview: FieldConfig[] = [
                 placeholder: "Enter Expired Date",
             },
         ],
+    },
+    {
+        key: "marketDataSectionHeader",
+        label: "Market Data",
+        type: "header",
+    },
+    {
+        key: "dosageForms",
+        label: "Dosage Forms",
+        type: "text",
+        required: false,
+        placeholder: "Enter Dosage Forms",
+    },
+    {
+        key: "additionalInfoSectionHeader",
+        label: "Additional Information",
+        type: "header",
+    },
+    {
+        key: "version",
+        label: "Version",
+        type: "text",
+        required: false,
+        placeholder: "Enter Version",
     },
 ];
 
