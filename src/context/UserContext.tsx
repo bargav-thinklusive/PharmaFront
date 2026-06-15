@@ -1,21 +1,15 @@
 
 import { createContext, useContext, useEffect, type ReactNode } from "react";
-//import { useNavigate } from "react-router";
 import UserService from "../services/UserService";
 import TokenService from "../services/shared/TokenService";
 import AuthService from "../services/AuthService";
-//import { LOGIN_URL } from "../urlConfig";
 import useGet from "../hooks/useGet";
 import DrugService from "../services/DrugService";
-import { useNavigate, useLocation } from "react-router";
-import { LOGIN_URL } from "../urlConfig";
 
 const tokenService = TokenService;
 const UserContext = createContext<any | undefined>(undefined)
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
-  const navigate = useNavigate();
-  const location = useLocation();
   const { fetchData: fetchUser, data: user, loading: userLoading } = useGet();
   const { fetchData: fetchDrugs, data: drugsData, loading: drugsLoading } = useGet();
 
@@ -36,11 +30,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return true;
     }
 
-    const publicPaths = ['/login', '/register', '/home1', '/', '/what-we-do', '/areas-served', '/about', '/contacts'];
-    if (!publicPaths.includes(location.pathname)) {
-      // Save where the user was so LoginPage can send them back after login
-      navigate(LOGIN_URL, { state: { from: location.pathname + location.search } });
-    }
+    // Not authenticated — PublicOnlyRoute and ProtectedRoute handle redirects
+    // at the router level, so no manual navigate() call needed here.
     return false;
   }
 
@@ -59,18 +50,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     init();
   }, [])
 
-  // const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
-  // if(!isAuthPage && (userLoading || !user)){
-  //   return <div>Loading...</div>
-  // }
-
   // Derive roles: prefer live user data, fallback to localStorage on refresh
   const roles: string[] =
     user?.data?.roles ??
     AuthService.getUserRoles();
 
   return (
-    <UserContext.Provider value={{ user, userLoading, checkTokenAndGetUser, drugsData: drugsData?.data || [], drugsLoading, refetchDrugs: getDrugs, roles }}>
+    <UserContext.Provider value={{ user, userLoading, checkTokenAndGetUser, drugsData: Array.isArray(drugsData) ? drugsData : (drugsData?.data || []), drugsLoading, refetchDrugs: getDrugs, roles }}>
       {children}
     </UserContext.Provider>
   )
@@ -85,4 +71,3 @@ export const useUser = () => {
   }
   return context;
 };
-

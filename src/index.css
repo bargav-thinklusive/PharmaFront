@@ -1,9 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap');
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #0E8A67;
+  --color-primary-hover: #0A7557;
+  --color-primary-active: #086348;
+  --color-primary-accent: #1AA36F;
+  --color-primary-light: #F3FBF8;
+  
+  --color-navy: #0F172A;
+  --color-slate: #1E293B;
+  
+  --color-text-main: #0F172A;
+  --color-text-section: #1E293B;
+  --color-text-body: #475569;
+  --color-text-secondary: #64748B;
+  --color-text-disabled: #94A3B8;
+
+  --color-page: #F8FAFC;
+  --color-content: #FFFFFF;
+  --color-alt: #F1F5F9;
+
+  --color-border-main: #E2E8F0;
+  --color-border-hover: #CFEFDF;
+
+  --font-sans: 'Inter', sans-serif;
+  --font-display: 'Poppins', sans-serif;
+}
 
 :root {
-  /* font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; */
-  font-family: 'Robot',sans-serif;
+  font-family: var(--font-sans);
   line-height: 1.5;
   font-weight: 400;
   font-synthesis: none;
@@ -11,10 +37,12 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
- margin: 0;
+  margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
+  background-color: var(--color-page);
+  color: var(--color-text-body);
 }
 
 html, body {
@@ -22,5 +50,61 @@ html, body {
   width: 100%;
   margin: 0;
   padding: 0;
-  /* font-family: 'Roboto',sans-serif; */
+  font-family: var(--font-sans);
 }
+
+/* Draft badge pulse animation */
+@keyframes draftPulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.35); }
+  50%       { box-shadow: 0 0 0 7px rgba(245, 158, 11, 0.1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-15px) scale(1.05); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.85; }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 8s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Hide scrollbars but keep functionality */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}

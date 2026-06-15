@@ -1,31 +1,47 @@
-.ag-theme-quartz .ag-cell-value {
-  font-weight: normal !important;
-}
-
-/* Clean table styling to match Market360UI/Hiring image */
+/* ── AG Grid brand theme ─────────────────────────────────────────── */
 .ag-theme-quartz {
-  --ag-header-background-color: #ffffff;
-  --ag-header-foreground-color: #333333;
-  --ag-border-color: #e2e8f0;
-  --ag-row-border-color: #f1f5f9;
+  --ag-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ag-font-size: 13.5px;
+
+  /* Colors */
   --ag-background-color: #ffffff;
   --ag-odd-row-background-color: #ffffff;
   --ag-even-row-background-color: #ffffff;
-  --ag-cell-horizontal-border: none;
-  --ag-header-cell-horizontal-padding: 16px;
+  --ag-header-background-color: #F8FAFC;
+  --ag-header-foreground-color: #1E293B;
+  --ag-border-color: #E2E8F0;
+  --ag-row-border-color: #F1F5F9;
+  --ag-selected-row-background-color: #F3FBF8;
+  --ag-range-selection-border-color: #0E8A67;
+  --ag-input-focus-border-color: #0E8A67;
+
+  /* Sizing */
+  --ag-header-height: 56px;
+  --ag-row-height: 48px;
   --ag-cell-horizontal-padding: 16px;
-  --ag-header-height: 48px;
-  --ag-row-height: 44px;
-  --ag-font-size: 14px;
-  --ag-font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --ag-header-column-separator-display: block;
-  --ag-header-column-separator-color: #cbd5e1;
-  --ag-header-column-separator-height: 50%;
+  --ag-header-cell-horizontal-padding: 16px;
+
+  /* Borders */
+  --ag-cell-horizontal-border: none;
+  --ag-header-column-separator-display: none;
+
+  /* Hover */
+  --ag-row-hover-color: #F3FBF8;
 }
 
-/* Custom header cell styling for the vertical bar effect */
+/* Clean header style */
+.ag-theme-quartz .ag-header {
+  border-bottom: 1px solid #E2E8F0 !important;
+  background-color: #F8FAFC !important;
+}
+
+.ag-theme-quartz .ag-header-row {
+  background-color: #F8FAFC !important;
+}
+
+/* Light column separators in header */
 .ag-theme-quartz .ag-header-cell {
-  border-right: 1px solid #e2e8f0 !important;
+  border-right: 1px solid #E2E8F0 !important;
 }
 
 .ag-theme-quartz .ag-header-cell:last-child {
@@ -37,8 +53,80 @@
 }
 
 .ag-theme-quartz .ag-header-cell-text {
-  font-weight: 700 !important;
-  color: #1e293b;
+  font-weight: 600 !important;
+  font-size: 13.5px !important;
+  color: #1E293B !important;
+  letter-spacing: 0.01em;
+}
+
+/* Sort icons — brand green */
+.ag-theme-quartz .ag-sort-indicator-icon .ag-icon {
+  color: #0E8A67 !important;
+}
+
+/* Filter icon active */
+.ag-theme-quartz .ag-header-icon.ag-header-cell-filter-button .ag-icon {
+  color: #0E8A67 !important;
+}
+
+/* Rows */
+.ag-theme-quartz .ag-row {
+  border-bottom: 1px solid #F1F5F9 !important;
+  transition: background-color 0.15s ease;
+}
+.ag-theme-quartz .ag-row:hover {
+  background-color: #F3FBF8 !important;
+}
+.ag-theme-quartz .ag-row-selected {
+  background-color: #F3FBF8 !important;
+  border-left: 3px solid #0E8A67 !important;
+}
+
+/* Cells */
+.ag-theme-quartz .ag-cell-value {
+  font-weight: 400 !important;
+  color: #334155;
+}
+.ag-theme-quartz .ag-cell {
+  display: flex;
+  align-items: center;
+  border-right: none !important;
+  color: #334155 !important;
+  font-size: 13.5px !important;
+}
+
+/* Pinned right column styles */
+.ag-theme-quartz .ag-pinned-right-header {
+  border-left: 1px solid #E2E8F0 !important;
+  background-color: #F8FAFC !important;
+}
+
+.ag-theme-quartz .ag-pinned-right-cols-container {
+  border-left: 1px solid #E2E8F0 !important;
+  background-color: #ffffff !important;
+}
+
+/* Custom AG Grid Checkbox styling */
+.ag-theme-quartz .ag-checkbox-input-wrapper {
+  background-color: transparent !important;
+  border: 1px solid #CBD5E1 !important;
+  border-radius: 4px !important;
+  width: 16px !important;
+  height: 16px !important;
+  margin-right: 0 !important;
+}
+
+.ag-theme-quartz .ag-checkbox-input-wrapper.ag-checked {
+  background-color: #0E8A67 !important;
+  border-color: #0E8A67 !important;
+}
+
+.ag-theme-quartz .ag-checkbox-input-wrapper .ag-icon-checkbox-checked {
+  color: #ffffff !important;
+}
+
+.ag-theme-quartz .ag-checkbox-input-wrapper .ag-icon-checkbox-unchecked {
+  display: none !important;
 }
 
 /* Hide AG Grid watermark */
@@ -46,9 +134,36 @@
   display: none !important;
 }
 
+/* ── Columns Drawer Checkbox styles ───────────────────────────────── */
+.custom-checkbox {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background-color: #ffffff;
+  transition: all 0.15s ease;
+}
 
-.modal-footer {
-  display: "flex";
-  flex-direction: "row";
-  justify-content: "space-between";
+.custom-checkbox:checked {
+  background-color: #0E8A67;
+  border-color: #0E8A67;
+}
+
+.custom-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  top: 1px;
+  left: 4px;
 }

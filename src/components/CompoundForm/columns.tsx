@@ -8,45 +8,48 @@ export const addExecutiveSummary: FieldConfig[] = [
         type: "textarea",
         required: false,
         placeholder: "Enter Executive Summary",
+        fullRowWidth: true,
     },
 ];
 // Step 2: Product Overview & Basic Details
 export const addProductOverview: FieldConfig[] = [
     {
-        key: "version",
-        label: "Version",
-        type: "text",
-        required: false,
-        placeholder: "Enter Version",
+        key: "drugInfoSectionHeader",
+        label: "Drug Information",
+        type: "header",
     },
     {
         key: "drugName",
         label: "Drug Name",
         type: "text",
-        required: false,
-        placeholder: "Enter Drug Name",
+        required: true,
+        placeholder: "Enter drug name",
     },
     {
         key: "apiName",
         label: "API Name",
         type: "text",
-        required: false,
-        placeholder: "Enter API Name",
+        required: true,
+        placeholder: "Enter API name",
     },
     {
         key: "mechanismOfAction",
         label: "Mechanism of Action",
-        // type: "dropdown",
         type: "text",
         required: false,
-        placeholder: "Select Mechanism of Action",
+        placeholder: "Select mechanism",
     },
     {
         key: "companyName",
         label: "Company Name",
         type: "text",
         required: false,
-        placeholder: "Enter Company Name",
+        placeholder: "Enter company name",
+    },
+    {
+        key: "regulatoryInfoSectionHeader",
+        label: "Regulatory Information",
+        type: "header",
     },
     {
         key: "approvedIndications",
@@ -68,18 +71,11 @@ export const addProductOverview: FieldConfig[] = [
         type: "textarea",
         required: false,
         placeholder: "Enter First Approved Region",
-    }, {
-        key: "dosageForms",
-        label: "Dosage Forms",
-        type: "text",
-        required: false,
-        placeholder: "Enter Dosage Forms",
-    }, {
-        key: "lossOfExclusivity",
-        label: "Loss Of Exclusivity",
-        type: "datepicker",
-        required: false,
-        placeholder: "Enter Loss Of Exclusivity",
+    },
+    {
+        key: "commercialInfoSectionHeader",
+        label: "Commercial Information",
+        type: "header",
     },
     {
         key: "globalAnnualRevenue",
@@ -87,6 +83,68 @@ export const addProductOverview: FieldConfig[] = [
         type: "text",
         required: false,
         placeholder: "Enter Global Annual Revenue",
+    },
+    {
+        key: "lossOfExclusivitySectionHeader",
+        label: "Loss Of Exclusivity",
+        type: "header",
+    },
+    {
+        key: "lossOfExclusivity",
+        label: "Loss Of Exclusivity",
+        type: "dynamic",
+        required: false,
+        singleFieldInRow: true,
+        dynamicComponent: (key: string, field: any, form: any) => (
+            <CustomForm key={key} field={field} form={form} />
+        ),
+        dynamicFields: [
+            {
+                key: "exclusivityCode",
+                label: "Designation Type / Exclusivity Code",
+                type: "text",
+                required: false,
+                placeholder: "Enter Designation Type / Exclusivity Code",
+            },
+            {
+                key: "regulatoryBody",
+                label: "Regulatory Body",
+                type: "text",
+                required: false,
+                placeholder: "Enter Regulatory Body",
+            },
+            {
+                key: "expiredDate",
+                label: "Expired Date",
+                type: "datepicker",
+                required: false,
+                placeholder: "Enter Expired Date",
+            },
+        ],
+    },
+    {
+        key: "marketDataSectionHeader",
+        label: "Market Data",
+        type: "header",
+    },
+    {
+        key: "dosageForms",
+        label: "Dosage Forms",
+        type: "text",
+        required: false,
+        placeholder: "Enter Dosage Forms",
+    },
+    {
+        key: "additionalInfoSectionHeader",
+        label: "Additional Information",
+        type: "header",
+    },
+    {
+        key: "version",
+        label: "Version",
+        type: "text",
+        required: false,
+        placeholder: "Enter Version",
     },
 ];
 
@@ -187,7 +245,8 @@ export const addPhysicalChemicalProperties: FieldConfig[] = [
         type: "text",
         required: false,
         placeholder: "Select logD",
-    }, {
+    },
+    {
         key: "individualSolvent",
         label: "Individual Solvent",
         type: "dynamic",
@@ -336,6 +395,13 @@ export const addRegulatoryInsights: FieldConfig[] = [
                 type: "datepicker",
                 required: false,
                 placeholder: "Enter Date Granted",
+            },
+            {
+                key: "expiryDate",
+                label: "Expiry Date",
+                type: "datepicker",
+                required: false,
+                placeholder: "Enter Expiry Date",
             },
         ],
     },
@@ -669,10 +735,60 @@ export const addDrugSubstance: FieldConfig[] = [
     {
         key: "stability",
         label: "Stability",
-        // type: "dropdown",
-        type: "text",
+        type: "dynamic",
         required: false,
-        placeholder: "Select Stability",
+        singleFieldInRow: true,
+        dynamicComponent: (key: string, field: any, form: any) => (
+            <CustomForm key={key} field={field} form={form} />
+        ),
+        dynamicFields: [
+            {
+                key: "strength",
+                label: "Strength",
+                type: "text",
+                required: false,
+                placeholder: "Enter Strength",
+            },
+            {
+                key: "formulation",
+                label: "Formulation",
+                // type: "dropdown",
+                type: "text",
+                required: false,
+                placeholder: "Select Formulation",
+            },
+            {
+                key: "packaging",
+                label: "Packaging",
+                // type: "dropdown",
+                type: "text",
+                required: false,
+                placeholder: "Select Packaging",
+            },
+            {
+                key: "storageCondition",
+                label: "Storage Condition",
+                // type: "dropdown",
+                type: "text",
+                required: false,
+                placeholder: "Select Storage Condition",
+            },
+            {
+                key: "strength",
+                label: "Strength",
+                type: "text",
+                required: false,
+                placeholder: "Enter Strength",
+            },
+            {
+                key: "lastTimePointDataAvailable",
+                label: "Last Time Point Data Available",
+                // type: "dropdown",
+                type: "text",
+                required: false,
+                placeholder: "Select Last Time Point Data Available",
+            },
+        ],
     },
     {
         key: "nitrosaminesAssessment",
@@ -744,6 +860,13 @@ export const addDrugProductInformation: FieldConfig[] = [
                 type: "text",
                 required: false,
                 placeholder: "Enter Size",
+            },
+            {
+                key: "shape",
+                label: "Shape",
+                type: "text",
+                required: false,
+                placeholder: "Enter Shape",
             },
             {
                 key: "color",
@@ -849,11 +972,11 @@ export const addDrugProductInformation: FieldConfig[] = [
         ),
         dynamicFields: [
             {
-                key: "currentExpirationDate",
-                label: "Current Expiration Date",
-                type: "datepicker",
+                key: "numberOfYears",
+                label: "Number of Years",
+                type: "text",
                 required: false,
-                placeholder: "Select Current Expiration Date",
+                placeholder: "Enter Number of Years",
             },
             {
                 key: "strength",
@@ -1053,10 +1176,60 @@ export const addDrugProductInformation: FieldConfig[] = [
     {
         key: "stabilityStudies",
         label: "Stability Studies",
-        // type: "dropdown",
-        type: "text",
+        type: "dynamic",
         required: false,
-        placeholder: "Select Stability Studies",
+        singleFieldInRow: true,
+        dynamicComponent: (key: string, field: any, form: any) => (
+            <CustomForm key={key} field={field} form={form} />
+        ),
+        dynamicFields: [
+            {
+                key: "strength",
+                label: "Strength",
+                type: "text",
+                required: false,
+                placeholder: "Enter Strength",
+            },
+            {
+                key: "formulation",
+                label: "Formulation",
+                // type: "dropdown",
+                type: "text",
+                required: false,
+                placeholder: "Select Formulation",
+            },
+            {
+                key: "packaging",
+                label: "Packaging",
+                // type: "dropdown",
+                type: "text",
+                required: false,
+                placeholder: "Select Packaging",
+            },
+            {
+                key: "storageCondition",
+                label: "Storage Condition",
+                // type: "dropdown",
+                type: "text",
+                required: false,
+                placeholder: "Select Storage Condition",
+            },
+            {
+                key: "strength",
+                label: "Strength",
+                type: "text",
+                required: false,
+                placeholder: "Enter Strength",
+            },
+            {
+                key: "lastTimePointDataAvailable",
+                label: "Last Time Point Data Available",
+                // type: "dropdown",
+                type: "text",
+                required: false,
+                placeholder: "Select Last Time Point Data Available",
+            },
+        ],
     },
     {
         key: "maximumDailyDose",

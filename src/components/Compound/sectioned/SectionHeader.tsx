@@ -1,8 +1,11 @@
 
+import type { ReactNode } from 'react';
+
 interface Section {
     id: number;
     key: string;
     title: string;
+    icon?: ReactNode;
 }
 
 interface SectionHeaderProps {
@@ -16,20 +19,22 @@ interface SectionHeaderProps {
  */
 const SectionHeader = ({ sections, currentStep, onNavigate }: SectionHeaderProps) => {
     return (
-        <header className="mb-6 border-b border-gray-200">
-            <nav className="flex flex-wrap gap-1 pb-0">
+        <header className="mb-6 border-b border-slate-200">
+            <nav className="flex flex-wrap gap-x-3 gap-y-1 pb-0">
                 {sections.map((section) => {
                     const isActive = section.id === currentStep;
                     return (
                         <button
                             key={section.id}
                             onClick={() => onNavigate(section.id)}
-                            className={`px-3 py-2 text-sm font-medium rounded-t-md transition-all duration-150 whitespace-nowrap border-b-2 ${isActive
-                                    ? 'border-blue-500 text-blue-600 bg-blue-50'
-                                    : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300 hover:bg-gray-50'
-                                }`}
+                            className={`flex items-center gap-2 px-2.5 py-2 text-xs font-bold tracking-wide transition-all duration-150 whitespace-nowrap border-b-2 cursor-pointer ${
+                                isActive
+                                    ? 'border-[#0e8a67] text-[#0e8a67]'
+                                    : 'border-transparent text-slate-500 hover:text-[#0e8a67]/70'
+                            }`}
                         >
-                            {section.title}
+                            {section.icon && <span className="flex-shrink-0">{section.icon}</span>}
+                            <span>{section.title}</span>
                         </button>
                     );
                 })}

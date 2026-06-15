@@ -1,11 +1,16 @@
-import { capitalizeFirstLetter } from "../../utils/utils";
+import { capitalizeFirstLetter, unixToDate } from "../../utils/utils";
 import BrandNameCellRenderer from "../DrugTable/BrandNameCellRenderer";
-import BookmarkCellRenderer from "../DrugTable/BookmarkCellRenderer";
-import ActionMenuCellRenderer from "../DrugTable/ActionMenuCellRenderer";
-import type { ColDef } from "ag-grid-community";
+import ActionCellRenderer from "./ActionCellRenderer";
 
-const valueFormatter = (params: { value?: any }): string => {
-  if (params.value == null) return "-"; // handle null/undefined
+const valueFormatter = (params: { value?: any; colDef?: any }): string => {
+  if (params.value == null) return "-";
+
+  const field = params.colDef?.field || "";
+
+  // Handle Date fields explicitly or by value detection
+  if (field.toLowerCase().includes('date') || (typeof params.value === 'number' && params.value > 100000000)) {
+    return unixToDate(params.value);
+  }
 
   if (typeof params.value === "string") {
     if (params.value.includes("@")) return params.value;
@@ -13,8 +18,6 @@ const valueFormatter = (params: { value?: any }): string => {
   }
 
   if (typeof params.value === "object") {
-    // Handle nested objects like chemicalName: {Cefepime: "", Enmetazobactam: ""}
-    // or molecularWeight: {Cefepime: "480.6 g/mol", Enmetazobactam: "314.32 g/mol"}
     const entries = Object.entries(params.value).filter(([_, val]) => val && typeof val === 'string' && val.trim());
     if (entries.length > 0) {
       return entries.map(([key, val]) => `${key}: ${val}`).join('; ');
@@ -22,19 +25,18 @@ const valueFormatter = (params: { value?: any }): string => {
     return "-";
   }
 
-  // For numbers or other types
   return String(params.value);
 };
 
-export const columns: ColDef[] = [
+export const columns: any = [
   {
-    headerName: "Bookmark",
-    field: "bookmark",
-    cellRenderer: BookmarkCellRenderer,
-    width: 110,
+    headerName: 'Actions',
+    field: 'actions',
+    cellRenderer: ActionCellRenderer,
+    width: 120,
+    pinned: 'left',
     sortable: false,
-    filter: true,
-    suppressColumnsToolPanel: true
+    filter: false
   },
   {
     headerName: "CID",
@@ -94,7 +96,6 @@ export const columns: ColDef[] = [
     width: 350,
     cellStyle: { lineHeight: '2' },
     valueFormatter: valueFormatter,
-
   },
   {
     headerName: "Molecular Formula",
@@ -131,16 +132,5 @@ export const columns: ColDef[] = [
     sortable: true,
     filter: true,
     valueFormatter: valueFormatter
-  },
-  {
-    headerName: 'Actions',
-    field: 'actions',
-    cellRenderer: ActionMenuCellRenderer,
-    width: 110,
-    pinned: 'right',
-    sortable: false,
-    filter: false,
-    resizable: false,
-    suppressColumnsToolPanel: true
   }
-]
+];
