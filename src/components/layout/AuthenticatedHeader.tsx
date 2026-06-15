@@ -4,6 +4,7 @@ import CompanyLogo from "../../assets/CMCINTELLOGO.png";
 import SearchBar from "../SearchBar";
 import AuthService from "../../services/AuthService";
 import { useUser } from "../../context/UserContext";
+import useRoles from "../../hooks/useRoles";
 
 interface AuthenticatedHeaderProps {
   isLoginPage?: boolean;
@@ -13,6 +14,7 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useUser();
+  const { isAdmin, canEditDrugs, canManageUsers, roles } = useRoles();
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -102,17 +104,47 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
             <Link to="/contacts" state={{ headerType: 'header' }} className="text-white no-underline">
               Contacts us
             </Link>
-            <Link to="/drugslist" className="text-white no-underline">
-              Drugs List
-            </Link>
+
+            {/* Drugs List — editor and admin only */}
+            {canEditDrugs && (
+              <Link to="/drugsList" className="text-white no-underline">
+                Drugs List
+              </Link>
+            )}
+
+            {/* Add Drug — editor and admin only */}
+            {canEditDrugs && (
+              <Link
+                to="/drug-form"
+                className="bg-white text-[#36b669] font-semibold px-3 py-1 rounded-md no-underline hover:bg-green-50 transition-colors duration-200"
+              >
+                + Add Drug
+              </Link>
+            )}
+
+            {/* Admin Panel — admin only */}
+            {canManageUsers && (
+              <Link
+                to="/admin"
+                className="text-yellow-300 no-underline font-semibold hover:text-yellow-100 transition-colors duration-200"
+              >
+                ⚙ Admin
+              </Link>
+            )}
 
             {/* User Dropdown */}
-            <div ref={dropdownRef} className="ml-8 relative">
+            <div ref={dropdownRef} className="ml-4 relative">
               <span
-                className="cursor-pointer font-bold"
+                className="cursor-pointer font-bold flex items-center gap-1"
                 onClick={() => setDropdownOpen((p) => !p)}
               >
                 👤 {user?.data?.name || "User"}
+                {/* Role badge */}
+                {roles.length > 0 && (
+                  <span className="text-[10px] bg-white/20 text-white px-1.5 py-0.5 rounded-full capitalize font-normal">
+                    {roles[0]}
+                  </span>
+                )}
               </span>
               {dropdownOpen && (
                 <div className="absolute top-full right-0 bg-white border border-gray-300 rounded-md shadow-md mt-2 min-w-[100px] overflow-hidden">

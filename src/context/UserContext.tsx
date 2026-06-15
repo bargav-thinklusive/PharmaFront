@@ -1,9 +1,9 @@
 
-
 import { createContext, useContext, useEffect, type ReactNode } from "react";
 //import { useNavigate } from "react-router";
 import UserService from "../services/UserService";
 import TokenService from "../services/shared/TokenService";
+import AuthService from "../services/AuthService";
 //import { LOGIN_URL } from "../urlConfig";
 import useGet from "../hooks/useGet";
 import DrugService from "../services/DrugService";
@@ -64,8 +64,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   //   return <div>Loading...</div>
   // }
 
+  // Derive roles: prefer live user data, fallback to localStorage on refresh
+  const roles: string[] =
+    user?.data?.roles ??
+    AuthService.getUserRoles();
+
   return (
-    <UserContext.Provider value={{ user, userLoading, checkTokenAndGetUser, drugsData: drugsData?.data || [], drugsLoading, refetchDrugs: getDrugs }}>
+    <UserContext.Provider value={{ user, userLoading, checkTokenAndGetUser, drugsData: drugsData?.data || [], drugsLoading, refetchDrugs: getDrugs, roles }}>
       {children}
     </UserContext.Provider>
   )

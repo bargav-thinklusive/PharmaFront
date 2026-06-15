@@ -12,7 +12,7 @@ class AuthService {
     const payload = { email, password };
     try {
       const resp: any = await axios.post(`${this.baseUrl}/login`, payload);
-      const { access_token, refresh_token } = resp.data;
+      const { access_token, refresh_token, data: userData } = resp.data;
 
       // Save both tokens as cookies
       TokenService.setToken(access_token);
@@ -20,11 +20,29 @@ class AuthService {
         TokenService.setRefreshToken(refresh_token);
       }
 
+      // Save user data (including roles) to localStorage for RBAC
+      if (userData) {
+        localStorage.setItem("user", JSON.stringify(userData));
+      }
+
       return resp.data;
     } catch (error) {
       console.error("Something went wrong while logging in", error);
       throw error;
     }
+  }
+
+  static getUserData(): { id: string; name: string; email: string; roles: string[] } | null {
+    try {
+      const raw = localStorage.getItem("user");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  static getUserRoles(): string[] {
+    return AuthService.getUserData()?.roles ?? [];
   }
 
   async forgotPassword(email: string, newPassword: string) {

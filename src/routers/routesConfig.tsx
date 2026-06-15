@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+import ProtectedRoute from '../components/shared/ProtectedRoute';
 
 // Lazy load all components
 const Login = lazy(() => import("../components/pages/auth/LoginPage"));
@@ -11,24 +12,75 @@ const About = lazy(() => import('../components/pages/About'));
 const Contacts = lazy(() => import('../components/pages/Contacts'));
 const DrugsTable = lazy(() => import('../components/DrugTable/DrugsTable'));
 const NotFound = lazy(() => import("../components/pages/NotFound"));
+const Unauthorized = lazy(() => import("../components/pages/Unauthorized"));
 const DrugForm = lazy(() => import("../components/CompoundForm/CompoundForm"));
 const SectionedViewDrug = lazy(() => import("../components/Compound/SectionedViewDrug"));
 const BookMark = lazy(() => import("../components/Bookmark/BookMark"));
 const DrugsList = lazy(() => import("../components/DrugsList/DrugsList"));
 
 export const routesConfig = [
+    // ── Public routes ──────────────────────────────────────────────────────────
     { path: "/", element: <LandingPage /> },
     { path: "/register", element: <Register /> },
     { path: "/login", element: <Login /> },
-    { path: "/home", element: <Home /> },
     { path: "/what-we-do", element: <WhatWeDo /> },
     { path: "/areas-served", element: <AreasServed /> },
     { path: "/about", element: <About /> },
     { path: "/contacts", element: <Contacts /> },
-    { path: ":ccategory/:searchtext", element: <DrugsTable /> },
-    { path: "/drug-form", element: <DrugForm /> },
-    { path: "/bookmark", element: <BookMark /> },
-    { path: "/drugsList", element: <DrugsList /> },
-    { path: ":ccategory/:searchtext/:cid/:version", element: <SectionedViewDrug /> },
-    { path: "*", element: <NotFound /> }
+    { path: "/unauthorized", element: <Unauthorized /> },
+
+    // ── Authenticated routes (any logged-in user) ──────────────────────────────
+    {
+        path: "/home",
+        element: (
+            <ProtectedRoute>
+                <Home />
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: "/bookmark",
+        element: (
+            <ProtectedRoute>
+                <BookMark />
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: ":ccategory/:searchtext",
+        element: (
+            <ProtectedRoute>
+                <DrugsTable />
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: ":ccategory/:searchtext/:cid/:version",
+        element: (
+            <ProtectedRoute>
+                <SectionedViewDrug />
+            </ProtectedRoute>
+        ),
+    },
+
+    // ── Editor + Admin routes ──────────────────────────────────────────────────
+    {
+        path: "/drug-form",
+        element: (
+            <ProtectedRoute allowedRoles={["editor", "admin"]}>
+                <DrugForm />
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: "/drugsList",
+        element: (
+            <ProtectedRoute allowedRoles={["editor", "admin"]}>
+                <DrugsList />
+            </ProtectedRoute>
+        ),
+    },
+
+    // ── Catch-all ──────────────────────────────────────────────────────────────
+    { path: "*", element: <NotFound /> },
 ];
