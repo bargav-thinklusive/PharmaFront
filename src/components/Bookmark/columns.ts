@@ -1,6 +1,8 @@
 import { capitalizeFirstLetter } from "../../utils/utils";
 import BrandNameCellRenderer from "../DrugTable/BrandNameCellRenderer";
-
+import BookmarkCellRenderer from "../DrugTable/BookmarkCellRenderer";
+import ActionMenuCellRenderer from "../DrugTable/ActionMenuCellRenderer";
+import type { ColDef } from "ag-grid-community";
 
 const valueFormatter = (params: { value?: any }): string => {
   if (params.value == null) return "-"; // handle null/undefined
@@ -24,9 +26,16 @@ const valueFormatter = (params: { value?: any }): string => {
   return String(params.value);
 };
 
-
-
-export const columns: any = [
+export const columns: ColDef[] = [
+  {
+    headerName: "Bookmark",
+    field: "bookmark",
+    cellRenderer: BookmarkCellRenderer,
+    width: 110,
+    sortable: false,
+    filter: true,
+    suppressColumnsToolPanel: true
+  },
   {
     headerName: "CID",
     headerClass: "table-header",
@@ -35,7 +44,6 @@ export const columns: any = [
     filter: true,
     width: 100,
     valueFormatter: valueFormatter,
-
   },
   {
     headerName: "Version",
@@ -123,5 +131,16 @@ export const columns: any = [
     sortable: true,
     filter: true,
     valueFormatter: valueFormatter
+  },
+  {
+    headerName: 'Actions',
+    field: 'actions',
+    cellRenderer: ActionMenuCellRenderer,
+    width: 110,
+    pinned: 'right',
+    sortable: false,
+    filter: false,
+    resizable: false,
+    suppressColumnsToolPanel: true
   }
 ]

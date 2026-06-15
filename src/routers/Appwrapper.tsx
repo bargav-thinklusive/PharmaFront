@@ -7,11 +7,13 @@ import { routesConfig } from './routesConfig';
 import Loader from '../components/Loader';
 import PublicHeader from '../components/layout/PublicHeader';
 
+import TokenService from '../services/shared/TokenService';
+
 const AppWrapper = () => {
   const location = useLocation();
   const isLoginPage = location.pathname === '/login' || location.pathname === '/register';
-  const isHome1Page = location.pathname === "/" || location.pathname === "/what-we-do" || location.pathname === "/areas-served";
-  const showPublicHeader = isHome1Page || location.state?.headerType === 'header1';
+  const isAuthenticated = !!TokenService.getToken();
+  const showPublicHeader = !isAuthenticated;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -27,7 +29,7 @@ const AppWrapper = () => {
         </Suspense>
       </BodyWrapper>
 
-      {!isLoginPage && <Footer />}
+      {!isLoginPage && location.pathname !== '/drug-form' && <Footer />}
     </div>
   );
 };

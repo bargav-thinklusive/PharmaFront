@@ -9,7 +9,18 @@ function App() {
     <Router>
       <UserProvider>
         <AppWrapper />
-        <ToastContainer position="top-center" autoClose={2000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" />
+        <ToastContainer
+          position="bottom-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          style={{ zIndex: 99999 }}
+        />
       </UserProvider>
     </Router>
   );
