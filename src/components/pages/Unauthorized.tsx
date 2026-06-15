@@ -22,7 +22,7 @@ const Unauthorized: React.FC = () => {
       {roles.length > 0 && (
         <p className="text-sm text-gray-400 mb-8">
           Your role:{" "}
-          {roles.map((r) => (
+          {roles.map((r: string) => (
             <span
               key={r}
               className="inline-block bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs font-semibold mx-1 capitalize"
