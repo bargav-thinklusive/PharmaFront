@@ -19,6 +19,7 @@ const SectionedViewDrug = lazy(() => import("../components/Compound/SectionedVie
 const BookMark = lazy(() => import("../components/Bookmark/BookMark"));
 const DrugsList = lazy(() => import("../components/DrugsList/DrugsList"));
 const DrugPreview = lazy(() => import("../components/DrugPreview/DrugPreview"));
+const UsersTable = lazy(() => import("../components/UserTable/UsersTable"));
 
 // Helper to wrap with ProtectedRoute (authenticated users only)
 const protect = (element: React.ReactNode) => (
@@ -58,6 +59,9 @@ export const routesConfig = [
     // ── Editor + Admin routes ──────────────────────────────────────────────────
     { path: "/drug-form",     element: protectWithRoles(["editor", "admin"], <DrugForm />) },
     { path: "/drugsList",     element: protectWithRoles(["editor", "admin"], <DrugsList />) },
+
+    // ── Admin-only routes ──────────────────────────────────────────────────────
+    { path: "/admin",         element: protectWithRoles(["admin"], <UsersTable />) },
 
     // ── Catch-all ──────────────────────────────────────────────────────────────
     { path: "*", element: <NotFound /> },

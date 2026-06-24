@@ -125,10 +125,9 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
   };
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `font-medium text-sm no-underline transition-colors pb-1 border-b-2 font-display ${
-      isActive
-        ? "border-primary text-primary"
-        : "text-[#334155] border-transparent hover:text-primary-hover"
+    `font-medium text-sm no-underline transition-colors pb-1 border-b-2 font-display ${isActive
+      ? "border-primary text-primary"
+      : "text-[#334155] border-transparent hover:text-primary-hover"
     }`;
 
   return (
@@ -167,26 +166,18 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
                 <NavLink to="/drugsList" className={navLinkClass} onClick={(e) => handleHeaderNavClick("/drugsList", e)}>Drugs List</NavLink>
               )}
 
-              {/* Add Drug — editor and admin only */}
-              {canEditDrugs && (
-                <NavLink
-                  to="/drug-form"
-                  className={() => "font-medium text-sm no-underline px-3 py-1.5 rounded-full bg-primary text-white hover:bg-primary-hover transition-colors font-display"}
-                  onClick={(e) => handleHeaderNavClick("/drug-form", e)}
-                >
-                  + Add Drug
-                </NavLink>
-              )}
-
               {/* Admin Panel — admin only */}
               {canManageUsers && (
                 <NavLink
                   to="/admin"
-                  className={() => "font-medium text-sm no-underline text-amber-600 hover:text-amber-800 font-semibold font-display"}
+                  className={navLinkClass}
+                  onClick={(e) => handleHeaderNavClick("/admin", e)}
                 >
-                  ⚙ Admin
+                  Users List
                 </NavLink>
               )}
+
+
 
               {/* Drafts Dropdown */}
               {drafts && drafts.length > 0 && (
@@ -307,10 +298,18 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
               {canEditDrugs && (
                 <Link to="/drugsList" className="text-[#334155] no-underline font-medium" onClick={(e) => handleHeaderNavClick("/drugsList", e, true)}>Drugs List</Link>
               )}
-              {/* Mobile: Add Drug — editor and admin only */}
-              {canEditDrugs && (
-                <Link to="/drug-form" className="text-primary no-underline font-semibold" onClick={(e) => handleHeaderNavClick("/drug-form", e, true)}>+ Add Drug</Link>
+
+              {/* Mobile: Admin Panel — admin only */}
+              {canManageUsers && (
+                <Link
+                  to="/admin"
+                  className="text-[#334155] no-underline font-medium"
+                  onClick={(e) => handleHeaderNavClick("/admin", e, true)}
+                >
+                  Users List
+                </Link>
               )}
+
 
               {/* Mobile Drafts list */}
               {drafts && drafts.length > 0 && (

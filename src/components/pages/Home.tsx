@@ -6,10 +6,12 @@ import { useUser } from '../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { getAllDrafts } from '../../hooks/useDraft';
 import { FiPlus, FiFileText, FiSearch, FiZap, FiArrowRight } from 'react-icons/fi';
+import useRoles from '../../hooks/useRoles';
 
 const Home: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const { user, drugsData } = useUser();
+  const { canEditDrugs } = useRoles();
   const navigate = useNavigate();
 
   const firstName = user?.data?.name?.split(' ')[0] || 'there';
@@ -18,7 +20,15 @@ const Home: React.FC = () => {
   const draftCount = drafts.length;
 
   const popularSearches = useMemo(() => {
-    // 1. Get unique drug names dynamically from the API drugs list
+    // 1. Load search history from local storage
+    let history: Record<string, number> = {};
+    try {
+      history = JSON.parse(localStorage.getItem('search_history') || '{}');
+    } catch (e) {
+      console.error(e);
+    }
+
+    // 2. Extract unique drug names dynamically from the API drugs list
     const apiDrugNames: string[] = [];
     const seenApiNames = new Set<string>();
     
@@ -34,25 +44,32 @@ const Home: React.FC = () => {
       }
     });
 
-    // 2. Load search history from local storage
-    let sortedUserSearches: string[] = [];
-    try {
-      const history = JSON.parse(localStorage.getItem('search_history') || '{}');
-      sortedUserSearches = Object.entries(history)
-        .sort((a: any, b: any) => b[1] - a[1])
-        .map(([term]) => term);
-    } catch (e) {
-      console.error(e);
-    }
+    // 3. Score each unique drug name based on user's search history
+    const getSearchScore = (drugName: string) => {
+      const lowerDrugName = drugName.toLowerCase();
+      let score = 0;
+      Object.entries(history).forEach(([term, count]) => {
+        const lowerTerm = term.toLowerCase();
+        if (
+          lowerDrugName === lowerTerm ||
+          lowerDrugName.includes(lowerTerm) ||
+          lowerTerm.includes(lowerDrugName)
+        ) {
+          score += count;
+        }
+      });
+      return score;
+    };
 
-    // 3. Merge sorted user search history with the API drug names (unique entries)
-    const merged = Array.from(new Set([...sortedUserSearches, ...apiDrugNames]));
-    
-    // 4. Return top 7 unique searches (or fallback to basic defaults if empty)
-    if (merged.length > 0) {
-      return merged.slice(0, 7);
-    }
-    return ['Aspirin', 'Amoxicillin', 'Metformin', 'Sitagliptin', 'Pomalidomide', 'Voriconazole'];
+    // 4. Sort the unique drug names based on their search score (descending)
+    const sortedDrugs = [...apiDrugNames].sort((a, b) => {
+      const scoreA = getSearchScore(a);
+      const scoreB = getSearchScore(b);
+      return scoreB - scoreA;
+    });
+
+    // 5. Return top 7 unique searches/drugs directly from drugsData
+    return sortedDrugs.slice(0, 7);
   }, [drugsData]);
 
   const quickActions = [
@@ -66,26 +83,28 @@ const Home: React.FC = () => {
       cta: 'Start Searching',
       badge: null,
     },
-    {
-      icon: <FiPlus className="w-6 h-6" />,
-      title: 'Add New Drug',
-      desc: 'Submit a new drug entry with full CMC and regulatory details.',
-      color: 'from-navy/10 to-navy/5',
-      iconBg: 'bg-navy',
-      action: () => setShowModal(true),
-      cta: 'Add Drug',
-      badge: null,
-    },
-    {
-      icon: <FiFileText className="w-6 h-6" />,
-      title: `My Drafts (${draftCount})`,
-      desc: 'Continue working on your saved drug drafts anytime.',
-      color: 'from-amber-50 to-amber-50/30',
-      iconBg: 'bg-amber-500',
-      action: () => navigate('/drug-form'),
-      cta: draftCount > 0 ? `View ${draftCount} Draft${draftCount > 1 ? 's' : ''}` : 'Start a Draft',
-      badge: draftCount > 0 ? draftCount : null,
-    },
+    ...(canEditDrugs ? [
+      {
+        icon: <FiPlus className="w-6 h-6" />,
+        title: 'Add New Drug',
+        desc: 'Submit a new drug entry with full CMC and regulatory details.',
+        color: 'from-navy/10 to-navy/5',
+        iconBg: 'bg-navy',
+        action: () => setShowModal(true),
+        cta: 'Add Drug',
+        badge: null,
+      },
+      {
+        icon: <FiFileText className="w-6 h-6" />,
+        title: `My Drafts (${draftCount})`,
+        desc: 'Continue working on your saved drug drafts anytime.',
+        color: 'from-amber-50 to-amber-50/30',
+        iconBg: 'bg-amber-500',
+        action: () => navigate('/drug-form'),
+        cta: draftCount > 0 ? `View ${draftCount} Draft${draftCount > 1 ? 's' : ''}` : 'Start a Draft',
+        badge: draftCount > 0 ? draftCount : null,
+      }
+    ] : [])
   ];
 
   return (

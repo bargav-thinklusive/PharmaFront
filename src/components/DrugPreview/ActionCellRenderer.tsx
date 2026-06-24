@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { FaEdit } from 'react-icons/fa';
 import { flattenDrug } from '../CompoundForm/helper';
 import useDraft from '../../hooks/useDraft';
+import useRoles from '../../hooks/useRoles';
 
 const ActionCellRenderer: React.FC<any> = (params) => {
     const navigate = useNavigate();
     const { saveDraft } = useDraft();
+    const { canEditDrugs } = useRoles();
 
     const handleEdit = () => {
         const data = params.data;
@@ -15,6 +17,10 @@ const ActionCellRenderer: React.FC<any> = (params) => {
         const newDraftId = saveDraft(flatData, 0);
         navigate(`/drug-form?draftId=${newDraftId}`);
     };
+
+    if (!canEditDrugs) {
+        return null;
+    }
 
     return (
         <button

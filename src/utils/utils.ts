@@ -163,3 +163,18 @@ const formalizeData = (data: any): any => {
   }
   return result;
 };
+
+/**
+ * Tracks the search/view of a drug by its exact name, incrementing its count in localStorage.
+ */
+export const trackDrugSearch = (drugName: string) => {
+  if (!drugName || !drugName.trim()) return;
+  try {
+    const history = JSON.parse(localStorage.getItem("search_history") || "{}");
+    const key = drugName.trim();
+    history[key] = (history[key] || 0) + 1;
+    localStorage.setItem("search_history", JSON.stringify(history));
+  } catch (e) {
+    console.error(e);
+  }
+};

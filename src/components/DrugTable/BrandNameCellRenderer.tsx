@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { trackDrugSearch } from "../../utils/utils";
 
 const BrandNameCellRenderer = (params: any) => {
   const navigate = useNavigate();
@@ -16,6 +17,11 @@ const BrandNameCellRenderer = (params: any) => {
         drugData?.ProductOverview?.brandName ||
         drugData?.drugName ||
         drugData?.cid;
+      
+      if (drugName) {
+        trackDrugSearch(String(drugName));
+      }
+
       const search = searchtext || drugName || drugData.cid;
       // Version lives inside ProductOverview
       const version = drugData?.ProductOverview?.version ?? 1;
