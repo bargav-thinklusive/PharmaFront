@@ -4,6 +4,7 @@ import { RxCross2 } from "react-icons/rx";
 import { useUser } from "../context/UserContext";
 import { debounce } from "lodash";
 import { FiChevronDown } from "react-icons/fi";
+import { trackDrugSearch } from "../utils/utils";
 
 interface SearchBarProps {
   compact?: boolean;
@@ -93,23 +94,46 @@ const SearchBar: React.FC<SearchBarProps> = ({ compact = false }) => {
     debouncedComputeSuggestions();
   }, [debouncedComputeSuggestions]);
 
-  const trackSearchHistory = (term: string) => {
-    if (!term || !term.trim()) return;
-    try {
-      const history = JSON.parse(localStorage.getItem("search_history") || "{}");
-      // Normalize key (trim and capitalize first letter or keep user casing)
-      const key = term.trim();
-      history[key] = (history[key] || 0) + 1;
-      localStorage.setItem("search_history", JSON.stringify(history));
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (search.trim()) {
-      trackSearchHistory(search.trim());
+      // Find matching drugs to count search of drug
+      const query = search.trim().toLowerCase();
+      const matchedDrugs = (drugsData || []).filter((item: any) => {
+        const drugName = (item?.ProductOverview?.drugName || item?.ProductOverview?.brandName || item?.drugName || "").toLowerCase();
+        const apiName = (item?.ProductOverview?.apiName || "").toLowerCase();
+        const iupacName = (item?.PhysicalChemicalProperties?.iupacName || "").toLowerCase();
+        const innName = (item?.PhysicalChemicalProperties?.innName || "").toLowerCase();
+        const cid = item?.cid ? String(item.cid).toLowerCase() : "";
+
+        if (category === "all") {
+          return drugName.includes(query) || apiName.includes(query) || iupacName.includes(query) || innName.includes(query) || cid.includes(query);
+        } else if (category === "drugName") {
+          return drugName.includes(query);
+        } else if (category === "apiName") {
+          return apiName.includes(query);
+        } else if (category === "iupacName") {
+          return iupacName.includes(query);
+        } else if (category === "innName") {
+          return innName.includes(query);
+        } else if (category === "cid") {
+          return cid.includes(query);
+        }
+        return false;
+      });
+
+      if (matchedDrugs.length > 0) {
+        matchedDrugs.forEach((item: any) => {
+          const exactName = item?.ProductOverview?.drugName || item?.ProductOverview?.brandName || item?.drugName;
+          if (exactName) {
+            trackDrugSearch(exactName);
+          }
+        });
+      } else {
+        // Fallback: track raw search query if no drugs matched
+        trackDrugSearch(search.trim());
+      }
+
       const searchPath = `/${category}/${encodeURIComponent(search.trim())}`;
       if (location.pathname === "/drug-form" && (window as any).triggerSaveDraftNavigationBlocker) {
         (window as any).triggerSaveDraftNavigationBlocker(searchPath);
@@ -140,9 +164,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ compact = false }) => {
   };
 
   const handleSelect = (item: any) => {
+    const exactName =
+      item?.ProductOverview?.drugName || item?.ProductOverview?.brandName || item?.drugName || item?.cid || "";
+    if (exactName) {
+      trackDrugSearch(exactName);
+    }
     const searchText =
       item.matchedText || item?.ProductOverview?.drugName || item?.ProductOverview?.brandName || item?.cid || "";
-    trackSearchHistory(searchText);
     const searchPath = `/${category}/${encodeURIComponent(searchText)}`;
     if (location.pathname === "/drug-form" && (window as any).triggerSaveDraftNavigationBlocker) {
       (window as any).triggerSaveDraftNavigationBlocker(searchPath);

@@ -8,12 +8,14 @@ import DrugService from '../../services/DrugService';
 import useDraft from '../../hooks/useDraft';
 import { flattenDrug } from '../CompoundForm/helper';
 import { toast } from 'react-toastify';
+import useRoles from '../../hooks/useRoles';
 
 const ActionMenuCellRenderer: React.FC<any> = (params) => {
   const navigate = useNavigate();
   const { refetchDrugs } = useUser();
   const { deleteData } = useDelete();
   const { saveDraft } = useDraft();
+  const { canEditDrugs, canDeleteDrugs } = useRoles();
   const drugService = new DrugService();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -85,6 +87,10 @@ const ActionMenuCellRenderer: React.FC<any> = (params) => {
     }
   };
 
+  if (!canEditDrugs && !canDeleteDrugs) {
+    return null;
+  }
+
   return (
     <div className="flex items-center justify-center w-full h-full relative">
       <button
@@ -103,20 +109,24 @@ const ActionMenuCellRenderer: React.FC<any> = (params) => {
             style={{ top: coords.top + 4, left: coords.left }}
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={handleEdit}
-              className="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2 text-[#2563EB] hover:text-[#1d4ed8] cursor-pointer"
-            >
-              <FiEdit className="w-3.5 h-3.5" />
-              <span>Edit</span>
-            </button>
-            <button
-              onClick={handleDelete}
-              className="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2 text-red-600 hover:text-red-700 border-t border-gray-100 cursor-pointer"
-            >
-              <FiTrash2 className="w-3.5 h-3.5" />
-              <span>Delete</span>
-            </button>
+            {canEditDrugs && (
+              <button
+                onClick={handleEdit}
+                className="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2 text-[#2563EB] hover:text-[#1d4ed8] cursor-pointer"
+              >
+                <FiEdit className="w-3.5 h-3.5" />
+                <span>Edit</span>
+              </button>
+            )}
+            {canDeleteDrugs && (
+              <button
+                onClick={handleDelete}
+                className="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2 text-red-600 hover:text-red-700 border-t border-gray-100 cursor-pointer"
+              >
+                <FiTrash2 className="w-3.5 h-3.5" />
+                <span>Delete</span>
+              </button>
+            )}
           </div>,
           document.body
         )}

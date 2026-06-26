@@ -5,8 +5,9 @@ import { flattenDrug } from '../CompoundForm/helper';
 import useDraft from '../../hooks/useDraft';
 import useDelete from '../../hooks/useDelete';
 import DrugService from '../../services/DrugService';
-import { unixToDate } from '../../utils/utils';
+import { unixToDate, trackDrugSearch } from '../../utils/utils';
 import { toast } from 'react-toastify';
+import useRoles from '../../hooks/useRoles';
 import {
     FiChevronLeft,
     FiChevronRight,
@@ -49,6 +50,7 @@ export default function SectionedViewDrug() {
     const { drugsData, refetchDrugs } = useUser();
     const { saveDraft } = useDraft();
     const { deleteData } = useDelete();
+    const { canEditDrugs, canDeleteDrugs } = useRoles();
 
     const [currentStep, setCurrentStep] = useState(1);
     const [editMenuOpen, setEditMenuOpen] = useState(false);
@@ -64,6 +66,15 @@ export default function SectionedViewDrug() {
         const found = drugsData.find((d: any) => d.cid === cid);
         return found || null;
     }, [cid, drugsData]);
+
+    useEffect(() => {
+        if (drugToDisplay) {
+            const name = drugToDisplay?.ProductOverview?.drugName || drugToDisplay?.ProductOverview?.brandName || drugToDisplay?.drugName;
+            if (name) {
+                trackDrugSearch(name);
+            }
+        }
+    }, [drugToDisplay]);
 
     // Format display data by excluding internal fields
     const displayData = useMemo(() => {
@@ -250,32 +261,34 @@ export default function SectionedViewDrug() {
                     {/* Right Pane: Split actions buttons */}
                     <div className="flex items-center gap-3 w-full md:w-auto justify-end relative">
                         {/* Edit Split Button */}
-                        <div ref={editBtnRef} className="inline-flex rounded-xl shadow-xs relative">
-                            <button
-                                onClick={handleEdit}
-                                className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors cursor-pointer border-0 rounded-l-xl"
-                            >
-                                <FiEdit className="w-3.5 h-3.5" />
-                                Edit Drug
-                            </button>
-                            <button
-                                onClick={() => setEditMenuOpen(!editMenuOpen)}
-                                className="px-2 py-2 bg-blue-600 hover:bg-blue-500 text-white border-l border-blue-500/50 flex items-center justify-center cursor-pointer border-0 rounded-r-xl"
-                            >
-                                <FiChevronRight className="w-3.5 h-3.5 rotate-90" />
-                            </button>
-                            {editMenuOpen && (
-                                <div className="absolute right-0 top-full mt-1.5 w-40 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50 text-xs font-semibold text-slate-700 text-left">
-                                    <button
-                                        onClick={handleEdit}
-                                        className="w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-2 cursor-pointer text-slate-700"
-                                    >
-                                        <FiEdit className="w-3.5 h-3.5" />
-                                        <span>Modify Record</span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                        {canEditDrugs && (
+                            <div ref={editBtnRef} className="inline-flex rounded-xl shadow-xs relative">
+                                <button
+                                    onClick={handleEdit}
+                                    className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors cursor-pointer border-0 rounded-l-xl"
+                                >
+                                    <FiEdit className="w-3.5 h-3.5" />
+                                    Edit Drug
+                                </button>
+                                <button
+                                    onClick={() => setEditMenuOpen(!editMenuOpen)}
+                                    className="px-2 py-2 bg-blue-600 hover:bg-blue-500 text-white border-l border-blue-500/50 flex items-center justify-center cursor-pointer border-0 rounded-r-xl"
+                                >
+                                    <FiChevronRight className="w-3.5 h-3.5 rotate-90" />
+                                </button>
+                                {editMenuOpen && (
+                                    <div className="absolute right-0 top-full mt-1.5 w-40 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50 text-xs font-semibold text-slate-700 text-left">
+                                        <button
+                                            onClick={handleEdit}
+                                            className="w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-2 cursor-pointer text-slate-700"
+                                        >
+                                            <FiEdit className="w-3.5 h-3.5" />
+                                            <span>Modify Record</span>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {/* Export Dropdown Button */}
                         <div className="relative">
@@ -309,26 +322,28 @@ export default function SectionedViewDrug() {
                         </div>
 
                         {/* Meatball Actions Menu */}
-                        <div className="relative">
-                            <button
-                                ref={moreBtnRef}
-                                onClick={() => setMoreMenuOpen(!moreMenuOpen)}
-                                className="w-8 h-8 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:bg-slate-50 transition-colors cursor-pointer"
-                            >
-                                <FiMoreHorizontal className="w-4 h-4" />
-                            </button>
-                            {moreMenuOpen && (
-                                <div className="absolute right-0 top-full mt-1.5 w-40 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50 text-xs font-semibold text-slate-700 text-left">
-                                    <button
-                                        onClick={handleDelete}
-                                        className="w-full text-left px-4 py-2.5 hover:bg-red-50 text-red-600 hover:text-red-700 flex items-center gap-2 cursor-pointer"
-                                    >
-                                        <FiTrash2 className="w-3.5 h-3.5" />
-                                        <span>Delete Record</span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                        {canDeleteDrugs && (
+                            <div className="relative">
+                                <button
+                                    ref={moreBtnRef}
+                                    onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+                                    className="w-8 h-8 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:bg-slate-50 transition-colors cursor-pointer"
+                                >
+                                    <FiMoreHorizontal className="w-4 h-4" />
+                                </button>
+                                {moreMenuOpen && (
+                                    <div className="absolute right-0 top-full mt-1.5 w-40 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50 text-xs font-semibold text-slate-700 text-left">
+                                        <button
+                                            onClick={handleDelete}
+                                            className="w-full text-left px-4 py-2.5 hover:bg-red-50 text-red-600 hover:text-red-700 flex items-center gap-2 cursor-pointer"
+                                        >
+                                            <FiTrash2 className="w-3.5 h-3.5" />
+                                            <span>Delete Record</span>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 

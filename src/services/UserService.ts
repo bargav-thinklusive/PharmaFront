@@ -13,7 +13,7 @@ class UserService {
   createUser = () => `${this.baseUrl}/user`;
 
   // Read operation
-  getUsers = () => `${this.baseUrl}/user`;
+  getUsers = () => `${this.baseUrl}/allusers`;
 
   getUsersByProject = (project = "profile.firstName,profile._id") =>
     `${this.baseUrl}/user?project=${project}`;
