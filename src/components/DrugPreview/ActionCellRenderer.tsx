@@ -10,11 +10,11 @@ const ActionCellRenderer: React.FC<any> = (params) => {
     const { saveDraft } = useDraft();
     const { canEditDrugs } = useRoles();
 
-    const handleEdit = () => {
+    const handleEdit = async () => {
         const data = params.data;
         if (!data?.cid) return;
         const flatData = flattenDrug(data);
-        const newDraftId = saveDraft(flatData, 0);
+        const newDraftId = await saveDraft(flatData, 0);
         navigate(`/drug-form?draftId=${newDraftId}`);
     };
 

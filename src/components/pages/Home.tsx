@@ -4,20 +4,18 @@ import AddDrugModal from '../CompoundForm/AddDrugModal';
 import MoleculeBackground from '../shared/MoleculeBackground';
 import { useUser } from '../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
-import { getAllDrafts } from '../../hooks/useDraft';
 import { FiPlus, FiFileText, FiSearch, FiZap, FiArrowRight } from 'react-icons/fi';
 import useRoles from '../../hooks/useRoles';
 
 const Home: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
-  const { user, drugsData } = useUser();
+  const { user, drugsData, drafts } = useUser();
   const { canEditDrugs } = useRoles();
   const navigate = useNavigate();
 
   const firstName = user?.data?.name?.split(' ')[0] || 'there';
 
-  const drafts = getAllDrafts();
-  const draftCount = drafts.length;
+  const draftCount = drafts?.length ?? 0;
 
   const popularSearches = useMemo(() => {
     // 1. Load search history from local storage
@@ -98,8 +96,8 @@ const Home: React.FC = () => {
         icon: <FiFileText className="w-6 h-6" />,
         title: `My Drafts (${draftCount})`,
         desc: 'Continue working on your saved drug drafts anytime.',
-        color: 'from-amber-50 to-amber-50/30',
-        iconBg: 'bg-amber-500',
+        color: 'from-primary-light to-primary-light/50',
+        iconBg: 'bg-primary',
         action: () => navigate('/drug-form'),
         cta: draftCount > 0 ? `View ${draftCount} Draft${draftCount > 1 ? 's' : ''}` : 'Start a Draft',
         badge: draftCount > 0 ? draftCount : null,
@@ -173,7 +171,7 @@ const Home: React.FC = () => {
             >
               {/* Badge */}
               {badge !== null && badge !== undefined && (
-                <span className="absolute top-4 right-4 min-w-[24px] h-6 px-1.5 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center shadow-sm">
+                <span className={`absolute top-4 right-4 min-w-[24px] h-6 px-1.5 rounded-full ${iconBg} text-white text-xs font-bold flex items-center justify-center shadow-sm`}>
                   {badge}
                 </span>
               )}

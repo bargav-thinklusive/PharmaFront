@@ -116,18 +116,18 @@ const Register: React.FC = () => {
 
         {/* ── Left branding panel ── */}
         <div
-          className="hidden lg:flex lg:w-[55%] relative flex-col justify-between p-12 overflow-hidden"
-          style={{ background: "linear-gradient(135deg, #0f1c3f 0%, #0d3a52 40%, #0a5c6e 70%, #0d7a72 100%)" }}
+          className="hidden lg:flex lg:w-[55%] relative flex-col justify-between p-12 overflow-hidden border-r border-border-main"
+          style={{ background: "linear-gradient(135deg, #A7F3D0 0%, #7DD3FC 100%)" }}
         >
           {/* Decorative blobs */}
-          <div className="absolute top-[-15%] right-[-10%] w-[60%] h-[60%] rounded-full bg-teal-400/20 blur-3xl pointer-events-none" />
-          <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-400/15 blur-3xl pointer-events-none" />
+          <div className="absolute top-[-15%] right-[-10%] w-[70%] h-[70%] rounded-full bg-primary-light/80 blur-3xl pointer-events-none" />
+          <div className="absolute bottom-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-primary-light/50 blur-3xl pointer-events-none" />
 
           {/* Dot-grid overlay */}
           <div
-            className="absolute inset-0 opacity-5 pointer-events-none"
+            className="absolute inset-0 opacity-[0.06] pointer-events-none"
             style={{
-              backgroundImage: `radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 0)`,
+              backgroundImage: `radial-gradient(circle at 1px 1px, #0E8A67 1.5px, transparent 0)`,
               backgroundSize: "32px 32px",
             }}
           />
@@ -138,7 +138,6 @@ const Register: React.FC = () => {
               src={CompanyLogo}
               alt="CMC Intel Logo"
               className="h-10 sm:h-12 w-auto"
-              style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.45)) drop-shadow(0 0 20px rgba(255,255,255,0.15))" }}
             />
           </div>
 
@@ -150,11 +149,11 @@ const Register: React.FC = () => {
             </div>
 
             <div>
-              <h1 className="text-4xl xl:text-5xl font-extrabold text-white font-display leading-tight mb-4">
+              <h1 className="text-4xl xl:text-5xl font-extrabold text-main font-display leading-tight mb-4">
                 Your Gateway to<br />
                 <span className="text-primary">Regulatory</span> Intelligence
               </h1>
-              <p className="text-white/60 text-base leading-relaxed max-w-sm">
+              <p className="text-body text-base leading-relaxed max-w-sm">
                 Get instant access to trusted pharmaceutical data, CMC intelligence, and global regulatory insights.
               </p>
             </div>
@@ -167,17 +166,17 @@ const Register: React.FC = () => {
                 "Accelerate global filing strategies",
               ].map((benefit) => (
                 <div key={benefit} className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <FiCheckCircle className="w-3 h-3 text-primary" />
                   </div>
-                  <span className="text-white/70 text-sm">{benefit}</span>
+                  <span className="text-body text-sm font-medium">{benefit}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Bottom tagline */}
-          <p className="relative z-10 text-white/30 text-xs">
+          <p className="relative z-10 text-secondary text-xs">
             © {new Date().getFullYear()} CMCIntel. All rights reserved.
           </p>
         </div>

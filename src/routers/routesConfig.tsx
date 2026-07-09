@@ -14,7 +14,7 @@ const Contacts = lazy(() => import('../components/pages/Contacts'));
 const DrugsTable = lazy(() => import('../components/DrugTable/DrugsTable'));
 const NotFound = lazy(() => import("../components/pages/NotFound"));
 const Unauthorized = lazy(() => import("../components/pages/Unauthorized"));
-const DrugForm = lazy(() => import("../components/CompoundForm/CompoundForm"));
+const CompoundForm = lazy(() => import("../components/CompoundForm/CompoundForm"));
 const SectionedViewDrug = lazy(() => import("../components/Compound/SectionedViewDrug"));
 const BookMark = lazy(() => import("../components/Bookmark/BookMark"));
 const DrugsList = lazy(() => import("../components/DrugsList/DrugsList"));
@@ -57,7 +57,7 @@ export const routesConfig = [
     { path: "/drug-preview",                            element: protect(<DrugPreview />) },
 
     // ── Editor + Admin routes ──────────────────────────────────────────────────
-    { path: "/drug-form",     element: protectWithRoles(["editor", "admin"], <DrugForm />) },
+    { path: "/drug-form",     element: protectWithRoles(["editor", "admin"], <CompoundForm />) },
     { path: "/drugsList",     element: protectWithRoles(["editor", "admin"], <DrugsList />) },
 
     // ── Admin-only routes ──────────────────────────────────────────────────────

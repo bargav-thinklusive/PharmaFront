@@ -1166,13 +1166,7 @@ export const addDrugProductInformation: FieldConfig[] = [
             },
         ],
     },
-    {
-        key: "formulationChallenges",
-        label: "Formulation Challenges",
-        type: "textarea",
-        required: false,
-        placeholder: "Enter Formulation Challenges",
-    },
+
     {
         key: "stabilityStudies",
         label: "Stability Studies",
@@ -1230,6 +1224,13 @@ export const addDrugProductInformation: FieldConfig[] = [
                 placeholder: "Select Last Time Point Data Available",
             },
         ],
+    },
+    {
+        key: "formulationChallenges",
+        label: "Formulation Challenges",
+        type: "textarea",
+        required: false,
+        placeholder: "Enter Formulation Challenges",
     },
     {
         key: "maximumDailyDose",

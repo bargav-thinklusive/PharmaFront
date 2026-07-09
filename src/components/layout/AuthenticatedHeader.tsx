@@ -5,7 +5,6 @@ import CompanyLogo from "../../assets/CMCINTELLOGO.png";
 import AuthService from "../../services/AuthService";
 import { useUser } from "../../context/UserContext";
 import useRoles from "../../hooks/useRoles";
-import { getAllDrafts } from "../../hooks/useDraft";
 import useDraft from "../../hooks/useDraft";
 import { FiChevronDown, FiLogOut, FiUser, FiFileText, FiTrash2, FiSave, FiX } from "react-icons/fi";
 import { toast } from "react-toastify";
@@ -17,7 +16,7 @@ interface AuthenticatedHeaderProps {
 const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, drafts } = useUser();
   const { canEditDrugs, canManageUsers, roles } = useRoles();
   const { clearDraft } = useDraft();
 
@@ -115,12 +114,9 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
     navigate("/login");
   };
 
-  // Re-read drafts on each tick so deletions are reflected immediately
-  const drafts = getAllDrafts();
-
-  const handleRemoveDraft = (e: React.MouseEvent, draftId: string) => {
+  const handleRemoveDraft = async (e: React.MouseEvent, draftId: string) => {
     e.stopPropagation(); // prevent navigating to the draft
-    clearDraft(draftId);
+    await clearDraft(draftId);
     setDraftTick((t) => t + 1); // force re-render
   };
 
@@ -185,7 +181,7 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
                   <button
                     onClick={() => setDraftsDropdownOpen((p) => !p)}
                     title="Click to view your drafts"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 font-semibold text-xs border border-amber-300 hover:bg-amber-200 transition-colors cursor-pointer whitespace-nowrap"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-light text-primary font-semibold text-xs border border-primary/20 hover:bg-primary hover:text-white transition-colors cursor-pointer whitespace-nowrap"
                     style={{ animation: "draftPulse 2s ease-in-out infinite" }}
                   >
                     <FiFileText className="w-3.5 h-3.5" />
@@ -200,7 +196,7 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
                         <span className="text-xs font-bold text-main uppercase tracking-wider">Saved Drafts</span>
                       </div>
 
-                      {drafts.sort((a, b) => b.lastModified - a.lastModified).map((draft) => (
+                      {drafts.sort((a: any, b: any) => b.lastModified - a.lastModified).map((draft: any) => (
                         <div
                           key={draft.id}
                           className="flex items-center gap-2 px-4 py-3 border-b border-border-main last:border-0 hover:bg-primary-light group transition-colors duration-150"
@@ -314,11 +310,11 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
               {/* Mobile Drafts list */}
               {drafts && drafts.length > 0 && (
                 <div className="border border-border-main rounded-xl overflow-hidden">
-                  <div className="px-3 py-2 bg-amber-50 border-b border-border-main flex items-center gap-2">
-                    <FiFileText className="w-3.5 h-3.5 text-amber-700" />
-                    <span className="text-xs font-bold text-amber-800 uppercase tracking-wider">My Drafts ({drafts.length})</span>
+                  <div className="px-3 py-2 bg-primary-light border-b border-border-main flex items-center gap-2">
+                    <FiFileText className="w-3.5 h-3.5 text-primary" />
+                    <span className="text-xs font-bold text-primary uppercase tracking-wider">My Drafts ({drafts.length})</span>
                   </div>
-                  {drafts.sort((a, b) => b.lastModified - a.lastModified).map((draft) => (
+                  {drafts.sort((a: any, b: any) => b.lastModified - a.lastModified).map((draft: any) => (
                     <div key={draft.id} className="flex items-center gap-2 px-3 py-2.5 border-b border-border-main last:border-0">
                       <div
                         className="flex-1 min-w-0 cursor-pointer"

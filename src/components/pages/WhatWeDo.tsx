@@ -91,7 +91,7 @@ const WhatWeDo: React.FC = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-page pt-20 pb-20 font-sans overflow-x-hidden">
+        <div className="min-h-screen bg-page pt-24 pb-24 font-sans overflow-x-hidden">
             {/* Background elements */}
             <div className="absolute top-0 left-0 -z-10 w-full h-full overflow-hidden opacity-40 pointer-events-none">
                 <div className="absolute -left-[10%] top-[10%] w-[40%] h-[40%] rounded-full bg-gradient-to-r from-primary-light to-transparent blur-3xl mix-blend-multiply"></div>
@@ -99,7 +99,7 @@ const WhatWeDo: React.FC = () => {
             </div>
             <MoleculeBackground />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-2">
+            <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 mt-2">
                 
                 {/* Hero Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center mb-16">
