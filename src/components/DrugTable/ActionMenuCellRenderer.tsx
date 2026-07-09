@@ -41,7 +41,7 @@ const ActionMenuCellRenderer: React.FC<any> = (params) => {
     return () => window.removeEventListener('click', handleClose);
   }, [isOpen]);
 
-  const handleEdit = (e: React.MouseEvent) => {
+  const handleEdit = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsOpen(false);
     
@@ -53,7 +53,7 @@ const ActionMenuCellRenderer: React.FC<any> = (params) => {
     
     try {
       const flatData = flattenDrug(data);
-      const newDraftId = saveDraft(flatData, 0);
+      const newDraftId = await saveDraft(flatData, 0);
       navigate(`/drug-form?draftId=${newDraftId}`);
     } catch (err) {
       console.error("Error creating draft:", err);

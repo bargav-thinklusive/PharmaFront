@@ -80,7 +80,7 @@ const AreasServed: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-page pt-20 pb-12 font-sans overflow-x-hidden relative">
+    <div className="min-h-screen bg-page pt-24 pb-16 font-sans overflow-x-hidden relative">
       {/* Background decoration elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-30 pointer-events-none -z-10">
           <div className="absolute top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-gradient-to-r from-primary-light to-transparent blur-3xl mix-blend-multiply"></div>
@@ -89,7 +89,7 @@ const AreasServed: React.FC = () => {
       <MoleculeBackground />
 
       {/* Hero Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-0 pb-12">
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 relative z-10 pt-0 pb-12">
         <div className="flex flex-col items-center text-center">
           <div className="inline-flex items-center gap-2 text-primary font-bold text-sm tracking-wider uppercase mb-6 bg-primary-light px-3 py-1 rounded-full border border-primary-light">
               <span className="w-2 h-2 rounded-full bg-primary"></span>

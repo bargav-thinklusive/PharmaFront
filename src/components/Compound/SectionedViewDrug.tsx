@@ -154,10 +154,10 @@ export default function SectionedViewDrug() {
         setCurrentStep(id);
     };
 
-    const handleEdit = () => {
+    const handleEdit = async () => {
         try {
             const flatData = flattenDrug(drugToDisplay);
-            const newDraftId = saveDraft(flatData, 0);
+            const newDraftId = await saveDraft(flatData, 0);
             navigate(`/drug-form?draftId=${newDraftId}`);
         } catch (err) {
             console.error("Error creating draft for edit:", err);

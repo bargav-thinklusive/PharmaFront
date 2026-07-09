@@ -4,7 +4,7 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import get from "lodash.get";
 import TagsInput from "./TagSelector";
-import { FiInfo, FiChevronDown, FiChevronRight, FiChevronUp, FiShield, FiDollarSign, FiClock, FiActivity, FiLayers, FiFileText } from "react-icons/fi";
+import { FiInfo, FiChevronDown, FiChevronRight, FiChevronUp, FiCheck } from "react-icons/fi";
 import ToggleSwitch from "./Switch";
 
 // ─── Shared input class strings ───────────────────────────────────────────────
@@ -147,16 +147,7 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
         }));
     };
 
-    const getIconForHeader = (label: string) => {
-        const l = label.toLowerCase();
-        if (l.includes("drug")) return <FiLayers className="w-4 h-4" />;
-        if (l.includes("regulatory")) return <FiShield className="w-4 h-4" />;
-        if (l.includes("commercial") || l.includes("revenue")) return <FiDollarSign className="w-4 h-4" />;
-        if (l.includes("exclusivity") || l.includes("patent")) return <FiClock className="w-4 h-4" />;
-        if (l.includes("market") || l.includes("generic")) return <FiActivity className="w-4 h-4" />;
-        if (l.includes("additional") || l.includes("source") || l.includes("glossary")) return <FiFileText className="w-4 h-4" />;
-        return <FiFileText className="w-4 h-4" />;
-    };
+
 
     const validateZipCode = (value: any) => {
         if (value && !/^\d+$/.test(value)) return "Zip Code must be numeric";
@@ -438,6 +429,33 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
         }
     };
 
+    const getSubsectionStatus = (groupFields: FieldConfig[]) => {
+        if (groupFields.length === 0) return "Not Started";
+        
+        let filledCount = 0;
+        let totalCount = 0;
+        
+        groupFields.forEach(f => {
+            if (f.type === "dynamic") {
+                const val = form.getFieldValue ? form.getFieldValue(f.key) : form[f.key];
+                totalCount++;
+                if (Array.isArray(val) && val.length > 0) {
+                    filledCount++;
+                }
+            } else {
+                const val = form.getFieldValue ? form.getFieldValue(f.key) : form[f.key];
+                totalCount++;
+                if (val !== undefined && val !== null && String(val).trim() !== "") {
+                    filledCount++;
+                }
+            }
+        });
+        
+        if (filledCount === 0) return "Not Started";
+        if (filledCount === totalCount) return "Complete";
+        return "In Progress";
+    };
+
     // Group fields by header
     const groups: { header: FieldConfig | null; fields: FieldConfig[] }[] = [];
     let currentGroup: { header: FieldConfig | null; fields: FieldConfig[] } = { header: null, fields: [] };
@@ -529,6 +547,41 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
                 const header = group.header;
                 if (!header) return null;
                 const isOpen = !!openHeaders[header.key];
+                const status = getSubsectionStatus(group.fields);
+                
+                let statusIcon = null;
+                let statusBadge = null;
+                
+                if (status === "Complete") {
+                    statusIcon = (
+                        <div className="w-6 h-6 rounded-full bg-[#0e8a67] flex items-center justify-center text-white flex-shrink-0">
+                            <FiCheck className="w-3.5 h-3.5 stroke-[3]" />
+                        </div>
+                    );
+                    statusBadge = (
+                        <span className="text-[10px] font-semibold text-[#0e8a67] bg-[#e6f4f0] border border-[#0e8a67]/20 px-2 py-0.5 rounded-md">
+                            Complete
+                        </span>
+                    );
+                } else if (status === "In Progress") {
+                    statusIcon = (
+                        <div className="w-6 h-6 rounded-full border-2 border-amber-500 bg-transparent flex-shrink-0" />
+                    );
+                    statusBadge = (
+                        <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 border border-amber-500/20 px-2 py-0.5 rounded-md">
+                            In Progress
+                        </span>
+                    );
+                } else {
+                    statusIcon = (
+                        <div className="w-6 h-6 rounded-full border-2 border-slate-300 bg-transparent flex-shrink-0" />
+                    );
+                    statusBadge = (
+                        <span className="text-[10px] font-semibold text-slate-500 bg-slate-50 border border-slate-300/30 px-2 py-0.5 rounded-md">
+                            Not Started
+                        </span>
+                    );
+                }
 
                 return (
                     <div
@@ -541,13 +594,11 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
                             className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-alt/10 transition-colors"
                         >
                             <div className="flex items-center gap-3.5">
-                                {/* Icon box */}
-                                <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-[#2563eb]">
-                                    {getIconForHeader(header.label)}
-                                </div>
+                                {statusIcon}
                                 <span className="text-sm font-bold text-main font-display">
                                     {header.label}
                                 </span>
+                                {statusBadge}
                             </div>
                             {isOpen ? (
                                 <FiChevronUp className="w-4 h-4 text-slate-500" />

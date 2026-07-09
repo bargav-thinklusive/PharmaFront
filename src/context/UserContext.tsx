@@ -5,6 +5,7 @@ import TokenService from "../services/shared/TokenService";
 import AuthService from "../services/AuthService";
 import useGet from "../hooks/useGet";
 import DrugService from "../services/DrugService";
+import DraftService from "../services/DraftService";
 
 const tokenService = TokenService;
 const UserContext = createContext<any | undefined>(undefined)
@@ -12,6 +13,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const { fetchData: fetchUser, data: user, loading: userLoading } = useGet();
   const { fetchData: fetchDrugs, data: drugsData, loading: drugsLoading } = useGet();
+  const { fetchData: fetchDrafts, data: draftsRawData, loading: draftsLoading } = useGet();
 
   const checkTokenAndGetUser = async (): Promise<boolean> => {
     let token = tokenService.getToken();
@@ -40,11 +42,22 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     await fetchDrugs(drugService.getDrugs())
   }
 
+  const getDrafts = async () => {
+    const rolesList = user?.data?.roles ?? AuthService.getUserRoles() ?? [];
+    const normalized = rolesList.map((r: string) => r.toLowerCase());
+    const isEditor = normalized.includes("editor") || normalized.includes("admin");
+    if (!isEditor) return;
+
+    const draftService = new DraftService();
+    await fetchDrafts(draftService.getDrafts());
+  }
+
   useEffect(() => {
     const init = async () => {
       const isAuthenticated = await checkTokenAndGetUser();
       if (isAuthenticated) {
         await getDrugs();
+        await getDrafts();
       }
     };
     init();
@@ -55,8 +68,21 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     user?.data?.roles ??
     AuthService.getUserRoles();
 
+  const drafts = Array.isArray(draftsRawData) ? draftsRawData : [];
+
   return (
-    <UserContext.Provider value={{ user, userLoading, checkTokenAndGetUser, drugsData: Array.isArray(drugsData) ? drugsData : (drugsData?.data || []), drugsLoading, refetchDrugs: getDrugs, roles }}>
+    <UserContext.Provider value={{
+      user,
+      userLoading,
+      checkTokenAndGetUser,
+      drugsData: Array.isArray(drugsData) ? drugsData : (drugsData?.data || []),
+      drugsLoading,
+      refetchDrugs: getDrugs,
+      drafts,
+      draftsLoading,
+      refetchDrafts: getDrafts,
+      roles
+    }}>
       {children}
     </UserContext.Provider>
   )

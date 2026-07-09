@@ -1,17 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PhoneInput from "react-phone-input-2";
-import { FiTrash2, FiEdit2, FiChevronUp, FiChevronRight, FiLayers, FiShield, FiDollarSign, FiClock, FiActivity, FiFileText } from "react-icons/fi";
+import { FiTrash2, FiEdit2, FiChevronUp, FiChevronRight, FiCheck } from "react-icons/fi";
 import type { FieldConfig } from "./index";
-
-const getIconForLabel = (label: string) => {
-    const l = label.toLowerCase();
-    if (l.includes("drug")) return <FiLayers className="w-4 h-4" />;
-    if (l.includes("regulatory") || l.includes("vendor") || l.includes("dmf")) return <FiShield className="w-4 h-4" />;
-    if (l.includes("commercial") || l.includes("revenue") || l.includes("price")) return <FiDollarSign className="w-4 h-4" />;
-    if (l.includes("exclusivity") || l.includes("patent")) return <FiClock className="w-4 h-4" />;
-    if (l.includes("market") || l.includes("generic") || l.includes("solvent")) return <FiActivity className="w-4 h-4" />;
-    return <FiFileText className="w-4 h-4" />;
-};
 
 interface CustomFormProps {
     field: FieldConfig;
@@ -125,7 +115,7 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                         value={value || ""}
                         onChange={(e) => onChange(e.target.value)}
                         placeholder={dynamicField.placeholder || "Enter"}
-                        rows={2}
+                        rows={4}
                         className={`${commonClasses} resize-y`}
                     />
                 );
@@ -208,6 +198,54 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
 
 
 
+    const isInputRowActive = Object.entries(inputRow).some(([k, v]) => {
+        if (k === "phone" && v === "+1") return false;
+        return v !== "" && v !== undefined && v !== null;
+    });
+    
+    const hasRows = tableRows.length > 0;
+    
+    let status = "Not Started";
+    if (hasRows) {
+        status = isInputRowActive ? "In Progress" : "Complete";
+    } else {
+        status = isInputRowActive ? "In Progress" : "Not Started";
+    }
+
+    let statusIcon = null;
+    let statusBadge = null;
+    
+    if (status === "Complete") {
+        statusIcon = (
+            <div className="w-6 h-6 rounded-full bg-[#0e8a67] flex items-center justify-center text-white flex-shrink-0">
+                <FiCheck className="w-3.5 h-3.5 stroke-[3]" />
+            </div>
+        );
+        statusBadge = (
+            <span className="text-[10px] font-semibold text-[#0e8a67] bg-[#e6f4f0] border border-[#0e8a67]/20 px-2 py-0.5 rounded-md">
+                Complete
+            </span>
+        );
+    } else if (status === "In Progress") {
+        statusIcon = (
+            <div className="w-6 h-6 rounded-full border-2 border-amber-500 bg-transparent flex-shrink-0" />
+        );
+        statusBadge = (
+            <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 border border-amber-500/20 px-2 py-0.5 rounded-md">
+                In Progress
+            </span>
+        );
+    } else {
+        statusIcon = (
+            <div className="w-6 h-6 rounded-full border-2 border-slate-300 bg-transparent flex-shrink-0" />
+        );
+        statusBadge = (
+            <span className="text-[10px] font-semibold text-slate-500 bg-slate-50 border border-slate-300/30 px-2 py-0.5 rounded-md">
+                Not Started
+            </span>
+        );
+    }
+
     return (
         <div className="space-y-4 mb-6 text-left">
             {/* Accordion Box */}
@@ -218,13 +256,11 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                     className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-alt/10 transition-colors"
                 >
                     <div className="flex items-center gap-3.5">
-                        {/* Icon box */}
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-[#2563eb]">
-                            {getIconForLabel(cleanLabel)}
-                        </div>
+                        {statusIcon}
                         <span className="text-sm font-bold text-main font-display">
                             {editingIndex !== null ? `Editing: ${cleanLabel}` : cleanLabel}
                         </span>
+                        {statusBadge}
                     </div>
                     {accordionOpen ? (
                         <FiChevronUp className="w-4 h-4 text-slate-500" />
@@ -236,22 +272,28 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                 {/* Collapsible Input Form */}
                 {accordionOpen && (
                     <div className="px-6 pb-6 pt-5 border-t border-border-main bg-white">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                            {dynamicFields?.map((dynamicField) => (
-                                <div key={dynamicField.key} className="flex flex-col">
-                                    <label className="block text-xs font-semibold text-main uppercase tracking-wide mb-1.5">
-                                        {dynamicField.label}
-                                        {dynamicField.required && (
-                                            <span className="text-red-500 ml-0.5">*</span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+                            {dynamicFields?.map((dynamicField) => {
+                                const isTextarea = dynamicField.type === "textarea";
+                                return (
+                                    <div
+                                        key={dynamicField.key}
+                                        className={`flex flex-col ${isTextarea ? "col-span-full" : ""}`}
+                                    >
+                                        <label className="block text-xs font-semibold text-main uppercase tracking-wide mb-1.5">
+                                            {dynamicField.label}
+                                            {dynamicField.required && (
+                                                <span className="text-red-500 ml-0.5">*</span>
+                                            )}
+                                        </label>
+                                        {renderInput(
+                                            dynamicField,
+                                            inputRow[dynamicField.key],
+                                            (v) => handleInputChange(dynamicField.key, v)
                                         )}
-                                    </label>
-                                    {renderInput(
-                                        dynamicField,
-                                        inputRow[dynamicField.key],
-                                        (v) => handleInputChange(dynamicField.key, v)
-                                    )}
-                                </div>
-                            ))}
+                                    </div>
+                                );
+                            })}
                         </div>
 
                         {/* Accordion Actions */}

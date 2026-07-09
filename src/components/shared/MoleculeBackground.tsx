@@ -4,6 +4,7 @@ interface Props {
   /** 'default' = molecule + hexagon grid
    *  'dna'     = molecule + DNA double helix (About page) */
   variant?: 'default' | 'dna';
+  maxWidthClass?: string;
 }
 
 /**
@@ -13,13 +14,14 @@ interface Props {
  * z-index 1 keeps it above the page background colour but behind all content (z-10+).
  * pointer-events-none ensures no interaction interference.
  */
-const MoleculeBackground: React.FC<Props> = ({ variant = 'default' }) => {
+const MoleculeBackground: React.FC<Props> = ({ variant = 'default', maxWidthClass = 'max-w-[1440px]' }) => {
   return (
     <div
       className="fixed inset-0 pointer-events-none select-none overflow-hidden"
       style={{ zIndex: 1 }}
       aria-hidden="true"
     >
+      <div className={`relative w-full h-full mx-auto ${maxWidthClass}`}>
       {/* ── Top-left large molecule ─────────────────────────────── */}
       <div className="absolute top-16 left-0" style={{ opacity: 0.15, width: 280, height: 280 }}>
         <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" width="280" height="280">
@@ -142,6 +144,7 @@ const MoleculeBackground: React.FC<Props> = ({ variant = 'default' }) => {
           <circle cx="94"  cy="120" r="4"   fill="#0E8A67"/>
           <circle cx="120" cy="108" r="4.5" fill="#0E8A67"/>
         </svg>
+      </div>
       </div>
     </div>
   );

@@ -1,6 +1,5 @@
 import { capitalizeFirstLetter } from "../../utils/utils";
 import BrandNameCellRenderer from "../DrugTable/BrandNameCellRenderer";
-import BookmarkCellRenderer from "../DrugTable/BookmarkCellRenderer";
 import ActionMenuCellRenderer from "../DrugTable/ActionMenuCellRenderer";
 import type { ColDef } from "ag-grid-community";
 
@@ -27,15 +26,6 @@ const valueFormatter = (params: { value?: any }): string => {
 };
 
 export const columns: ColDef[] = [
-  {
-    headerName: "Bookmark",
-    field: "bookmark",
-    cellRenderer: BookmarkCellRenderer,
-    width: 110,
-    sortable: false,
-    filter: true,
-    suppressColumnsToolPanel: true
-  },
   {
     headerName: "CID",
     headerClass: "table-header",

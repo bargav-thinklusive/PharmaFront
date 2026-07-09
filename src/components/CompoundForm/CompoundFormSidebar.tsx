@@ -1,0 +1,190 @@
+import React from "react";
+import { FiCheck, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+
+interface CompoundFormSidebarProps {
+    steps: any[];
+    currentStep: number;
+    setCurrentStep: (index: number) => void;
+    isSidebarExpanded: boolean;
+    setIsSidebarExpanded: (expanded: boolean) => void;
+    getStepStatus: (index: number) => string;
+    getSubsectionStats: (index: number) => any;
+    validateCurrentStep: () => boolean;
+    setErrors: (errors: any) => void;
+}
+
+export const CompoundFormSidebar: React.FC<CompoundFormSidebarProps> = ({
+    steps,
+    currentStep,
+    setCurrentStep,
+    isSidebarExpanded,
+    setIsSidebarExpanded,
+    getStepStatus,
+    getSubsectionStats,
+    validateCurrentStep,
+    setErrors,
+}) => {
+    const handleStepClick = (index: number) => {
+        if (index < currentStep || validateCurrentStep()) {
+            setCurrentStep(index);
+            setErrors({});
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    };
+
+    return (
+        <div className={isSidebarExpanded ? "lg:col-span-3 lg:sticky lg:top-24" : "lg:col-span-1 lg:sticky lg:top-24"}>
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col max-h-[calc(100vh-120px)] overflow-y-auto">
+                {/* Sidebar Header */}
+                <div className="pb-4 border-b border-slate-100 flex flex-col items-start">
+                    <span className="text-sm font-extrabold tracking-wide font-display text-slate-800">
+                        Edit Drug Entry
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium mt-0.5">
+                        Step by step
+                    </span>
+                </div>
+
+                {/* Steps List */}
+                {!isSidebarExpanded ? (
+                    /* Collapsed steps list */
+                    <nav className="hidden lg:flex flex-col items-center py-6 px-2 space-y-3">
+                        {steps.map((step, index) => {
+                            const isActive = index === currentStep;
+                            const status = getStepStatus(index);
+                            
+                            let circleClass = "bg-transparent border-slate-300 text-slate-500";
+                            if (isActive) {
+                                circleClass = "bg-transparent border-amber-500 text-amber-500 font-bold ring-2 ring-amber-500/20";
+                            } else if (status === "Completed") {
+                                circleClass = "bg-[#0e8a67] border-[#0e8a67] text-white";
+                            } else if (status === "In Progress") {
+                                circleClass = "bg-transparent border-amber-500 text-amber-500";
+                            }
+
+                            return (
+                                <button
+                                    key={index}
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleStepClick(index);
+                                    }}
+                                    className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all cursor-pointer ${
+                                        isActive
+                                            ? "bg-slate-50 text-slate-800 shadow-xs border border-slate-200"
+                                            : "text-slate-400 hover:text-slate-800 hover:bg-slate-50"
+                                    }`}
+                                    title={step.title}
+                                >
+                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border-2 transition-all flex-shrink-0 ${circleClass}`}>
+                                        {status === "Completed" && !isActive ? <FiCheck className="w-3.5 h-3.5" /> : index + 1}
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </nav>
+                ) : (
+                    /* Expanded steps list */
+                    <nav className="flex flex-col gap-1.5 mt-4">
+                        {steps.map((step, index) => {
+                            const isActive = index === currentStep;
+                            const status = getStepStatus(index);
+                            const stats = getSubsectionStats(index);
+                            
+                            let circleClass = "bg-transparent border-slate-300 text-slate-400 group-hover:border-slate-500 group-hover:text-slate-600";
+                            let statusBadge = null;
+                            let rowBg = "text-slate-600 hover:bg-slate-50 hover:text-slate-800";
+                            
+                            if (isActive) {
+                                circleClass = "bg-transparent border-amber-500 text-amber-500 font-bold ring-2 ring-amber-500/20";
+                                rowBg = "bg-slate-50 border-l-4 border-[#0e8a67] text-[#0e8a67] font-bold shadow-xs";
+                                
+                                let pct = 0;
+                                if (stats.hasSubsections) {
+                                    const total = stats.complete + stats.inProgress + stats.notStarted;
+                                    pct = total > 0 ? Math.round((stats.complete / total) * 100) : 0;
+                                }
+                                statusBadge = (
+                                    <span className="text-[9px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 whitespace-nowrap">
+                                        {pct}%
+                                    </span>
+                                );
+                            } else if (status === "Completed") {
+                                circleClass = "bg-[#0e8a67] border-[#0e8a67] text-white";
+                                rowBg = "text-slate-800 hover:bg-slate-50";
+                                statusBadge = (
+                                    <div className="w-4 h-4 rounded-full bg-[#0e8a67] flex items-center justify-center text-white flex-shrink-0 shadow-xs">
+                                        <FiCheck className="w-2.5 h-2.5 stroke-[3]" />
+                                    </div>
+                                );
+                            } else if (status === "In Progress") {
+                                circleClass = "bg-transparent border-amber-500 text-amber-500";
+                                rowBg = "text-slate-700 hover:bg-slate-50";
+                                
+                                let pct = 0;
+                                if (stats.hasSubsections) {
+                                    const total = stats.complete + stats.inProgress + stats.notStarted;
+                                    pct = total > 0 ? Math.round((stats.complete / total) * 100) : 0;
+                                    statusBadge = (
+                                        <span className="text-[9px] font-bold text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20 whitespace-nowrap">
+                                            {pct}%
+                                        </span>
+                                    );
+                                } else {
+                                    statusBadge = (
+                                        <span className="text-[9px] font-bold text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20 whitespace-nowrap">
+                                            In Progress
+                                        </span>
+                                    );
+                                }
+                            } else {
+                                statusBadge = (
+                                    <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 whitespace-nowrap">
+                                        Not Started
+                                    </span>
+                                );
+                            }
+                            
+                            return (
+                                <button
+                                    key={index}
+                                    type="button"
+                                    onClick={() => handleStepClick(index)}
+                                    className={`w-full flex items-start justify-between gap-2 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-left cursor-pointer group ${rowBg}`}
+                                >
+                                    <div className="flex items-start gap-3 min-w-0">
+                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border-2 transition-all flex-shrink-0 ${circleClass}`}>
+                                            {status === "Completed" && !isActive ? <FiCheck className="w-3.5 h-3.5" /> : index + 1}
+                                        </div>
+                                        <span className="leading-tight py-0.5 break-words">{step.title}</span>
+                                    </div>
+                                    <div className="flex-shrink-0 mt-0.5">
+                                        {statusBadge}
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </nav>
+                )}
+
+                {/* Collapse Button */}
+                <button
+                    type="button"
+                    onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
+                    className="mt-6 flex items-center justify-center gap-2 w-full py-2.5 border border-slate-200 text-slate-500 rounded-xl text-xs font-bold hover:bg-slate-50 hover:text-slate-800 cursor-pointer transition-colors shadow-xs"
+                    title={isSidebarExpanded ? "Collapse" : "Expand"}
+                >
+                    {isSidebarExpanded ? (
+                        <>
+                            <FiChevronLeft className="w-4 h-4" />
+                            Collapse
+                        </>
+                    ) : (
+                        <FiChevronRight className="w-5 h-5" />
+                    )}
+                </button>
+            </div>
+        </div>
+    );
+};
