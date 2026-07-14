@@ -99,12 +99,12 @@ const WhatWeDo: React.FC = () => {
             </div>
             <MoleculeBackground />
 
-            <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 mt-2">
+            <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 mt-2 relative z-10">
                 
                 {/* Hero Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center mb-16">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center mb-16">
                     {/* Left content */}
-                    <div className="lg:col-span-5">
+                    <div className="lg:col-span-2 flex flex-col items-start">
                         <div className="inline-flex items-center gap-2 text-primary font-bold text-sm tracking-wider uppercase mb-6 bg-primary-light px-3 py-1 rounded-full border border-primary-light">
                             <span className="w-2 h-2 rounded-full bg-primary"></span>
                             Our Services
@@ -126,22 +126,20 @@ const WhatWeDo: React.FC = () => {
                     </div>
 
                     {/* Right Carousel */}
-                    <div className="lg:col-span-7 relative">
-                        <div className="relative w-full h-[350px] sm:h-[450px] md:h-[550px] rounded-3xl overflow-hidden shadow-lg bg-white border border-border-main p-2 lg:p-4">
-                            <div className="w-full h-full relative rounded-2xl overflow-hidden">
-                                {images.map((img, index) => (
-                                    <div
-                                        key={index}
-                                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-                                    >
-                                        <img
-                                            src={img}
-                                            alt={`Service visualization ${index + 1}`}
-                                            className="w-full h-full object-contain"
-                                        />
-                                    </div>
-                                ))}
-                            </div>
+                    <div className="lg:col-span-3 relative">
+                        <div className="relative w-full rounded-2xl overflow-hidden shadow-xl border border-border-main bg-white p-2 lg:p-4" style={{ aspectRatio: '16/9', minHeight: '260px' }}>
+                            {images.map((img, index) => (
+                                <div
+                                    key={index}
+                                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+                                >
+                                    <img
+                                        src={img}
+                                        alt={`Service visualization ${index + 1}`}
+                                        className="w-full h-full object-contain"
+                                    />
+                                </div>
+                            ))}
                         </div>
 
                         {/* Carousel Controls */}
@@ -165,17 +163,19 @@ const WhatWeDo: React.FC = () => {
                 </div>
 
                 {/* Dynamic Features Strip */}
-                <div className="mb-16 transition-all duration-500 ease-in-out">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="mb-16 bg-primary-light rounded-3xl p-8 sm:p-12 lg:p-16 shadow-sm border border-border-main transition-all duration-500 ease-in-out">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 text-left font-sans">
                         {stripContent[currentSlide].map((item, idx) => (
-                            <div key={idx} className="bg-white rounded-2xl shadow-sm border border-border-main p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
-                                <div className="w-16 h-16 rounded-full bg-primary-light flex items-center justify-center text-primary mb-4">
+                            <div key={idx} className="flex flex-col sm:flex-row gap-5 items-start">
+                                <div className="bg-primary text-white p-3 rounded-full flex-shrink-0 shadow-md flex items-center justify-center">
                                     {item.icon}
                                 </div>
-                                <h3 className="font-bold text-section font-display mb-2">{item.title}</h3>
-                                <p className="text-body text-sm leading-relaxed">
-                                    {item.description}
-                                </p>
+                                <div>
+                                    <h3 className="font-bold text-section font-display mb-2 text-lg">{item.title}</h3>
+                                    <p className="text-body text-sm leading-relaxed">
+                                        {item.description}
+                                    </p>
+                                </div>
                             </div>
                         ))}
                     </div>

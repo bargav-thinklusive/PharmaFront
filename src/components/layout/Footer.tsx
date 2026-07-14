@@ -16,7 +16,7 @@ const contactItems = [
 ];
 
 const Footer: React.FC = () => (
-  <footer className="bg-navy text-white w-full mt-auto font-sans">
+  <footer className="bg-[#E2F3EE] border-t border-border-main text-[#334155] w-full mt-auto font-sans">
 
     {/* ── Main footer body ── */}
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-10">
@@ -25,9 +25,9 @@ const Footer: React.FC = () => (
         {/* ── Brand column ── */}
         <div className="flex flex-col gap-5">
           <div className="flex items-center gap-2">
-            <img src={CompanyLogo} alt="CMCIntel Logo" className="h-10 sm:h-12 w-auto brightness-0 invert" />
+            <img src={CompanyLogo} alt="CMCIntel Logo" className="h-10 sm:h-12 w-auto" />
           </div>
-          <p className="text-white/60 text-sm leading-relaxed max-w-xs">
+          <p className="text-body text-sm leading-relaxed max-w-xs">
             Equipping pharmaceutical teams with the clarity and confidence to
             successfully build portfolios and execute filings globally.
           </p>
@@ -38,7 +38,7 @@ const Footer: React.FC = () => (
               target="_blank"
               rel="noopener noreferrer"
               aria-label="LinkedIn"
-              className="w-9 h-9 rounded-full bg-white/10 hover:bg-primary flex items-center justify-center transition-colors duration-200"
+              className="w-9 h-9 rounded-full bg-white text-primary border border-border-main/50 hover:bg-primary hover:text-white flex items-center justify-center transition-colors duration-200 shadow-xs"
             >
               <FiLinkedin className="w-4 h-4" />
             </a>
@@ -47,7 +47,7 @@ const Footer: React.FC = () => (
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Twitter / X"
-              className="w-9 h-9 rounded-full bg-white/10 hover:bg-primary flex items-center justify-center transition-colors duration-200"
+              className="w-9 h-9 rounded-full bg-white text-primary border border-border-main/50 hover:bg-primary hover:text-white flex items-center justify-center transition-colors duration-200 shadow-xs"
             >
               <FiTwitter className="w-4 h-4" />
             </a>
@@ -56,7 +56,7 @@ const Footer: React.FC = () => (
 
         {/* ── Quick links ── */}
         <div className="flex flex-col gap-4">
-          <h4 className="text-xs font-bold uppercase tracking-widest text-white/40 font-display">
+          <h4 className="text-xs font-bold uppercase tracking-widest text-[#334155]/50 font-display">
             Quick Links
           </h4>
           <ul className="flex flex-col gap-3">
@@ -64,7 +64,7 @@ const Footer: React.FC = () => (
               <li key={to}>
                 <Link
                   to={to}
-                  className="group flex items-center gap-1.5 text-sm text-white/70 hover:text-primary transition-colors duration-200 no-underline"
+                  className="group flex items-center gap-1.5 text-sm text-body hover:text-primary transition-colors duration-200 no-underline"
                 >
                   <FiArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-200" />
                   {label}
@@ -76,7 +76,7 @@ const Footer: React.FC = () => (
 
         {/* ── Contact ── */}
         <div className="flex flex-col gap-4">
-          <h4 className="text-xs font-bold uppercase tracking-widest text-white/40 font-display">
+          <h4 className="text-xs font-bold uppercase tracking-widest text-[#334155]/50 font-display">
             Contact
           </h4>
           <ul className="flex flex-col gap-4">
@@ -86,11 +86,11 @@ const Footer: React.FC = () => (
                   {icon}
                 </span>
                 {href ? (
-                  <a href={href} className="text-sm text-white/70 hover:text-primary transition-colors duration-200 no-underline leading-relaxed">
+                  <a href={href} className="text-sm text-body hover:text-primary transition-colors duration-200 no-underline leading-relaxed">
                     {text}
                   </a>
                 ) : (
-                  <span className="text-sm text-white/70 leading-relaxed">{text}</span>
+                  <span className="text-sm text-body leading-relaxed">{text}</span>
                 )}
               </li>
             ))}
@@ -101,15 +101,15 @@ const Footer: React.FC = () => (
     </div>
 
     {/* ── Bottom bar ── */}
-    <div className="border-t border-white/10">
+    <div className="border-t border-border-main">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p className="text-xs text-white/40 m-0">
+        <p className="text-xs text-body/60 m-0">
           &copy; {new Date().getFullYear()} CMCINTEL. All rights reserved.
         </p>
         <div className="flex items-center gap-5">
-          <span className="text-xs text-white/40 hover:text-white/70 cursor-pointer transition-colors">Privacy Policy</span>
-          <span className="text-white/20">·</span>
-          <span className="text-xs text-white/40 hover:text-white/70 cursor-pointer transition-colors">Terms of Use</span>
+          <span className="text-xs text-body/60 hover:text-primary cursor-pointer transition-colors">Privacy Policy</span>
+          <span className="text-body/30">·</span>
+          <span className="text-xs text-body/60 hover:text-primary cursor-pointer transition-colors">Terms of Use</span>
         </div>
       </div>
     </div>

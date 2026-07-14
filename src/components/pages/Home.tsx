@@ -114,7 +114,7 @@ const Home: React.FC = () => {
       </div>
       <MoleculeBackground variant="dna" />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-14 pb-20">
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 relative z-10 pt-14 pb-20">
 
         {/* ── Hero ── */}
         <div className="flex flex-col items-center text-center mb-12">
