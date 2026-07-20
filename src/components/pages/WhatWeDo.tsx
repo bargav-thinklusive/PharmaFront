@@ -99,12 +99,12 @@ const WhatWeDo: React.FC = () => {
             </div>
             <MoleculeBackground />
 
-            <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 mt-2 relative z-10">
+            <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-12 mt-2 relative z-10">
                 
                 {/* Hero Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center mb-16">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-16">
                     {/* Left content */}
-                    <div className="lg:col-span-2 flex flex-col items-start">
+                    <div className="lg:col-span-5 flex flex-col items-start">
                         <div className="inline-flex items-center gap-2 text-primary font-bold text-sm tracking-wider uppercase mb-6 bg-primary-light px-3 py-1 rounded-full border border-primary-light">
                             <span className="w-2 h-2 rounded-full bg-primary"></span>
                             Our Services
@@ -126,8 +126,8 @@ const WhatWeDo: React.FC = () => {
                     </div>
 
                     {/* Right Carousel */}
-                    <div className="lg:col-span-3 relative">
-                        <div className="relative w-full rounded-2xl overflow-hidden shadow-xl border border-border-main bg-white p-2 lg:p-4" style={{ aspectRatio: '16/9', minHeight: '260px' }}>
+                    <div className="lg:col-span-7 relative">
+                        <div className="relative w-full rounded-2xl overflow-hidden shadow-xl border border-border-main bg-white p-2 lg:p-4" style={{ aspectRatio: '16/9', minHeight: '350px' }}>
                             {images.map((img, index) => (
                                 <div
                                     key={index}
@@ -163,10 +163,10 @@ const WhatWeDo: React.FC = () => {
                 </div>
 
                 {/* Dynamic Features Strip */}
-                <div className="mb-16 bg-primary-light rounded-3xl p-8 sm:p-12 lg:p-16 shadow-sm border border-border-main transition-all duration-500 ease-in-out">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 text-left font-sans">
+                <div className="mb-16 bg-primary-light rounded-3xl p-6 sm:p-10 lg:p-12 shadow-sm border border-border-main transition-all duration-500 ease-in-out">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left font-sans">
                         {stripContent[currentSlide].map((item, idx) => (
-                            <div key={idx} className="flex flex-col sm:flex-row gap-5 items-start">
+                            <div key={idx} className="flex flex-col items-start gap-4">
                                 <div className="bg-primary text-white p-3 rounded-full flex-shrink-0 shadow-md flex items-center justify-center">
                                     {item.icon}
                                 </div>

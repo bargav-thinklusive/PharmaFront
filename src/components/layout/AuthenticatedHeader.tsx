@@ -16,7 +16,7 @@ interface AuthenticatedHeaderProps {
 const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, drafts } = useUser();
+  const { user, drafts, selectedList, setSelectedList } = useUser();
   const { canEditDrugs, canManageUsers, roles } = useRoles();
   const { clearDraft } = useDraft();
 
@@ -25,6 +25,9 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
 
   const [draftsDropdownOpen, setDraftsDropdownOpen] = useState(false);
   const draftsDropdownRef = useRef<HTMLDivElement>(null);
+
+  const [drugsListDropdownOpen, setDrugsListDropdownOpen] = useState(false);
+  const drugsListDropdownRef = useRef<HTMLDivElement>(null);
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -97,6 +100,9 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
       if (draftsDropdownRef.current && !draftsDropdownRef.current.contains(event.target as Node)) {
         setDraftsDropdownOpen(false);
       }
+      if (drugsListDropdownRef.current && !drugsListDropdownRef.current.contains(event.target as Node)) {
+        setDrugsListDropdownOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -111,7 +117,7 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
     AuthService.logout();
     setDropdownOpen(false);
     setMobileMenuOpen(false);
-    navigate("/login");
+    window.location.href = "/login";
   };
 
   const handleRemoveDraft = async (e: React.MouseEvent, draftId: string) => {
@@ -129,7 +135,7 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
   return (
     <header className="bg-white/95 backdrop-blur-md border-b border-border-main text-[#334155] px-4 sm:px-6 py-3 fixed top-0 left-0 w-full z-[1000] shadow-sm">
       {/* Top bar */}
-      <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
+      <div className="flex items-center justify-between w-full max-w-[1440px] mx-auto">
 
         {/* Logo */}
         <div className="flex-shrink-0">
@@ -157,9 +163,50 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
               <NavLink to="/about" state={{ headerType: "header" }} className={navLinkClass} onClick={(e) => handleHeaderNavClick("/about", e)}>About us</NavLink>
               <NavLink to="/contacts" state={{ headerType: "header" }} className={navLinkClass} onClick={(e) => handleHeaderNavClick("/contacts", e)}>Contact us</NavLink>
 
-              {/* Drugs List — editor and admin only */}
+              {/* Drugs List Dropdown — editor and admin only */}
               {canEditDrugs && (
-                <NavLink to="/drugsList" className={navLinkClass} onClick={(e) => handleHeaderNavClick("/drugsList", e)}>Drugs List</NavLink>
+                <div ref={drugsListDropdownRef} className="relative">
+                  <button
+                    onClick={() => setDrugsListDropdownOpen((p) => !p)}
+                    className={`flex items-center gap-1.5 font-medium text-sm no-underline transition-colors pb-1 border-b-2 font-display cursor-pointer ${
+                      location.pathname === '/drugsList'
+                        ? 'border-primary text-primary'
+                        : 'text-[#334155] border-transparent hover:text-primary-hover'
+                    }`}
+                  >
+                    Drugs List
+                    <FiChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${drugsListDropdownOpen ? "rotate-180" : ""}`} />
+                  </button>
+
+                  {drugsListDropdownOpen && (
+                    <div className="absolute top-full left-0 bg-white border border-border-main rounded-xl shadow-xl mt-2 min-w-[200px] overflow-hidden z-50 py-1.5 text-[13.5px] font-semibold text-gray-700">
+                      <button
+                        onClick={() => {
+                          setSelectedList('fda');
+                          setDrugsListDropdownOpen(false);
+                          navigate('/drugsList');
+                        }}
+                        className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 transition-colors flex items-center justify-between cursor-pointer ${
+                          selectedList === 'fda' ? 'text-primary bg-primary-light/30' : ''
+                        }`}
+                      >
+                        FDA Approved List
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedList('cmcintel');
+                          setDrugsListDropdownOpen(false);
+                          navigate('/drugsList');
+                        }}
+                        className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 transition-colors border-t border-gray-100 flex items-center justify-between cursor-pointer ${
+                          selectedList === 'cmcintel' ? 'text-primary bg-primary-light/30' : ''
+                        }`}
+                      >
+                        cmcintel Library List
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
 
               {/* Admin Panel — admin only */}
@@ -278,7 +325,7 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <nav className="md:hidden flex flex-col gap-3 mt-3 pb-4 border-t border-border-main pt-4 max-w-7xl mx-auto">
+        <nav className="md:hidden flex flex-col gap-3 mt-3 pb-4 border-t border-border-main pt-4 max-w-[1440px] mx-auto">
           {showMinimalHeader ? (
             <>
               <Link to="/about" state={{ fromLogin: true, headerType: "header" }} className="text-[#334155] no-underline font-medium" onClick={(e) => handleHeaderNavClick("/about", e, true)}>About us</Link>
@@ -292,7 +339,31 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
 
               {/* Mobile: Drugs List — editor and admin only */}
               {canEditDrugs && (
-                <Link to="/drugsList" className="text-[#334155] no-underline font-medium" onClick={(e) => handleHeaderNavClick("/drugsList", e, true)}>Drugs List</Link>
+                <div className="flex flex-col gap-2">
+                  <span className="text-[#334155] font-semibold text-xs uppercase tracking-wider">Drugs List</span>
+                  <div className="flex flex-col gap-1.5 pl-3 border-l border-border-main">
+                    <Link
+                      to="/drugsList"
+                      className={`text-sm no-underline font-medium ${selectedList === 'fda' ? 'text-primary font-bold' : 'text-body hover:text-primary-hover'}`}
+                      onClick={(e) => {
+                        setSelectedList('fda');
+                        handleHeaderNavClick("/drugsList", e, true);
+                      }}
+                    >
+                      FDA Approved List
+                    </Link>
+                    <Link
+                      to="/drugsList"
+                      className={`text-sm no-underline font-medium ${selectedList === 'cmcintel' ? 'text-primary font-bold' : 'text-body hover:text-primary-hover'}`}
+                      onClick={(e) => {
+                        setSelectedList('cmcintel');
+                        handleHeaderNavClick("/drugsList", e, true);
+                      }}
+                    >
+                      cmcintel Library List
+                    </Link>
+                  </div>
+                </div>
               )}
 
               {/* Mobile: Admin Panel — admin only */}

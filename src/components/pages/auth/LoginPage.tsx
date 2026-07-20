@@ -13,7 +13,7 @@ const authService = new AuthService();
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { refetchDrugs, checkTokenAndGetUser } = useUser();
+  const { checkTokenAndGetUser } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -63,7 +63,6 @@ const Login: React.FC = () => {
             render: "Login successful!",
             onClose: async () => {
               await checkTokenAndGetUser();
-              await refetchDrugs();
               const from = (location.state as any)?.from || "/home";
               navigate(from, { replace: true });
             },

@@ -1,25 +1,31 @@
-import { capitalizeFirstLetter } from "../../utils/utils";
+import type { ColDef } from "ag-grid-community";
+import { valueFormatter } from "../../utils/utils";
+import BookmarkCellRenderer from "../DrugTable/BookmarkCellRenderer";
+import BrandNameCellRenderer from "../DrugTable/BrandNameCellRenderer";
+import ActionMenuCellRenderer from "../DrugTable/ActionMenuCellRenderer";
 
-const valueFormatter = (params: { value?: any }): string => {
-  if (params.value == null) return "-"; // handle null/undefined
-
-  if (typeof params.value === "string") {
-    if (params.value.includes("@")) return params.value;
-    return capitalizeFirstLetter(params.value);
+export const cmcintelColumns: ColDef[] = [
+  { headerName: 'Bookmark', field: 'bookmark', cellRenderer: BookmarkCellRenderer, width: 110, sortable: false, filter: true, suppressColumnsToolPanel: true },
+  { headerName: 'CID', field: 'cid', width: 100, sortable: true, filter: true, valueFormatter },
+  { headerName: 'Drug Name', field: 'ProductOverview.drugName', cellRenderer: BrandNameCellRenderer, width: 160, sortable: true, filter: true },
+  { headerName: 'API Name', field: 'ProductOverview.apiName', width: 150, sortable: true, filter: true, valueFormatter },
+  { headerName: 'IUPAC Name', field: 'PhysicalChemicalProperties.iupacName', width: 160, sortable: true, filter: true, valueFormatter },
+  { headerName: 'Molecular Formula', field: 'PhysicalChemicalProperties.molecularFormula', minWidth: 220, flex: 1, sortable: true, filter: true, valueFormatter },
+  { headerName: 'Molecular Weight', field: 'PhysicalChemicalProperties.molecularWeight', minWidth: 200, flex: 1, sortable: true, filter: true, valueFormatter },
+  // Actions column pinned to the right
+  {
+    headerName: 'Actions',
+    field: 'actions',
+    cellRenderer: ActionMenuCellRenderer,
+    width: 110,
+    pinned: 'right',
+    sortable: false,
+    filter: false,
+    resizable: false,
+    suppressHeaderMenuButton: true,
+    suppressColumnsToolPanel: true
   }
-
-  if (typeof params.value === "object") {
-    const entries = Object.entries(params.value).filter(([_, val]) => val && typeof val === 'string' && val.trim());
-    if (entries.length > 0) {
-      return entries.map(([key, val]) => `${key}: ${val}`).join('; ');
-    }
-    return "-";
-  }
-
-  return String(params.value);
-};
-
-
+];
 
 export const columns: any = [
 
@@ -88,4 +94,4 @@ export const columns: any = [
     filter: true,
     valueFormatter: valueFormatter
   },
-]
+];

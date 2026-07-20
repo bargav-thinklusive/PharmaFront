@@ -69,6 +69,32 @@ export const capitalizeFirstLetter = (
   }
 };
 
+export const valueFormatter = (params: { value?: any; colDef?: any }): string => {
+  if (params.value == null) return "-";
+
+  const field = params.colDef?.field || "";
+
+  if (field.toLowerCase().includes('date') || field === 'createdAt' || field === 'updatedAt' || (typeof params.value === 'number' && params.value > 100000000)) {
+    return unixToDate(params.value);
+  }
+
+  if (typeof params.value === "string") {
+    if (params.value.includes("@")) return params.value;
+    return capitalizeFirstLetter(params.value);
+  }
+
+  if (typeof params.value === "object") {
+    const entries = Object.entries(params.value).filter(([_, val]) => val && typeof val === 'string' && val.trim());
+    if (entries.length > 0) {
+      return entries.map(([key, val]) => `${key}: ${val}`).join('; ');
+    }
+    return "-";
+  }
+
+  return String(params.value);
+};
+
+
 // Utility functions for nested object access
 export const getNestedValue = (obj: any, path: string): string => {
   return path.split('.').reduce((current, key) => current?.[key] ?? '', obj);
