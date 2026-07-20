@@ -37,10 +37,7 @@ export const CompoundFormSidebar: React.FC<CompoundFormSidebarProps> = ({
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col max-h-[calc(100vh-120px)] overflow-y-auto">
                 {/* Sidebar Header */}
                 <div className="pb-4 border-b border-slate-100 flex flex-col items-start">
-                    <span className="text-sm font-extrabold tracking-wide font-display text-slate-800">
-                        Edit Drug Entry
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-medium mt-0.5">
+                    <span className="text-sm font-bold font-display text-slate-800 mt-0.5">
                         Step by step
                     </span>
                 </div>

@@ -49,9 +49,7 @@ const CompoundForm = () => {
     const [showSaveDraftConfirm, setShowSaveDraftConfirm] = useState(false);
     const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
 
-    // Auto-save state
-    const [lastSavedTime, setLastSavedTime] = useState<Date | null>(null);
-    const [secondsSinceSave, setSecondsSinceSave] = useState<number>(0);
+
 
     const formDataRef = useRef<any>(formData);
 
@@ -67,7 +65,6 @@ const CompoundForm = () => {
                 formDataRef.current = draft.formData;
                 setFormData(draft.formData);
                 setCurrentStep(draft.currentStep ?? 0);
-                setLastSavedTime(new Date());
             } else {
                 setSearchParams({}, { replace: true });
             }
@@ -112,8 +109,6 @@ const CompoundForm = () => {
         try {
             const newDraftId = await saveDraft(formDataRef.current, currentStep, draftId);
             if (!draftId) setSearchParams({ draftId: newDraftId }, { replace: true });
-            setLastSavedTime(new Date());
-            setSecondsSinceSave(0);
             toast.success("✅ Draft saved successfully!", { autoClose: 3000 });
         } catch (err) {
             console.error("Save draft error:", err);
@@ -122,37 +117,6 @@ const CompoundForm = () => {
             setIsSavingDraft(false);
         }
     };
-
-    // Auto-save logic
-    useEffect(() => {
-        if (draftId) {
-            setLastSavedTime(new Date());
-            setSecondsSinceSave(0);
-        }
-    }, [draftId]);
-
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setSecondsSinceSave((prev) => prev + 1);
-        }, 1000);
-        return () => clearInterval(timer);
-    }, []);
-
-    useEffect(() => {
-        const autoSaveInterval = setInterval(async () => {
-            if (Object.keys(formDataRef.current).length > 0) {
-                try {
-                    const newDraftId = await saveDraft(formDataRef.current, currentStep, draftId);
-                    if (!draftId) setSearchParams({ draftId: newDraftId }, { replace: true });
-                    setLastSavedTime(new Date());
-                    setSecondsSinceSave(0);
-                } catch (e) {
-                    console.error("Background auto-save failed:", e);
-                }
-            }
-        }, 30000); // auto-save every 30s
-        return () => clearInterval(autoSaveInterval);
-    }, [currentStep, draftId, saveDraft]);
 
     const handleSaveDraftClick = () => {
         setShowSaveDraftConfirm(true);
@@ -166,6 +130,8 @@ const CompoundForm = () => {
             delete (window as any).executeSaveDraftGlobal;
         };
     }, [currentStep, draftId]);
+
+
 
     const handleNext = () => {
         if (validateCurrentStep()) {
@@ -347,8 +313,6 @@ const CompoundForm = () => {
                     overallProgressPct={overallProgressPct}
                     completedStepsCount={completedStepsCount}
                     totalStepsCount={steps.length}
-                    lastSavedTime={lastSavedTime}
-                    secondsSinceSave={secondsSinceSave}
                 />
 
                 {/* ── Main Two-Column Layout ── */}
@@ -437,7 +401,6 @@ const CompoundForm = () => {
                                 </div>
                             </div>
                         )}
-
                         {/* Bottom Actions Bar */}
                         <CompoundFormActions
                             currentStep={currentStep}

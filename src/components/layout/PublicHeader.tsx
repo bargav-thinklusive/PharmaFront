@@ -23,7 +23,7 @@ const PublicHeader = () => {
 
     return (
         <header className="bg-white/95 backdrop-blur-md border-b border-border-main text-[#334155] px-4 sm:px-6 py-3 fixed top-0 left-0 w-full z-[1000] shadow-sm">
-            <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
+            <div className="flex items-center justify-between w-full max-w-[1440px] mx-auto">
                 {/* Logo */}
                 <div className="flex-shrink-0 flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
                     <img

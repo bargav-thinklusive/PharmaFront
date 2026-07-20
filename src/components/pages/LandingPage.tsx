@@ -33,10 +33,10 @@ const LandingPage: React.FC = () => {
                 <div className="absolute -top-[20%] -right-[10%] w-[70%] h-[70%] rounded-full bg-gradient-to-b from-primary-light to-transparent blur-3xl mix-blend-multiply"></div>
                 <div className="absolute top-[40%] -left-[10%] w-[50%] h-[50%] rounded-full bg-gradient-to-t from-primary-light to-transparent blur-3xl mix-blend-multiply"></div>
             </div>
-            <MoleculeBackground maxWidthClass="max-w-[1600px]" />
+            <MoleculeBackground />
 
             {/* Hero Section */}
-            <div className="max-w-[1500px] mx-auto px-6 sm:px-10 lg:px-12 relative z-10">
+            <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-12 relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
                     {/* Left Column (Text) — 2/5 width */}
                     <div className="lg:col-span-2">
@@ -139,7 +139,7 @@ const LandingPage: React.FC = () => {
             </div>
 
             {/* Middle Section ("Ready to Explore...") */}
-            <div className="max-w-[1500px] mx-auto px-6 sm:px-10 lg:px-12 py-16 relative z-10">
+            <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-12 py-16 relative z-10">
                 <div className="bg-primary-light rounded-3xl p-8 sm:p-12 lg:p-16 text-center shadow-sm border border-border-main">
                     <h2 className="text-2xl sm:text-3xl font-bold font-display text-main mb-12">
                         Ready to Explore the World of Pharmaceuticals?

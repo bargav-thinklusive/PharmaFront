@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import SearchBar from '../SearchBar';
 import AddDrugModal from '../CompoundForm/AddDrugModal';
+import DraftsListModal from '../CompoundForm/DraftsListModal';
 import MoleculeBackground from '../shared/MoleculeBackground';
 import { useUser } from '../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +10,7 @@ import useRoles from '../../hooks/useRoles';
 
 const Home: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
+  const [showDraftsModal, setShowDraftsModal] = useState(false);
   const { user, drugsData, drafts } = useUser();
   const { canEditDrugs } = useRoles();
   const navigate = useNavigate();
@@ -98,7 +100,7 @@ const Home: React.FC = () => {
         desc: 'Continue working on your saved drug drafts anytime.',
         color: 'from-primary-light to-primary-light/50',
         iconBg: 'bg-primary',
-        action: () => navigate('/drug-form'),
+        action: () => draftCount > 0 ? setShowDraftsModal(true) : navigate('/drug-form'),
         cta: draftCount > 0 ? `View ${draftCount} Draft${draftCount > 1 ? 's' : ''}` : 'Start a Draft',
         badge: draftCount > 0 ? draftCount : null,
       }
@@ -114,7 +116,7 @@ const Home: React.FC = () => {
       </div>
       <MoleculeBackground variant="dna" />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-14 pb-20">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-12 relative z-10 pt-14 pb-20">
 
         {/* ── Hero ── */}
         <div className="flex flex-col items-center text-center mb-12">
@@ -192,8 +194,9 @@ const Home: React.FC = () => {
 
       </div>
 
-      {/* Modal */}
+      {/* Modals */}
       {showModal && <AddDrugModal onClose={() => setShowModal(false)} />}
+      {showDraftsModal && <DraftsListModal isOpen={showDraftsModal} onClose={() => setShowDraftsModal(false)} />}
     </div>
   );
 };

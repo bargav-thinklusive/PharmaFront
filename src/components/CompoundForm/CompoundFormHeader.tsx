@@ -1,5 +1,4 @@
 import React from "react";
-import { FiCheck } from "react-icons/fi";
 import { GiPill } from "react-icons/gi";
 
 interface CompoundFormHeaderProps {
@@ -8,8 +7,6 @@ interface CompoundFormHeaderProps {
     overallProgressPct: number;
     completedStepsCount: number;
     totalStepsCount: number;
-    lastSavedTime: Date | null;
-    secondsSinceSave: number;
 }
 
 export const CompoundFormHeader: React.FC<CompoundFormHeaderProps> = ({
@@ -18,8 +15,6 @@ export const CompoundFormHeader: React.FC<CompoundFormHeaderProps> = ({
     overallProgressPct,
     completedStepsCount,
     totalStepsCount,
-    lastSavedTime,
-    secondsSinceSave,
 }) => {
     return (
         <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6 shadow-sm">
@@ -47,7 +42,7 @@ export const CompoundFormHeader: React.FC<CompoundFormHeaderProps> = ({
                 </div>
             </div>
 
-            {/* Overall Progress & Auto-save Section */}
+            {/* Overall Progress Section */}
             <div className="flex flex-col md:flex-row items-center gap-6 md:max-w-xl w-full">
                 <div className="flex items-center gap-5 w-full">
                     <div className="flex flex-col items-start gap-1 w-full">
@@ -67,12 +62,6 @@ export const CompoundFormHeader: React.FC<CompoundFormHeaderProps> = ({
                     <div className="text-[10px] font-bold text-slate-500 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200/60 shadow-xs whitespace-nowrap">
                         {completedStepsCount} of {totalStepsCount} completed
                     </div>
-                </div>
-
-                {/* Auto-save status */}
-                <div className="flex items-center gap-1.5 text-xs text-green-600 font-bold bg-green-50 px-3 py-1.5 rounded-xl border border-green-100/50 shadow-xs whitespace-nowrap self-stretch md:self-auto justify-center">
-                    <FiCheck className="w-3.5 h-3.5 text-green-600" />
-                    {lastSavedTime ? `Auto-saved ${secondsSinceSave}s ago` : "Saving draft..."}
                 </div>
             </div>
         </div>

@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useEffect, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import UserService from "../services/UserService";
 import TokenService from "../services/shared/TokenService";
 import AuthService from "../services/AuthService";
@@ -54,14 +54,17 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     const init = async () => {
-      const isAuthenticated = await checkTokenAndGetUser();
-      if (isAuthenticated) {
-        await getDrugs();
-        await getDrafts();
-      }
+      await checkTokenAndGetUser();
     };
     init();
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      getDrugs();
+      getDrafts();
+    }
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Derive roles: prefer live user data, fallback to localStorage on refresh
   const roles: string[] =
@@ -69,6 +72,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     AuthService.getUserRoles();
 
   const drafts = Array.isArray(draftsRawData) ? draftsRawData : [];
+
+  const [selectedList, setSelectedList] = useState<'fda' | 'cmcintel'>('fda');
 
   return (
     <UserContext.Provider value={{
@@ -81,7 +86,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       drafts,
       draftsLoading,
       refetchDrafts: getDrafts,
-      roles
+      roles,
+      selectedList,
+      setSelectedList
     }}>
       {children}
     </UserContext.Provider>

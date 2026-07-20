@@ -41,7 +41,6 @@ import usePut from "../../hooks/usePut";
 import useDelete from "../../hooks/useDelete";
 import UserService from "../../services/UserService";
 import Loader from "../Loader";
-import PageHeader from "../shared/PageHeader";
 
 const userService = new UserService();
 const pageSize = 20;
@@ -138,13 +137,7 @@ const UsersTable: React.FC = () => {
         style={{ zIndex: 99999 }}
       />
 
-      <PageHeader
-        title="User Management"
-        subtitle="Manage user roles and platform access permissions."
-        eyebrow="Admin Panel"
-      />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-12 mt-8">
         {/* Toolbar card */}
         <div className="bg-white rounded-2xl border border-border-main p-5 mb-6 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           {/* Search box */}
