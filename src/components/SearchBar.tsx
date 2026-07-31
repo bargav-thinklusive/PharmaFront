@@ -238,7 +238,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ compact = false }) => {
 
             {/* Options list */}
             {categoryOpen && (
-              <div className="absolute top-full right-0 mt-1 bg-white border border-border-main rounded-xl shadow-xl z-[1002] min-w-[140px] overflow-hidden">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-border-main rounded-md shadow-xl z-[1002] min-w-[140px] overflow-hidden">
                 {CATEGORIES.map((cat) => (
                   <button
                     key={cat.value}
@@ -261,7 +261,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ compact = false }) => {
 
       {/* Suggestions dropdown */}
       {showSuggestions && search.trim() && (
-        <div className="absolute top-full mt-1 w-full max-w-2xl bg-white border border-border-main rounded-xl shadow-lg z-[1001]">
+        <div className="absolute top-full mt-1 w-full max-w-2xl bg-white border border-border-main rounded-md shadow-lg z-[1001]">
           <ul className="max-h-[50vh] overflow-y-auto">
             {suggestions.length > 0 ? (
               suggestions.map((item, index) => {

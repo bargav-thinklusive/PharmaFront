@@ -94,8 +94,8 @@ export default function SectionedViewDrug() {
     // Build section list for navigation
     const sections = useMemo(() => {
         return [
-            { id: 1, key: 'ExecutiveSummary', title: 'Executive Summary', icon: <FiFileText className="w-3.5 h-3.5" /> },
-            { id: 2, key: 'ProductOverview', title: 'Product Overview', icon: <FiLayers className="w-3.5 h-3.5" /> },
+            { id: 1, key: 'ProductOverview', title: 'Product Overview', icon: <FiLayers className="w-3.5 h-3.5" /> },
+            { id: 2, key: 'ExecutiveSummary', title: 'Executive Summary', icon: <FiFileText className="w-3.5 h-3.5" /> },
             { id: 3, key: 'RegulatoryInsights', title: 'Regulatory Insights', icon: <FiShield className="w-3.5 h-3.5" /> },
             { id: 4, key: 'GenericEntrants', title: 'Generic Entrants', icon: <FiUsers className="w-3.5 h-3.5" /> },
             { id: 5, key: 'PhysicalChemicalProperties', title: 'Physical & Chemical Properties', icon: <FiDroplet className="w-3.5 h-3.5" /> },
@@ -138,7 +138,7 @@ export default function SectionedViewDrug() {
                         No data was found for drug with CID: <span className="font-mono font-bold text-slate-700">{cid}</span>
                     </p>
                     <button
-                        onClick={() => navigate('/drugslist')}
+                        onClick={() => navigate('/drugsList')}
                         className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-colors cursor-pointer text-sm shadow-sm"
                     >
                         Back to Database
@@ -172,7 +172,7 @@ export default function SectionedViewDrug() {
                 await deleteData(drugService.deleteDrug(drugToDisplay._id));
                 toast.success("Drug record deleted successfully");
                 if (refetchDrugs) await refetchDrugs();
-                navigate("/drugslist");
+                navigate("/drugsList");
             } catch (err) {
                 console.error("Error deleting drug:", err);
                 toast.error("Failed to delete drug record.");

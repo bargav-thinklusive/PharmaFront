@@ -55,6 +55,7 @@ const UsersTable: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   // Modal states for delete confirmation
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -88,6 +89,30 @@ const UsersTable: React.FC = () => {
     }
   };
 
+  const handleToggleStatus = async (userId: string, currentIsActive: boolean) => {
+    const nextIsActive = !currentIsActive;
+    const nextStatus = nextIsActive ? "active" : "inactive";
+    try {
+      await updateUserApi(userService.updateUser(userId), {
+        status: nextStatus,
+        isActive: nextIsActive,
+      });
+      toast.success(
+        `User status updated to ${nextIsActive ? "Active" : "Inactive"}!`
+      );
+      setUsers((prev) =>
+        prev.map((u) =>
+          u._id === userId
+            ? { ...u, status: nextStatus, isActive: nextIsActive, is_active: nextIsActive }
+            : u
+        )
+      );
+    } catch (err) {
+      console.error("Failed to update status", err);
+      toast.error("Failed to update user status.");
+    }
+  };
+
   const confirmDeleteUser = (user: any) => {
     setUserToDelete(user);
     setShowDeleteModal(true);
@@ -107,7 +132,7 @@ const UsersTable: React.FC = () => {
     }
   };
 
-  // Filtered users list for search & role filters
+  // Filtered users list for search, role & status filters
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
       const name = u?.name || "";
@@ -120,9 +145,22 @@ const UsersTable: React.FC = () => {
       const matchesRole =
         roleFilter === "all" || userRoles.includes(roleFilter);
 
-      return matchesSearch && matchesRole;
+      const rawStatus = u?.status;
+      const rawIsActive = u?.isActive ?? u?.is_active;
+      const isActive = rawStatus
+        ? rawStatus.toLowerCase() === "active"
+        : rawIsActive !== undefined
+        ? Boolean(rawIsActive)
+        : true;
+
+      const matchesStatus =
+        statusFilter === "all" ||
+        (statusFilter === "active" && isActive) ||
+        (statusFilter === "inactive" && !isActive);
+
+      return matchesSearch && matchesRole && matchesStatus;
     });
-  }, [users, searchTerm, roleFilter]);
+  }, [users, searchTerm, roleFilter, statusFilter]);
 
   const onGridReady = useCallback((params: GridReadyEvent): void => {
     params.api.hideOverlay();
@@ -153,21 +191,39 @@ const UsersTable: React.FC = () => {
           </div>
 
           {/* Filter options */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-sm text-text-secondary font-medium">
-              <FiFilter className="w-4 h-4" />
-              <span>Role:</span>
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-sm text-text-secondary font-medium">
+                <FiFilter className="w-4 h-4" />
+                <span>Role:</span>
+              </div>
+              <select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                className="bg-white border border-border-main rounded-md px-4 py-2.5 text-sm text-text-main font-semibold focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer transition-all"
+              >
+                <option value="all">All Roles</option>
+                <option value="admin">Admin</option>
+                <option value="editor">Editor</option>
+                <option value="subscriber">Subscriber</option>
+              </select>
             </div>
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="bg-white border border-border-main rounded-xl px-4 py-2.5 text-sm text-text-main font-semibold focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer transition-all"
-            >
-              <option value="all">All Roles</option>
-              <option value="admin">Admin</option>
-              <option value="editor">Editor</option>
-              <option value="subscriber">Subscriber</option>
-            </select>
+
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-sm text-text-secondary font-medium">
+                <FiFilter className="w-4 h-4" />
+                <span>Status:</span>
+              </div>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="bg-white border border-border-main rounded-md px-4 py-2.5 text-sm text-text-main font-semibold focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer transition-all"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -197,12 +253,14 @@ const UsersTable: React.FC = () => {
                 }}
                 context={{
                   onUpdateRole: handleUpdateRole,
+                  onToggleStatus: handleToggleStatus,
                   onDeleteUser: confirmDeleteUser,
                 }}
                 rowHeight={60}
                 headerHeight={52}
               />
             </div>
+
           )}
         </div>
       </div>

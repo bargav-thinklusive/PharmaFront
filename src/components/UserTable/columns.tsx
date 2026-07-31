@@ -1,4 +1,4 @@
-import ActionsCellRenderer, { NameCellRenderer, RoleCellRenderer } from "./ActionsCellRenderer";
+import ActionsCellRenderer, { NameCellRenderer, RoleCellRenderer, StatusToggleCellRenderer } from "./ActionsCellRenderer";
 
 export const columns: any = [
   {
@@ -23,6 +23,16 @@ export const columns: any = [
     filter: true,
   },
   {
+    headerName: "Status",
+    headerClass: "table-header",
+    field: "status",
+    cellRenderer: StatusToggleCellRenderer,
+    flex: 1,
+    minWidth: 160,
+    sortable: true,
+    filter: true,
+  },
+  {
     headerName: "Actions",
     headerClass: "table-header",
     field: "actions",
@@ -35,3 +45,4 @@ export const columns: any = [
     pinned: "right",
   },
 ];
+

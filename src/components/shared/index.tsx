@@ -62,7 +62,7 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
                 />
             </div>
             {isOpen && filteredOptions.length > 0 && !disabled && (
-                <div className="absolute z-50 w-full mt-1 bg-white border border-border-main rounded-xl shadow-lg max-h-60 overflow-auto">
+                <div className="absolute z-50 w-full mt-1 bg-white border border-border-main rounded-md shadow-lg max-h-60 overflow-auto">
                     {filteredOptions.map((option, index) => (
                         <div
                             key={`${option.value}-${index}`}
@@ -75,7 +75,7 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
                 </div>
             )}
             {isOpen && filteredOptions.length === 0 && inputValue && !disabled && (
-                <div className="absolute z-50 w-full mt-1 bg-white border border-border-main rounded-xl shadow-lg">
+                <div className="absolute z-50 w-full mt-1 bg-white border border-border-main rounded-md shadow-lg">
                     <div className="px-3.5 py-2.5 text-sm text-body">No options found</div>
                 </div>
             )}

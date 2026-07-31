@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { FiMail, FiLock, FiArrowRight, FiShield } from "react-icons/fi";
 import AuthService from "../../../services/AuthService";
@@ -53,26 +53,16 @@ const Login: React.FC = () => {
     if (!passwordVal) return setError("Please enter password");
     setError("");
 
+    setLoading(true);
     try {
-      setLoading(true);
-      await toast.promise(
-        authService.login(emailVal, passwordVal),
-        {
-          pending: "Logging in...",
-          success: {
-            render: "Login successful!",
-            onClose: async () => {
-              await checkTokenAndGetUser();
-              const from = (location.state as any)?.from || "/home";
-              navigate(from, { replace: true });
-            },
-          },
-          error: "Login failed. Please check your credentials.",
-        }
-      );
+      await authService.login(emailVal, passwordVal);
+      await checkTokenAndGetUser();
+      const targetUrl = (location.state as any)?.from || "/home";
+      window.location.href = targetUrl;
     } catch (error: any) {
-      // handled by toast.promise
-    } finally {
+      const msg = error?.response?.data?.detail || "Login failed. Please check your credentials.";
+      setError(msg);
+      toast.error(msg);
       setLoading(false);
     }
   };
@@ -112,10 +102,10 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      e.preventDefault();
-      e.stopPropagation();
       isForgotPassword ? handleResetPassword() : handleLogin();
     }
   };
@@ -256,7 +246,7 @@ const Login: React.FC = () => {
                     onChange={(e) => { setEmail(e.target.value); clearErrors(); }}
                     className={inputClass}
                     autoComplete="email"
-                    onKeyDown={handleKeyDown}
+                    onKeyDown={handleKeyPress}
                   />
                 </div>
 
@@ -275,7 +265,7 @@ const Login: React.FC = () => {
                         onChange={(e) => { setPassword(e.target.value); clearErrors(); }}
                         className={passwordInputClass}
                         autoComplete="current-password"
-                        onKeyDown={handleKeyDown}
+                        onKeyDown={handleKeyPress}
                       />
                       <button
                         type="button"
@@ -310,7 +300,6 @@ const Login: React.FC = () => {
                         value={newPassword}
                         onChange={(e) => { setNewPassword(e.target.value); clearErrors(); }}
                         className={passwordInputClass}
-                        onKeyDown={handleKeyDown}
                       />
                       <button
                         type="button"
@@ -333,7 +322,6 @@ const Login: React.FC = () => {
                         value={retypePassword}
                         onChange={(e) => { setRetypePassword(e.target.value); clearErrors(); }}
                         className={passwordInputClass}
-                        onKeyDown={handleKeyDown}
                       />
                       <button
                         type="button"
