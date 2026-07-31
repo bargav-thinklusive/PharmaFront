@@ -47,6 +47,17 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
     };
   }, []);
 
+  const getInitials = (nameStr?: string) => {
+    if (!nameStr) return "US";
+    const parts = nameStr.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return nameStr.slice(0, 2).toUpperCase();
+  };
+
+  const userInitials = getInitials(user?.data?.name);
+
   const handleHeaderNavClick = (path: string, e: React.MouseEvent, closeMobile = false) => {
     if (closeMobile) {
       setMobileMenuOpen(false);
@@ -165,21 +176,27 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
 
               {/* Drugs List Dropdown — editor and admin only */}
               {canEditDrugs && (
-                <div ref={drugsListDropdownRef} className="relative">
-                  <button
-                    onClick={() => setDrugsListDropdownOpen((p) => !p)}
-                    className={`flex items-center gap-1.5 font-medium text-sm no-underline transition-colors pb-1 border-b-2 font-display cursor-pointer ${
-                      location.pathname === '/drugsList'
-                        ? 'border-primary text-primary'
-                        : 'text-[#334155] border-transparent hover:text-primary-hover'
-                    }`}
+                <div ref={drugsListDropdownRef} className="relative flex items-center">
+                  <NavLink
+                    to="/drugsList"
+                    onClick={(e) => {
+                      handleHeaderNavClick("/drugsList", e);
+                      setDrugsListDropdownOpen((p) => !p);
+                    }}
+                    className={({ isActive }) =>
+                      `flex items-center gap-1.5 font-medium text-sm no-underline transition-colors pb-1 border-b-2 font-display cursor-pointer ${
+                        isActive || location.pathname.toLowerCase().includes("drugslist") || drugsListDropdownOpen
+                          ? "border-primary text-primary"
+                          : "text-[#334155] border-transparent hover:text-primary-hover"
+                      }`
+                    }
                   >
                     Drugs List
                     <FiChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${drugsListDropdownOpen ? "rotate-180" : ""}`} />
-                  </button>
+                  </NavLink>
 
                   {drugsListDropdownOpen && (
-                    <div className="absolute top-full left-0 bg-white border border-border-main rounded-xl shadow-xl mt-2 min-w-[200px] overflow-hidden z-50 py-1.5 text-[13.5px] font-semibold text-gray-700">
+                    <div className="absolute top-full left-0 bg-white border border-border-main rounded-md shadow-xl mt-2 min-w-[200px] overflow-hidden z-50 py-1.5 text-[13.5px] font-semibold text-gray-700">
                       <button
                         onClick={() => {
                           setSelectedList('fda');
@@ -220,15 +237,13 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
                 </NavLink>
               )}
 
-
-
               {/* Drafts Dropdown */}
               {drafts && drafts.length > 0 && (
                 <div ref={draftsDropdownRef} className="relative" data-tick={draftTick}>
                   <button
                     onClick={() => setDraftsDropdownOpen((p) => !p)}
                     title="Click to view your drafts"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-light text-primary font-semibold text-xs border border-primary/20 hover:bg-primary hover:text-white transition-colors cursor-pointer whitespace-nowrap"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-light text-primary font-semibold text-xs border border-primary/20 hover:bg-primary hover:text-white transition-colors cursor-pointer whitespace-nowrap"
                     style={{ animation: "draftPulse 2s ease-in-out infinite" }}
                   >
                     <FiFileText className="w-3.5 h-3.5" />
@@ -237,7 +252,7 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
                   </button>
 
                   {draftsDropdownOpen && (
-                    <div className="absolute top-full right-0 bg-white border border-border-main rounded-xl shadow-xl mt-2 min-w-[260px] overflow-hidden max-h-[320px] overflow-y-auto z-50">
+                    <div className="absolute top-full right-0 bg-white border border-border-main rounded-md shadow-xl mt-2 min-w-[260px] overflow-hidden max-h-[320px] overflow-y-auto z-50">
                       {/* Header row */}
                       <div className="px-4 py-2.5 border-b border-border-main bg-alt/50">
                         <span className="text-xs font-bold text-main uppercase tracking-wider">Saved Drafts</span>
@@ -280,28 +295,42 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
               <div ref={dropdownRef} className="relative ml-2">
                 <button
                   onClick={() => setDropdownOpen((p) => !p)}
-                  className="flex items-center gap-2 pl-3 pr-4 py-2 rounded-full bg-primary-light text-primary font-semibold text-sm hover:bg-primary hover:text-white transition-all duration-200 cursor-pointer border border-primary/20"
+                  className="w-9 h-9 rounded-full bg-primary hover:bg-primary text-white font-bold text-xs cursor-pointer flex items-center justify-center shadow-sm select-none border-0"
+                  title={user?.data?.name || "User Profile"}
                 >
-                  <span className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
-                    {(user?.data?.name || "U")[0].toUpperCase()}
-                  </span>
-                  <span>{user?.data?.name || "User"}</span>
-                  {/* Role badge */}
-                  {roles.length > 0 && (
-                    <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded-full capitalize font-semibold">
-                      {roles[0]}
-                    </span>
-                  )}
-                  <FiChevronDown className={`w-4 h-4 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`} />
+                  <span className="font-display tracking-wide">{userInitials}</span>
                 </button>
+
                 {dropdownOpen && (
-                  <div className="absolute top-full right-0 bg-white border border-border-main rounded-xl shadow-xl mt-2 min-w-[140px] overflow-hidden">
+                  <div className="absolute top-full right-0 bg-white border border-border-main rounded-md shadow-xl mt-2 min-w-[220px] overflow-hidden z-50 p-2 animate-scale-up">
+                    {/* User Profile Header in Dropdown */}
+                    <div className="px-3.5 py-3 bg-alt/60 rounded-sm mb-1 flex flex-col gap-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-bold text-sm text-text-main font-sans truncate">
+                          {user?.data?.name || "User"}
+                        </span>
+                        {roles.length > 0 && (
+                          <span className="text-[10px] bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-md font-bold capitalize font-sans shrink-0">
+                            {roles[0]}
+                          </span>
+                        )}
+                      </div>
+                      {user?.data?.email && (
+                        <span className="text-xs text-text-secondary truncate font-sans">
+                          {user.data.email}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="border-t border-border-main my-1" />
+
+                    {/* Logout Button */}
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-3 flex items-center gap-2 text-[#334155] hover:bg-red-50 hover:text-red-600 transition-colors duration-200 text-sm font-medium cursor-pointer"
+                      className="w-full text-left px-3.5 py-2.5 rounded-sm flex items-center gap-2.5 text-red-600 hover:bg-red-50 transition-colors duration-150 text-xs font-semibold cursor-pointer"
                     >
-                      <FiLogOut className="w-4 h-4" />
-                      Logout
+                      <FiLogOut className="w-4 h-4 text-red-500" />
+                      <span>Logout</span>
                     </button>
                   </div>
                 )}

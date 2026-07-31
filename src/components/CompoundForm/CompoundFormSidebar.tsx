@@ -34,18 +34,27 @@ export const CompoundFormSidebar: React.FC<CompoundFormSidebarProps> = ({
 
     return (
         <div className={isSidebarExpanded ? "lg:col-span-3 lg:sticky lg:top-24" : "lg:col-span-1 lg:sticky lg:top-24"}>
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col max-h-[calc(100vh-120px)] overflow-y-auto">
-                {/* Sidebar Header */}
-                <div className="pb-4 border-b border-slate-100 flex flex-col items-start">
-                    <span className="text-sm font-bold font-display text-slate-800 mt-0.5">
-                        Step by step
-                    </span>
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex flex-col max-h-[calc(100vh-120px)] overflow-y-auto">
+                {/* Sidebar Header with Arrow Toggle Button */}
+                <div className="pb-3 border-b border-slate-100 flex items-center justify-between">
+                    <button
+                        type="button"
+                        onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
+                        className="w-8 h-8 flex items-center justify-center border border-slate-200 text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors shadow-xs"
+                        title={isSidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
+                    >
+                        {isSidebarExpanded ? (
+                            <FiChevronLeft className="w-4 h-4 text-slate-600" />
+                        ) : (
+                            <FiChevronRight className="w-4 h-4 text-slate-600" />
+                        )}
+                    </button>
                 </div>
 
                 {/* Steps List */}
                 {!isSidebarExpanded ? (
                     /* Collapsed steps list */
-                    <nav className="hidden lg:flex flex-col items-center py-6 px-2 space-y-3">
+                    <nav className="hidden lg:flex flex-col items-center py-4 px-1 space-y-3">
                         {steps.map((step, index) => {
                             const isActive = index === currentStep;
                             const status = getStepStatus(index);
@@ -83,7 +92,7 @@ export const CompoundFormSidebar: React.FC<CompoundFormSidebarProps> = ({
                     </nav>
                 ) : (
                     /* Expanded steps list */
-                    <nav className="flex flex-col gap-1.5 mt-4">
+                    <nav className="flex flex-col gap-1.5 mt-3">
                         {steps.map((step, index) => {
                             const isActive = index === currentStep;
                             const status = getStepStatus(index);
@@ -164,24 +173,8 @@ export const CompoundFormSidebar: React.FC<CompoundFormSidebarProps> = ({
                         })}
                     </nav>
                 )}
-
-                {/* Collapse Button */}
-                <button
-                    type="button"
-                    onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
-                    className="mt-6 flex items-center justify-center gap-2 w-full py-2.5 border border-slate-200 text-slate-500 rounded-xl text-xs font-bold hover:bg-slate-50 hover:text-slate-800 cursor-pointer transition-colors shadow-xs"
-                    title={isSidebarExpanded ? "Collapse" : "Expand"}
-                >
-                    {isSidebarExpanded ? (
-                        <>
-                            <FiChevronLeft className="w-4 h-4" />
-                            Collapse
-                        </>
-                    ) : (
-                        <FiChevronRight className="w-5 h-5" />
-                    )}
-                </button>
             </div>
         </div>
     );
+
 };

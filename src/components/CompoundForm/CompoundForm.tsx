@@ -73,8 +73,8 @@ const CompoundForm = () => {
     }, []);
 
     const steps = [
-        { title: "Executive Summary", fields: addExecutiveSummary },
         { title: "Product Overview", fields: addProductOverview },
+        { title: "Executive Summary", fields: addExecutiveSummary },
         { title: "Regulatory Insights", fields: addRegulatoryInsights },
         { title: "Generic Entrants", fields: addGenericEntrants },
         { title: "Physical & Chemical Properties", fields: addPhysicalChemicalProperties },
