@@ -6,12 +6,18 @@ import { convertDatesToUnix, fileToBase64 } from "../../utils/utils";
  */
 export const flattenDrug = (drug: any): any => {
     if (!drug) return {};
+    const existingId = drug._id || drug.id || drug.original_id;
+    const existingVersion = drug.ProductOverview?.version || drug.version || drug.originalVersion || "1.0";
     return {
+        _id: existingId,
+        original_id: existingId,
+        originalVersion: existingVersion,
+
         // Executive Summary (plain string)
         executiveSummary: drug.ExecutiveSummary ?? "",
 
         // Product Overview
-        version: drug.ProductOverview?.version ?? "",
+        version: existingVersion,
         drugName: drug.ProductOverview?.drugName ?? "",
         apiName: drug.ProductOverview?.apiName ?? "",
         mechanismOfAction: drug.ProductOverview?.mechanismOfAction ?? "",
@@ -21,6 +27,18 @@ export const flattenDrug = (drug: any): any => {
         firstApprovedRegion: drug.ProductOverview?.firstApprovedRegion ?? "",
         dosageForms: drug.ProductOverview?.dosageForms ?? "",
         lossOfExclusivity: drug.ProductOverview?.lossOfExclusivity ?? [],
+        exclusivityCode: Array.isArray(drug.ProductOverview?.lossOfExclusivity) && drug.ProductOverview?.lossOfExclusivity.length > 0
+            ? (drug.ProductOverview.lossOfExclusivity[0]?.exclusivityCode ?? "")
+            : (drug.ProductOverview?.exclusivityCode ?? ""),
+        country: Array.isArray(drug.ProductOverview?.lossOfExclusivity) && drug.ProductOverview?.lossOfExclusivity.length > 0
+            ? (drug.ProductOverview.lossOfExclusivity[0]?.country ?? "")
+            : (drug.ProductOverview?.country ?? ""),
+        regulatoryBody: Array.isArray(drug.ProductOverview?.lossOfExclusivity) && drug.ProductOverview?.lossOfExclusivity.length > 0
+            ? (drug.ProductOverview.lossOfExclusivity[0]?.regulatoryBody ?? "")
+            : (drug.ProductOverview?.regulatoryBody ?? ""),
+        expiredDate: Array.isArray(drug.ProductOverview?.lossOfExclusivity) && drug.ProductOverview?.lossOfExclusivity.length > 0
+            ? (drug.ProductOverview.lossOfExclusivity[0]?.expiredDate ?? "")
+            : (drug.ProductOverview?.expiredDate ?? ""),
         globalAnnualRevenue: drug.ProductOverview?.globalAnnualRevenue ?? "",
 
         // Regulatory Insights
@@ -60,7 +78,7 @@ export const flattenDrug = (drug: any): any => {
         nitrosaminesAssessment: drug.DrugSubstance?.nitrosaminesAssessment ?? "",
         otherInformation: drug.DrugSubstance?.otherInformation ?? "",
         regulatoryStartingMaterials: drug.DrugSubstance?.regulatoryStartingMaterials ?? "",
-        drugSubstanceSpecifications: drug.DrugSubstance?.drugSubstanceSpecifications ?? "",
+        drugSubstanceSpecifications: drug.DrugSubstance?.drugSubstanceSpecifications ?? [],
         stableAndCommerciallyUsedPolymorphicForm: drug.DrugSubstance?.stableAndCommerciallyUsedPolymorphicForm ?? "",
 
         // Drug Product Information
@@ -130,21 +148,44 @@ async function processImagesToBase64(data: any): Promise<any> {
     return result;
 }
 
-export const formatCreatedDrug = async (formData: any) => {
+export const formatCreatedDrug = async (formData: any, currentUser?: any) => {
+    const creatorId = currentUser?._id || currentUser?.id || currentUser?.sub || currentUser?.email || formData.createdBy;
+    const creatorEmail = currentUser?.email || formData.createdByEmail;
+    const creatorName = currentUser?.name || formData.createdByName;
+
     const rawResult = {
         ExecutiveSummary: formData.executiveSummary,
+        createdBy: creatorId,
+        createdByEmail: creatorEmail,
+        createdByName: creatorName,
         ProductOverview: {
             version: formData.version,
             drugName: formData.drugName,
             apiName: formData.apiName,
             mechanismOfAction: formData.mechanismOfAction,
             companyName: formData.companyName,
+            therapeuticArea: formData.therapeuticArea,
             approvedIndications: formData.approvedIndications,
             firstApprovedDate: formData.firstApprovedDate,
             firstApprovedRegion: formData.firstApprovedRegion,
             dosageForms: formData.dosageForms,
-            lossOfExclusivity: formData.lossOfExclusivity,
+            lossOfExclusivity: (Array.isArray(formData.lossOfExclusivity) && formData.lossOfExclusivity.length > 0)
+                ? formData.lossOfExclusivity
+                : [
+                    {
+                        exclusivityCode: formData.exclusivityCode || "",
+                        country: formData.country || "",
+                        regulatoryBody: formData.regulatoryBody || "",
+                        expiredDate: formData.expiredDate || "",
+                    }
+                ],
+            exclusivityCode: formData.exclusivityCode || "",
+            country: formData.country || "",
+            regulatoryBody: formData.regulatoryBody || "",
+            expiredDate: formData.expiredDate || "",
             globalAnnualRevenue: formData.globalAnnualRevenue,
+            createdBy: creatorId,
+            createdByEmail: creatorEmail,
         },
         RegulatoryInsights: {
             regulatoryInsights: formData.regulatoryInsights,

@@ -226,3 +226,56 @@ export function KeyValueDisplay({ data, className = '' }: { data: Record<string,
         </div>
     );
 }
+
+export function DrugSubstanceSpecificationsTable({ data }: { data: any }) {
+    if (!data) return null;
+    let rows: { key: string; value: any }[] = [];
+
+    if (Array.isArray(data)) {
+        rows = data.map((item: any) => {
+            if (typeof item === 'object' && item !== null) {
+                return {
+                    key: item.key || item.parameter || item.property || item.name || Object.keys(item)[0] || '',
+                    value: item.value || item.specification || item.val || Object.values(item)[0] || ''
+                };
+            }
+            return { key: 'Specification', value: String(item) };
+        });
+    } else if (typeof data === 'object' && data !== null) {
+        rows = Object.entries(data).map(([k, v]) => ({ key: formatKey(k), value: v }));
+    } else if (typeof data === 'string') {
+        try {
+            const parsed = JSON.parse(data);
+            if (typeof parsed === 'object') return <DrugSubstanceSpecificationsTable data={parsed} />;
+        } catch {
+            rows = [{ key: 'Specification Details', value: data }];
+        }
+    }
+
+    if (rows.length === 0) return null;
+
+    return (
+        <div className="overflow-x-auto border-2 border-[#0e8a67] rounded-xl shadow-xs my-3">
+            <table className="w-full text-sm text-left text-slate-800 border-collapse">
+                <thead className="text-xs uppercase bg-emerald-50 text-[#0e8a67] font-bold border-b-2 border-[#0e8a67]">
+                    <tr>
+                        <th className="px-6 py-3 border-r border-[#0e8a67]/20 w-1/3">Key</th>
+                        <th className="px-6 py-3">Value</th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 bg-white">
+                    {rows.map((row, idx) => (
+                        <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                            <td className="px-6 py-3.5 font-semibold text-slate-900 border-r border-slate-200/60 whitespace-pre-wrap">
+                                {row.key}
+                            </td>
+                            <td className="px-6 py-3.5 text-slate-700 whitespace-pre-wrap">
+                                {renderValue(row.value)}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+}

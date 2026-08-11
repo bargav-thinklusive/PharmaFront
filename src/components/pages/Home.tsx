@@ -2,15 +2,17 @@ import React, { useState, useMemo } from 'react';
 import SearchBar from '../SearchBar';
 import AddDrugModal from '../CompoundForm/AddDrugModal';
 import DraftsListModal from '../CompoundForm/DraftsListModal';
+import AdvancedSearchModal from '../AdvancedSearchModal';
 import MoleculeBackground from '../shared/MoleculeBackground';
 import { useUser } from '../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
-import { FiPlus, FiFileText, FiSearch, FiZap, FiArrowRight } from 'react-icons/fi';
+import { FiPlus, FiFileText, FiZap, FiArrowRight, FiSliders } from 'react-icons/fi';
 import useRoles from '../../hooks/useRoles';
 
 const Home: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [showDraftsModal, setShowDraftsModal] = useState(false);
+  const [showAdvancedSearchModal, setShowAdvancedSearchModal] = useState(false);
   const { user, drugsData, drafts } = useUser();
   const { canEditDrugs } = useRoles();
   const navigate = useNavigate();
@@ -74,13 +76,13 @@ const Home: React.FC = () => {
 
   const quickActions = [
     {
-      icon: <FiSearch className="w-6 h-6" />,
-      title: 'Search Drugs',
-      desc: 'Find chemical and regulatory information from authoritative sources.',
+      icon: <FiSliders className="w-6 h-6" />,
+      title: 'Advanced Search',
+      desc: 'Filter compounds with advanced parameters including chemical properties, company, and region.',
       color: 'from-primary/10 to-primary/5',
       iconBg: 'bg-primary',
-      action: () => document.getElementById('home-searchbar')?.querySelector('input')?.focus(),
-      cta: 'Start Searching',
+      action: () => setShowAdvancedSearchModal(true),
+      cta: 'Open Advanced Search',
       badge: null,
     },
     ...(canEditDrugs ? [
@@ -197,6 +199,7 @@ const Home: React.FC = () => {
       {/* Modals */}
       {showModal && <AddDrugModal onClose={() => setShowModal(false)} />}
       {showDraftsModal && <DraftsListModal isOpen={showDraftsModal} onClose={() => setShowDraftsModal(false)} />}
+      <AdvancedSearchModal isOpen={showAdvancedSearchModal} onClose={() => setShowAdvancedSearchModal(false)} />
     </div>
   );
 };

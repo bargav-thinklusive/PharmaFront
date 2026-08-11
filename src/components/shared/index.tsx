@@ -230,11 +230,15 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
                             className={`${selectClass} ${disabled ? disabledInput : ""}`}
                         >
                             <option value="">{placeholder || "Select…"}</option>
-                            {allOptions?.map((option, idx) => (
-                                <option key={idx} value={type === "select" ? get(option, labelKey) : option[valueKey]}>
-                                    {option[labelKey]}
-                                </option>
-                            ))}
+                            {allOptions?.map((option, idx) => {
+                                const val = typeof option === "string" ? option : (type === "select" ? get(option, labelKey) : (option[valueKey] ?? option.value ?? option.label));
+                                const lbl = typeof option === "string" ? option : (option[labelKey] ?? option.label ?? option.value);
+                                return (
+                                    <option key={idx} value={val}>
+                                        {lbl}
+                                    </option>
+                                );
+                            })}
                         </select>
                         <FiChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-body" />
                     </div>

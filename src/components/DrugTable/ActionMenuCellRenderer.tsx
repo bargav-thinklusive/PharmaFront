@@ -7,20 +7,27 @@ import useDelete from '../../hooks/useDelete';
 import DrugService from '../../services/DrugService';
 import useDraft from '../../hooks/useDraft';
 import { flattenDrug } from '../CompoundForm/helper';
+import { findExistingDraft, } from '../../utils/utils';
 import { toast } from 'react-toastify';
 import useRoles from '../../hooks/useRoles';
+import { ConfirmModal } from '../shared/ConfirmModal';
 
 const ActionMenuCellRenderer: React.FC<any> = (params) => {
   const navigate = useNavigate();
-  const { refetchDrugs } = useUser();
+  const { refetchDrugs, drafts } = useUser();
   const { deleteData } = useDelete();
   const { saveDraft } = useDraft();
-  const { canEditDrugs, canDeleteDrugs } = useRoles();
+  const { canEditDrug, canDeleteDrug } = useRoles();
   const drugService = new DrugService();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [coords, setCoords] = useState({ top: 0, left: 0 });
+
+  const drugData = params.data?.drug || params.data;
+  const allowEdit = canEditDrug(drugData);
+  const allowDelete = canDeleteDrug(drugData);
 
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -44,50 +51,63 @@ const ActionMenuCellRenderer: React.FC<any> = (params) => {
   const handleEdit = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsOpen(false);
-    
+
     const data = params.data?.drug || params.data;
-    if (!data?.cid) {
+    if (!data?.cid && !data?._id) {
       toast.error("Invalid drug data for editing");
       return;
     }
-    
+
     try {
       const flatData = flattenDrug(data);
-      const newDraftId = await saveDraft(flatData, 0);
-      navigate(`/drug-form?draftId=${newDraftId}`);
+      flatData.original_id = data._id || data.id;
+      flatData.originalVersion = flatData.version || data.version || "1.0";
+      if (!flatData.version) {
+        flatData.version = "1.0";
+      }
+      const existingDraft = findExistingDraft(drafts, flatData);
+      const targetDraftId = existingDraft ? (existingDraft.id || existingDraft._id) : null;
+      const newDraftId = await saveDraft(flatData, 0, targetDraftId);
+      navigate(`/drug-form?draftId=${newDraftId}`, { state: { initialData: flatData } });
     } catch (err) {
       console.error("Error creating draft:", err);
       toast.error("Failed to edit drug");
     }
   };
 
-  const handleDelete = async (e: React.MouseEvent) => {
+  const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsOpen(false);
-    
+
     const data = params.data?.drug || params.data;
     const drugId = data?._id;
-    
+
     if (!drugId) {
       toast.error("Invalid drug ID");
       return;
     }
+    setShowDeleteModal(true);
+  };
 
-    if (window.confirm("Are you sure you want to delete this drug?")) {
-      try {
-        await deleteData(drugService.deleteDrug(drugId));
-        toast.success("Drug deleted successfully");
-        if (refetchDrugs) {
-          await refetchDrugs();
-        }
-      } catch (err) {
-        console.error("Error deleting drug:", err);
-        toast.error("Failed to delete drug");
+  const handleConfirmDelete = async () => {
+    setShowDeleteModal(false);
+    const data = params.data?.drug || params.data;
+    const drugId = data?._id;
+    if (!drugId) return;
+
+    try {
+      await deleteData(drugService.deleteDrug(drugId));
+      toast.success("Drug deleted successfully");
+      if (refetchDrugs) {
+        await refetchDrugs();
       }
+    } catch (err) {
+      console.error("Error deleting drug:", err);
+      toast.error("Failed to delete drug");
     }
   };
 
-  if (!canEditDrugs && !canDeleteDrugs) {
+  if (!allowEdit && !allowDelete) {
     return null;
   }
 
@@ -109,18 +129,18 @@ const ActionMenuCellRenderer: React.FC<any> = (params) => {
             style={{ top: coords.top + 4, left: coords.left }}
             onClick={(e) => e.stopPropagation()}
           >
-            {canEditDrugs && (
+            {allowEdit && (
               <button
                 onClick={handleEdit}
-                className="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2 text-[#2563EB] hover:text-[#1d4ed8] cursor-pointer"
+                className="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2 text-primary hover:text-primary-hover cursor-pointer"
               >
                 <FiEdit className="w-3.5 h-3.5" />
                 <span>Edit</span>
               </button>
             )}
-            {canDeleteDrugs && (
+            {allowDelete && (
               <button
-                onClick={handleDelete}
+                onClick={handleDeleteClick}
                 className="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2 text-red-600 hover:text-red-700 border-t border-gray-100 cursor-pointer"
               >
                 <FiTrash2 className="w-3.5 h-3.5" />
@@ -130,6 +150,18 @@ const ActionMenuCellRenderer: React.FC<any> = (params) => {
           </div>,
           document.body
         )}
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Drug"
+        description="Are you sure you want to delete this drug record? This action cannot be undone."
+        confirmText="Yes, Delete"
+        icon={<FiTrash2 className="w-6 h-6 text-red-500" />}
+        iconBgColor="bg-red-50 border-red-200"
+        confirmButtonColor="bg-red-600 hover:bg-red-700"
+      />
     </div>
   );
 };

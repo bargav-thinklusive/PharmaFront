@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import {
   FiSearch,
   FiFilter,
@@ -168,13 +167,6 @@ const UsersTable: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-page font-sans pt-14 pb-20">
-      <ToastContainer
-        position="bottom-right"
-        autoClose={3000}
-        theme="light"
-        style={{ zIndex: 99999 }}
-      />
-
       <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-12 mt-8">
         {/* Toolbar card */}
         <div className="bg-white rounded-2xl border border-border-main p-5 mb-6 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">

@@ -7,6 +7,8 @@ import useGet from "../hooks/useGet";
 import DrugService from "../services/DrugService";
 import DraftService from "../services/DraftService";
 
+import MasterDataService from "../services/MasterDataService";
+
 const tokenService = TokenService;
 const UserContext = createContext<any | undefined>(undefined)
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -15,10 +17,33 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const { fetchData: fetchDrugs, data: drugsData, loading: drugsLoading } = useGet();
   const { fetchData: fetchDrafts, data: draftsRawData, loading: draftsLoading } = useGet();
 
+  const [masterData, setMasterData] = useState<{
+    therapeuticAreas: Record<string, string[]>;
+    regionsCountries: Record<string, string[]>;
+    regulatoryAuthorities: any[];
+  }>({
+    therapeuticAreas: {},
+    regionsCountries: {},
+    regulatoryAuthorities: []
+  });
+
+  const getMasterData = async () => {
+    const masterDataService = new MasterDataService();
+    const [ta, rc, ra] = await Promise.all([
+      masterDataService.getTherapeuticAreas(),
+      masterDataService.getRegionsCountries(),
+      masterDataService.getRegulatoryAuthorities()
+    ]);
+    setMasterData({
+      therapeuticAreas: ta,
+      regionsCountries: rc,
+      regulatoryAuthorities: ra
+    });
+  };
+
   const checkTokenAndGetUser = async (): Promise<boolean> => {
     let token = tokenService.getToken();
 
-    // No access token — try to silently refresh before giving up
     if (!token) {
       token = await tokenService.refreshToken();
     }
@@ -31,9 +56,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
       return true;
     }
-
-    // Not authenticated — PublicOnlyRoute and ProtectedRoute handle redirects
-    // at the router level, so no manual navigate() call needed here.
     return false;
   }
 
@@ -53,10 +75,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }
 
   useEffect(() => {
-    const init = async () => {
-      await checkTokenAndGetUser();
-    };
-    init();
+    checkTokenAndGetUser();
+    getMasterData();
   }, []);
 
   useEffect(() => {
@@ -66,7 +86,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Derive roles: prefer live user data, fallback to localStorage on refresh
   const roles: string[] =
     user?.data?.roles ??
     AuthService.getUserRoles();
@@ -88,7 +107,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       refetchDrafts: getDrafts,
       roles,
       selectedList,
-      setSelectedList
+      setSelectedList,
+      masterData,
+      refetchMasterData: getMasterData
     }}>
       {children}
     </UserContext.Provider>

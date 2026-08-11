@@ -4,8 +4,7 @@ import { FiUser, FiMail, FiLock, FiArrowRight, FiCheckCircle } from "react-icons
 import usePost from "../../../hooks/usePost";
 import LoginService from "../../../services/LoginService";
 import { useNavigate } from "react-router";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import CompanyLogo from "../../../assets/CMCINTELLOGO.png";
 
 const login = new LoginService();
@@ -98,19 +97,6 @@ const Register: React.FC = () => {
 
   return (
     <>
-      <ToastContainer
-        position="bottom-right"
-        autoClose={4000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        style={{ zIndex: 99999 }}
-        toastClassName="!bg-[#0F172A] !text-white text-center rounded-xl shadow-xl"
-      />
 
       <div className="fixed inset-0 flex min-h-screen w-screen font-sans overflow-hidden">
 

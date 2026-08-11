@@ -1,9 +1,13 @@
 import React from "react";
 import { GiPill } from "react-icons/gi";
+import { formatDraftDate } from "../../utils/utils";
 
 interface CompoundFormHeaderProps {
     drugName: string;
     drugId: string;
+    cid?: string | number;
+    version?: string | number;
+    lastUpdated?: string | number;
     overallProgressPct: number;
     completedStepsCount: number;
     totalStepsCount: number;
@@ -12,6 +16,9 @@ interface CompoundFormHeaderProps {
 export const CompoundFormHeader: React.FC<CompoundFormHeaderProps> = ({
     drugName,
     drugId,
+    cid,
+    version,
+    lastUpdated,
     overallProgressPct,
     completedStepsCount,
     totalStepsCount,
@@ -36,8 +43,14 @@ export const CompoundFormHeader: React.FC<CompoundFormHeaderProps> = ({
                             Approved Drug
                         </span>
                     </div>
-                    <div className="text-[10px] text-slate-400 font-medium mt-1">
-                        Drug ID: {drugId || "D004"} &nbsp;|&nbsp; Version: 2.1 (Draft) &nbsp;|&nbsp; Last Updated: May 15, 2026
+                    <div className="text-[10px] text-slate-400 font-medium mt-1 flex items-center gap-1.5 flex-wrap">
+                        <span className="font-semibold text-slate-700">Drug ID: {drugId || cid || "D004"}</span>
+                        {cid && drugId && String(drugId) !== String(cid) && (
+                            <span className="font-semibold text-slate-600">(CID: {cid})</span>
+                        )}
+                        <span>&nbsp;|&nbsp;</span>
+                        <span className="font-semibold text-slate-700">Version: {version || "1.0"} (Draft)</span>
+                        <span>&nbsp;|&nbsp; Last Updated: {formatDraftDate(lastUpdated || Date.now())}</span>
                     </div>
                 </div>
             </div>

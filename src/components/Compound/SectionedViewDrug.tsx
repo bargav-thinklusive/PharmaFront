@@ -2,10 +2,10 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import { flattenDrug } from '../CompoundForm/helper';
+import { findExistingDraft, unixToDate, trackDrugSearch } from '../../utils/utils';
 import useDraft from '../../hooks/useDraft';
 import useDelete from '../../hooks/useDelete';
 import DrugService from '../../services/DrugService';
-import { unixToDate, trackDrugSearch } from '../../utils/utils';
 import { toast } from 'react-toastify';
 import useRoles from '../../hooks/useRoles';
 import {
@@ -38,19 +38,20 @@ import {
 } from 'react-icons/fi';
 import './SectionedViewDrug.css';
 
-// Modular Components
 import SectionHeader from './sectioned/SectionHeader';
 import SectionContent from './sectioned/SectionContent';
+import { ConfirmModal } from '../shared/ConfirmModal';
 
 const drugService = new DrugService();
 
 export default function SectionedViewDrug() {
     const { cid, version } = useParams();
     const navigate = useNavigate();
-    const { drugsData, refetchDrugs } = useUser();
+    const { drugsData, refetchDrugs, drafts } = useUser();
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const { saveDraft } = useDraft();
     const { deleteData } = useDelete();
-    const { canEditDrugs, canDeleteDrugs } = useRoles();
+    const { canEditDrug, canDeleteDrug } = useRoles();
 
     const [currentStep, setCurrentStep] = useState(1);
     const [editMenuOpen, setEditMenuOpen] = useState(false);
@@ -58,8 +59,8 @@ export default function SectionedViewDrug() {
     const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
     const editBtnRef = useRef<HTMLDivElement>(null);
-    const exportBtnRef = useRef<HTMLButtonElement>(null);
-    const moreBtnRef = useRef<HTMLButtonElement>(null);
+    const exportBtnRef = useRef<HTMLDivElement>(null);
+    const moreBtnRef = useRef<HTMLDivElement>(null);
 
     // Find drug data by cid
     const drugToDisplay = useMemo(() => {
@@ -139,7 +140,7 @@ export default function SectionedViewDrug() {
                     </p>
                     <button
                         onClick={() => navigate('/drugsList')}
-                        className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-colors cursor-pointer text-sm shadow-sm"
+                        className="w-full py-2.5 px-4 bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl transition-colors cursor-pointer text-sm shadow-sm"
                     >
                         Back to Database
                     </button>
@@ -157,38 +158,66 @@ export default function SectionedViewDrug() {
     const handleEdit = async () => {
         try {
             const flatData = flattenDrug(drugToDisplay);
-            const newDraftId = await saveDraft(flatData, 0);
-            navigate(`/drug-form?draftId=${newDraftId}`);
+            flatData.original_id = drugToDisplay._id || drugToDisplay.id;
+            flatData.originalVersion = flatData.version || drugToDisplay.version || "1.0";
+            if (!flatData.version) {
+                flatData.version = "1.0";
+            }
+            const existingDraft = findExistingDraft(drafts, flatData);
+            const targetDraftId = existingDraft ? (existingDraft.id || existingDraft._id) : null;
+            const newDraftId = await saveDraft(flatData, 0, targetDraftId);
+            navigate(`/drug-form?draftId=${newDraftId}`, { state: { initialData: flatData } });
         } catch (err) {
             console.error("Error creating draft for edit:", err);
             toast.error("Failed to edit drug entry.");
         }
     };
 
-    const handleDelete = async () => {
+    const handleDelete = () => {
         if (!drugToDisplay?._id) return;
-        if (window.confirm("Are you sure you want to delete this drug record?")) {
-            try {
-                await deleteData(drugService.deleteDrug(drugToDisplay._id));
-                toast.success("Drug record deleted successfully");
-                if (refetchDrugs) await refetchDrugs();
-                navigate("/drugsList");
-            } catch (err) {
-                console.error("Error deleting drug:", err);
-                toast.error("Failed to delete drug record.");
-            }
+        setShowDeleteModal(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        setShowDeleteModal(false);
+        if (!drugToDisplay?._id) return;
+        try {
+            await deleteData(drugService.deleteDrug(drugToDisplay._id));
+            toast.success("Drug record deleted successfully");
+            if (refetchDrugs) await refetchDrugs();
+            navigate("/drugsList");
+        } catch (err) {
+            console.error("Error deleting drug:", err);
+            toast.error("Failed to delete drug record.");
         }
     };
 
     const handleExportJson = () => {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(drugToDisplay, null, 2));
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", `${flatDrug.drugName || 'drug'}_metadata.json`);
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        downloadAnchor.remove();
-        toast.success("Metadata exported as JSON!");
+        setExportMenuOpen(false);
+        try {
+            const fileName = (flatDrug.drugName || drugToDisplay.ProductOverview?.drugName || 'drug_entry').replace(/[^a-zA-Z0-9_-]/g, '_');
+            const jsonString = JSON.stringify(drugToDisplay, null, 2);
+            const blob = new Blob([jsonString], { type: "application/json;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute("download", `${fileName}_metadata.json`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            toast.success("Metadata exported as JSON!");
+        } catch (err) {
+            console.error("JSON Export error:", err);
+            toast.error("Failed to export JSON file.");
+        }
+    };
+
+    const handlePrintPdf = () => {
+        setExportMenuOpen(false);
+        setTimeout(() => {
+            window.print();
+        }, 150);
     };
 
     // Quick Stats Fields
@@ -218,7 +247,7 @@ export default function SectionedViewDrug() {
     return (
         <div className="sectioned-view-container bg-slate-50/50 min-h-screen text-slate-800">
             <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                
+
                 {/* ── Breadcrumb Back Link ── */}
                 <div className="mb-5 flex justify-start">
                     <button
@@ -251,7 +280,7 @@ export default function SectionedViewDrug() {
                                 <span className="bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-bold px-2.5 py-0.5 rounded-lg shadow-xs">
                                     Current Version: {version || "—"}
                                 </span>
-                                <span className="bg-blue-50 text-blue-700 border border-blue-100 text-[10px] font-bold px-2.5 py-0.5 rounded-lg shadow-xs">
+                                <span className="bg-primary-light text-primary border border-emerald-100 text-[10px] font-bold px-2.5 py-0.5 rounded-lg shadow-xs">
                                     Status: Published
                                 </span>
                             </div>
@@ -261,18 +290,18 @@ export default function SectionedViewDrug() {
                     {/* Right Pane: Split actions buttons */}
                     <div className="flex items-center gap-3 w-full md:w-auto justify-end relative">
                         {/* Edit Split Button */}
-                        {canEditDrugs && (
+                        {canEditDrug(drugToDisplay) && (
                             <div ref={editBtnRef} className="inline-flex rounded-xl shadow-xs relative">
                                 <button
                                     onClick={handleEdit}
-                                    className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors cursor-pointer border-0 rounded-l-xl"
+                                    className="flex items-center gap-1.5 px-4 py-2 bg-primary hover:bg-primary-hover text-white text-xs font-bold transition-colors cursor-pointer border-0 rounded-l-xl"
                                 >
                                     <FiEdit className="w-3.5 h-3.5" />
                                     Edit Drug
                                 </button>
                                 <button
                                     onClick={() => setEditMenuOpen(!editMenuOpen)}
-                                    className="px-2 py-2 bg-blue-600 hover:bg-blue-500 text-white border-l border-blue-500/50 flex items-center justify-center cursor-pointer border-0 rounded-r-xl"
+                                    className="px-2 py-2 bg-primary hover:bg-primary-hover text-white border-l border-emerald-700/40 flex items-center justify-center cursor-pointer border-0 rounded-r-xl"
                                 >
                                     <FiChevronRight className="w-3.5 h-3.5 rotate-90" />
                                 </button>
@@ -291,9 +320,8 @@ export default function SectionedViewDrug() {
                         )}
 
                         {/* Export Dropdown Button */}
-                        <div className="relative">
+                        <div ref={exportBtnRef} className="relative">
                             <button
-                                ref={exportBtnRef}
                                 onClick={() => setExportMenuOpen(!exportMenuOpen)}
                                 className="flex items-center gap-1.5 px-4 py-2 border border-slate-200 bg-white text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors rounded-xl shadow-xs cursor-pointer"
                             >
@@ -304,6 +332,7 @@ export default function SectionedViewDrug() {
                             {exportMenuOpen && (
                                 <div className="absolute right-0 top-full mt-1.5 w-44 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50 text-xs font-semibold text-slate-700 text-left">
                                     <button
+                                        type="button"
                                         onClick={handleExportJson}
                                         className="w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-2 cursor-pointer text-slate-700"
                                     >
@@ -311,7 +340,8 @@ export default function SectionedViewDrug() {
                                         <span>Export as JSON</span>
                                     </button>
                                     <button
-                                        onClick={() => window.print()}
+                                        type="button"
+                                        onClick={handlePrintPdf}
                                         className="w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-2 cursor-pointer text-slate-700"
                                     >
                                         <FiFileText className="w-3.5 h-3.5" />
@@ -322,10 +352,9 @@ export default function SectionedViewDrug() {
                         </div>
 
                         {/* Meatball Actions Menu */}
-                        {canDeleteDrugs && (
-                            <div className="relative">
+                        {canDeleteDrug(drugToDisplay) && (
+                            <div ref={moreBtnRef} className="relative">
                                 <button
-                                    ref={moreBtnRef}
                                     onClick={() => setMoreMenuOpen(!moreMenuOpen)}
                                     className="w-8 h-8 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:bg-slate-50 transition-colors cursor-pointer"
                                 >
@@ -348,14 +377,16 @@ export default function SectionedViewDrug() {
                 </div>
 
                 {/* ── Tabs Navigation ── */}
-                <SectionHeader
-                    sections={sections}
-                    currentStep={currentStep}
-                    onNavigate={handleNavigateById}
-                />
+                <div className="screen-only">
+                    <SectionHeader
+                        sections={sections}
+                        currentStep={currentStep}
+                        onNavigate={handleNavigateById}
+                    />
+                </div>
 
-                {/* ── Main Tab Content Wrapper ── */}
-                <main className="min-h-[50vh] animate-fadeIn bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 text-left mt-6">
+                {/* ── Main Tab Content Wrapper (Screen Only) ── */}
+                <main className="screen-only min-h-[50vh] animate-fadeIn bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 text-left mt-6">
                     {currentStep === 1 ? (
                         /* Executive Summary Custom Tab Dashboard */
                         <div className="space-y-8">
@@ -615,7 +646,51 @@ export default function SectionedViewDrug() {
                     )}
                 </main>
 
+                {/* ── Full Printable View (Renders ALL 12 sections during window.print()) ── */}
+                <div className="hidden print:block print-all p-8 bg-white text-slate-900 font-sans space-y-10">
+                    {/* Document Header */}
+                    <div className="border-b border-slate-300 pb-6 mb-8 flex items-center justify-between">
+                        <div>
+                            <h1 className="text-2xl font-bold text-slate-900 font-display">
+                                {flatDrug.drugName || drugToDisplay.ProductOverview?.drugName || "Drug Entry"}
+                            </h1>
+                            <p className="text-xs text-slate-600 mt-1 font-medium">
+                                Comprehensive Technical Dossier &amp; Drug Information Report
+                            </p>
+                        </div>
+                        <div className="text-right text-xs text-slate-500 font-medium">
+                            <div>CID: {flatDrug.cid || drugToDisplay.cid || "—"}</div>
+                            <div>Version: {flatDrug.version || drugToDisplay.version || "1.0"}</div>
+                            <div>Printed On: {new Date().toLocaleDateString()}</div>
+                        </div>
+                    </div>
+
+                    {/* All 12 Sections Iteration */}
+                    {displayData && sections.map((sec) => (
+                        <div key={sec.id} className="page-break-after pb-8 border-b border-slate-200 last:border-b-0">
+                            <h2 className="text-lg font-bold text-[#0e8a67] border-l-4 border-[#0e8a67] pl-3 mb-4 font-display">
+                                {sec.id}. {sec.title}
+                            </h2>
+                            <SectionContent
+                                data={displayData[sec.key]}
+                                sectionIndex={`${sec.id}`}
+                            />
+                        </div>
+                    ))}
+                </div>
+
             </div>
+            <ConfirmModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={handleConfirmDelete}
+                title="Delete Drug Record"
+                description="Are you sure you want to delete this drug record? This action cannot be undone."
+                confirmText="Yes, Delete"
+                icon={<FiTrash2 className="w-6 h-6 text-red-500" />}
+                iconBgColor="bg-red-50 border-red-200"
+                confirmButtonColor="bg-red-600 hover:bg-red-700"
+            />
         </div>
     );
 }

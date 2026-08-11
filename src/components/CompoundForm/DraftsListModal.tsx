@@ -4,6 +4,9 @@ import { useUser } from "../../context/UserContext";
 import useDraft from "../../hooks/useDraft";
 import { FiFileText, FiTrash2, FiX, FiPlus } from "react-icons/fi";
 
+import { formatDraftDate, getDraftTime } from "../../utils/utils";
+import { ConfirmModal } from "../shared/ConfirmModal";
+
 interface DraftsListModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -13,6 +16,7 @@ export const DraftsListModal: React.FC<DraftsListModalProps> = ({ isOpen, onClos
     const navigate = useNavigate();
     const { drafts } = useUser();
     const { clearDraft } = useDraft();
+    const [deletingDraftId, setDeletingDraftId] = React.useState<string | null>(null);
 
     if (!isOpen) return null;
 
@@ -21,10 +25,15 @@ export const DraftsListModal: React.FC<DraftsListModalProps> = ({ isOpen, onClos
         navigate(`/drug-form?draftId=${draftId}`);
     };
 
-    const handleRemoveDraft = async (e: React.MouseEvent, draftId: string) => {
+    const handleRemoveDraftClick = (e: React.MouseEvent, draftId: string) => {
         e.stopPropagation(); // Prevent opening the draft when clicking delete
-        if (confirm("Are you sure you want to delete this draft?")) {
-            await clearDraft(draftId);
+        setDeletingDraftId(draftId);
+    };
+
+    const handleConfirmRemoveDraft = async () => {
+        if (deletingDraftId) {
+            await clearDraft(deletingDraftId);
+            setDeletingDraftId(null);
         }
     };
 
@@ -34,7 +43,7 @@ export const DraftsListModal: React.FC<DraftsListModalProps> = ({ isOpen, onClos
     };
 
     // Sort drafts by last modified date (newest first)
-    const sortedDrafts = [...drafts].sort((a: any, b: any) => b.lastModified - a.lastModified);
+    const sortedDrafts = [...drafts].sort((a: any, b: any) => getDraftTime(b) - getDraftTime(a));
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-xs transition-opacity duration-300">
@@ -89,14 +98,14 @@ export const DraftsListModal: React.FC<DraftsListModalProps> = ({ isOpen, onClos
                                                 {draft.drugName || "Unnamed Draft"}
                                             </div>
                                             <div className="text-[10px] text-slate-400 font-medium mt-0.5">
-                                                Last saved: {new Date(draft.lastModified).toLocaleString()}
+                                                Last saved: {formatDraftDate(draft.lastModified || draft.updatedAt || draft.createdAt)}
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Action Buttons */}
+                                     {/* Action Buttons */}
                                     <button
-                                        onClick={(e) => handleRemoveDraft(e, draft.id)}
+                                        onClick={(e) => handleRemoveDraftClick(e, draft.id)}
                                         title="Delete draft"
                                         className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer border-0"
                                     >
@@ -125,6 +134,18 @@ export const DraftsListModal: React.FC<DraftsListModalProps> = ({ isOpen, onClos
                     </button>
                 </div>
             </div>
+
+            <ConfirmModal
+                isOpen={!!deletingDraftId}
+                onClose={() => setDeletingDraftId(null)}
+                onConfirm={handleConfirmRemoveDraft}
+                title="Delete Draft"
+                description="Are you sure you want to delete this draft? This action cannot be undone."
+                confirmText="Yes, Delete"
+                icon={<FiTrash2 className="w-6 h-6 text-red-500" />}
+                iconBgColor="bg-red-50 border-red-200"
+                confirmButtonColor="bg-red-600 hover:bg-red-700"
+            />
         </div>
     );
 };
