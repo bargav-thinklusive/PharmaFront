@@ -27,20 +27,27 @@ const useDraft = () => {
 
     /** Persist current form state to secure backend database */
     const saveDraft = useCallback(async (formData: any, currentStep: number, existingDraftId?: string | null): Promise<string> => {
-        // Extract a human-readable drug name for display in the header/home
-        const drugName =
-            formData?.brandName ||
+        const extractedDrugName = (
             formData?.drugName ||
+            formData?.ProductOverview?.drugName ||
+            formData?.brandName ||
             formData?.genericName ||
-            "";
+            formData?.apiName ||
+            ""
+        ).trim();
         
+        if (!extractedDrugName) {
+            throw new Error("Cannot save draft without a Drug Name.");
+        }
+
         const draftId = existingDraftId || Date.now().toString(36) + Math.random().toString(36).substring(2);
         
         const payload = {
             id: draftId,
             formData,
             currentStep,
-            drugName,
+            drugName: extractedDrugName,
+            lastModified: Date.now(),
         };
 
         try {

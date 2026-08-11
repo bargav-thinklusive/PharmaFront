@@ -52,11 +52,18 @@ export const addProductOverview: FieldConfig[] = [
         type: "header",
     },
     {
+        key: "therapeuticArea",
+        label: "Therapeutic Area",
+        type: "dropdown",
+        required: false,
+        placeholder: "Select Therapeutic Area",
+    },
+    {
         key: "approvedIndications",
         label: "Approved Indications",
-        type: "text",
+        type: "dropdown",
         required: false,
-        placeholder: "Enter Approved Indications",
+        placeholder: "Select Approved Indication",
     },
     {
         key: "firstApprovedDate",
@@ -68,9 +75,9 @@ export const addProductOverview: FieldConfig[] = [
     {
         key: "firstApprovedRegion",
         label: "First Approved Region",
-        type: "textarea",
+        type: "dropdown",
         required: false,
-        placeholder: "Enter First Approved Region",
+        placeholder: "Select First Approved Region",
     },
     {
         key: "commercialInfoSectionHeader",
@@ -90,37 +97,32 @@ export const addProductOverview: FieldConfig[] = [
         type: "header",
     },
     {
-        key: "lossOfExclusivity",
-        label: "Loss Of Exclusivity",
-        type: "dynamic",
+        key: "exclusivityCode",
+        label: "Designation Type / Exclusivity Code",
+        type: "text",
         required: false,
-        singleFieldInRow: true,
-        dynamicComponent: (key: string, field: any, form: any) => (
-            <CustomForm key={key} field={field} form={form} />
-        ),
-        dynamicFields: [
-            {
-                key: "exclusivityCode",
-                label: "Designation Type / Exclusivity Code",
-                type: "text",
-                required: false,
-                placeholder: "Enter Designation Type / Exclusivity Code",
-            },
-            {
-                key: "regulatoryBody",
-                label: "Regulatory Body",
-                type: "text",
-                required: false,
-                placeholder: "Enter Regulatory Body",
-            },
-            {
-                key: "expiredDate",
-                label: "Expired Date",
-                type: "datepicker",
-                required: false,
-                placeholder: "Enter Expired Date",
-            },
-        ],
+        placeholder: "Enter Designation Type / Exclusivity Code",
+    },
+    {
+        key: "country",
+        label: "Country",
+        type: "dropdown",
+        required: false,
+        placeholder: "Select Country",
+    },
+    {
+        key: "regulatoryBody",
+        label: "Regulatory Body",
+        type: "dropdown",
+        required: false,
+        placeholder: "Select Regulatory Body",
+    },
+    {
+        key: "expiredDate",
+        label: "Expired Date",
+        type: "datepicker",
+        required: false,
+        placeholder: "Select Expired Date",
     },
     {
         key: "marketDataSectionHeader",
@@ -277,20 +279,6 @@ export const addPhysicalChemicalProperties: FieldConfig[] = [
 // Step 3: Regulatory Insights
 export const addRegulatoryInsights: FieldConfig[] = [
     {
-        key: "regulatoryInsights",
-        label: "Regulatory Insights",
-        type: "text",
-        required: false,
-        placeholder: "Enter Regulatory Insights",
-    },
-    {
-        key: "regionalApproval",
-        label: "Regional Approval",
-        type: "text",
-        required: false,
-        placeholder: "Enter Regional Approval",
-    },
-    {
         key: "approvalDetails",
         label: "Approval Details",
         type: "dynamic",
@@ -310,9 +298,9 @@ export const addRegulatoryInsights: FieldConfig[] = [
             {
                 key: "region",
                 label: "Region",
-                type: "text",
+                type: "dropdown",
                 required: false,
-                placeholder: "Enter Region",
+                placeholder: "Select Region",
             },
             {
                 key: "indication",
@@ -352,9 +340,9 @@ export const addRegulatoryInsights: FieldConfig[] = [
             {
                 key: "regulatoryBodies",
                 label: "Regulatory Bodies",
-                type: "text",
+                type: "dropdown",
                 required: false,
-                placeholder: "Enter Regulatory Bodies",
+                placeholder: "Select Regulatory Bodies",
             },
         ],
     },
@@ -376,11 +364,18 @@ export const addRegulatoryInsights: FieldConfig[] = [
                 placeholder: "Enter Designation Type",
             },
             {
+                key: "country",
+                label: "Country",
+                type: "dropdown",
+                required: false,
+                placeholder: "Select Country",
+            },
+            {
                 key: "regulatorBody",
                 label: "Regulator Body",
-                type: "text",
+                type: "dropdown",
                 required: false,
-                placeholder: "Enter Regulator Body",
+                placeholder: "Select Regulator Body",
             },
             {
                 key: "indication",
@@ -607,8 +602,7 @@ export const addDrugSubstance: FieldConfig[] = [
             {
                 key: "regulatoryBody",
                 label: "Regulatory Body",
-                // type: "dropdown",
-                type: "text",
+                type: "dropdown",
                 required: false,
                 placeholder: "Select Regulatory Body",
             },
@@ -814,9 +808,28 @@ export const addDrugSubstance: FieldConfig[] = [
     {
         key: "drugSubstanceSpecifications",
         label: "Drug Substance Specifications",
-        type: "textarea",
+        type: "dynamic",
         required: false,
-        placeholder: "Enter Drug Substance Specifications",
+        singleFieldInRow: true,
+        dynamicComponent: (key: string, field: any, form: any) => (
+            <CustomForm key={key} field={field} form={form} />
+        ),
+        dynamicFields: [
+            {
+                key: "key",
+                label: "Key",
+                type: "text",
+                required: false,
+                placeholder: "Enter Key (e.g. Assay, Appearance, Heavy Metals)",
+            },
+            {
+                key: "value",
+                label: "Value",
+                type: "text",
+                required: false,
+                placeholder: "Enter Value (e.g. 98.0% - 102.0%, White Crystalline Powder)",
+            },
+        ],
     }, {
         key: "stableAndCommerciallyUsedPolymorphicForm",
         label: "Stable and Commercially Used Polymorphic Form",
@@ -1368,9 +1381,21 @@ export const addSources: FieldConfig[] = [
     {
         key: "sources",
         label: "Sources",
-        type: "textarea",
+        type: "dynamic",
         required: false,
-        placeholder: "Enter Sources",
+        singleFieldInRow: true,
+        dynamicComponent: (key: string, field: any, form: any) => (
+            <CustomForm key={key} field={field} form={form} />
+        ),
+        dynamicFields: [
+            {
+                key: "source",
+                label: "Source / Reference",
+                type: "textarea",
+                required: false,
+                placeholder: "Enter Source or Reference link/citation",
+            },
+        ],
     },
 ];
 
@@ -1379,9 +1404,28 @@ export const addGlossary: FieldConfig[] = [
     {
         key: "glossary",
         label: "Glossary",
-        type: "textarea",
+        type: "dynamic",
         required: false,
-        placeholder: "Enter Glossary",
+        singleFieldInRow: true,
+        dynamicComponent: (key: string, field: any, form: any) => (
+            <CustomForm key={key} field={field} form={form} />
+        ),
+        dynamicFields: [
+            {
+                key: "term",
+                label: "Term",
+                type: "text",
+                required: false,
+                placeholder: "Enter Term (e.g. ANDA, API, BCS)",
+            },
+            {
+                key: "definition",
+                label: "Definition",
+                type: "textarea",
+                required: false,
+                placeholder: "Enter Definition or Explanation",
+            },
+        ],
     },
 ];
 

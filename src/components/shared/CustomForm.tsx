@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import { FiTrash2, FiEdit2, FiChevronUp, FiChevronRight, FiCheck } from "react-icons/fi";
 import type { FieldConfig } from "./index";
+import { useUser } from "../../context/UserContext";
 
 interface CustomFormProps {
     field: FieldConfig;
@@ -10,6 +11,15 @@ interface CustomFormProps {
 
 const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
     const { key, dynamicFields, label: cleanLabel } = field;
+    const { masterData } = useUser() || {};
+
+    const activeTherapeuticAreas = masterData?.therapeuticAreas || {};
+    // const activeRegionsCountries = masterData?.regionsCountries || {};
+    const activeAuthorities: any[] = masterData?.regulatoryAuthorities || [];
+
+    const allCountries = (activeAuthorities.length > 0)
+        ? Array.from(new Set(activeAuthorities.map((r: any) => r.country))).sort()
+        : [];
 
     // Build an empty row object from the dynamic field definitions
     const getEmptyRow = () => {
@@ -25,6 +35,37 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
 
     // The single "input" row being filled in
     const [inputRow, setInputRow] = useState<any>(getEmptyRow());
+
+    const getFieldOptions = (dynamicField: any) => {
+        if (dynamicField.options && dynamicField.options.length > 0) {
+            return dynamicField.options;
+        }
+        const fieldKey = dynamicField.key;
+        if (fieldKey === "country") {
+            return allCountries.map((c: string) => ({ label: c, value: c }));
+        }
+        if (fieldKey === "regulatoryBody" || fieldKey === "regulatoryAuthority" || fieldKey === "regulatorBody" || fieldKey === "regulatoryBodies") {
+            const selectedCountry = inputRow?.country || inputRow?.region;
+            if (!selectedCountry || selectedCountry.trim() === "") {
+                return []; // Empty list first until country/region is selected
+            }
+            const filtered = activeAuthorities.filter((r: any) => r.country?.toLowerCase() === selectedCountry.toLowerCase());
+
+            return filtered.map((r: any) => ({
+                label: r.abbreviation || r.authority,
+                value: r.abbreviation || r.authority
+            }));
+        }
+        if (fieldKey === "region" || fieldKey === "firstApprovedRegion") {
+            return allCountries.map((c: string) => ({ label: c, value: c }));
+        }
+        if (fieldKey === "indication" || fieldKey === "approvedIndications") {
+            const selectedTA = inputRow?.therapeuticArea;
+            const indList = selectedTA && activeTherapeuticAreas[selectedTA] ? activeTherapeuticAreas[selectedTA] : [];
+            return indList.map((ind: string) => ({ label: ind, value: ind }));
+        }
+        return [];
+    };
 
     // Index of the row currently being edited
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -73,7 +114,7 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
         const updatedRows = tableRows.filter((_, i) => i !== index);
         setTableRows(updatedRows);
         syncToForm(updatedRows);
-        
+
         if (editingIndex === index) {
             setEditingIndex(null);
             setInputRow(getEmptyRow());
@@ -130,7 +171,8 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                     />
                 );
 
-            case "dropdown":
+            case "dropdown": {
+                const optionsList = getFieldOptions(dynamicField);
                 return (
                     <select
                         value={value || ""}
@@ -138,13 +180,14 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                         className={commonClasses}
                     >
                         <option value="">{dynamicField.placeholder || "Select"}</option>
-                        {dynamicField.options?.map((option: any, idx: number) => (
-                            <option key={idx} value={option.value}>
-                                {option.label}
+                        {optionsList.map((option: any, idx: number) => (
+                            <option key={idx} value={option.value || option.label}>
+                                {option.label || option.value}
                             </option>
                         ))}
                     </select>
                 );
+            }
 
             case "contact":
                 return (
@@ -202,9 +245,9 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
         if (k === "phone" && v === "+1") return false;
         return v !== "" && v !== undefined && v !== null;
     });
-    
+
     const hasRows = tableRows.length > 0;
-    
+
     let status = "Not Started";
     if (hasRows) {
         status = isInputRowActive ? "In Progress" : "Complete";
@@ -214,7 +257,7 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
 
     let statusIcon = null;
     let statusBadge = null;
-    
+
     if (status === "Complete") {
         statusIcon = (
             <div className="w-6 h-6 rounded-full bg-[#0e8a67] flex items-center justify-center text-white flex-shrink-0">
@@ -357,7 +400,7 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                                         <button
                                             type="button"
                                             onClick={() => handleEditClick(rowIndex)}
-                                            className="inline-flex items-center justify-center p-1.5 text-[#2563eb] hover:text-[#1d4ed8] hover:bg-blue-50 rounded-lg transition-colors mr-1 cursor-pointer"
+                                            className="inline-flex items-center justify-center p-1.5 text-primary hover:text-primary-hover hover:bg-primary-light rounded-lg transition-colors mr-1 cursor-pointer"
                                             aria-label="Edit row"
                                             title="Edit"
                                         >

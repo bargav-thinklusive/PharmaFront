@@ -15,6 +15,102 @@ export const toTitleCase = (str: unknown): string => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
+export const formatDraftDate = (val: any): string => {
+  if (!val) return "Unknown date";
+  let date: Date;
+  if (typeof val === 'number') {
+    date = val > 4102444800 ? new Date(val) : new Date(val * 1000);
+  } else if (typeof val === 'string') {
+    let str = val.trim();
+    if (/^\d+$/.test(str)) {
+      const num = parseInt(str, 10);
+      date = num > 4102444800 ? new Date(num) : new Date(num * 1000);
+    } else {
+      if (str.includes('T') && !str.endsWith('Z') && !/[+-]\d{2}:\d{2}$/.test(str)) {
+        str += 'Z';
+      } else if (!str.includes('T') && /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}/.test(str)) {
+        str = str.replace(' ', 'T') + 'Z';
+      }
+      date = new Date(str);
+    }
+  } else {
+    date = new Date(val);
+  }
+
+  if (isNaN(date.getTime())) {
+    return String(val);
+  }
+
+  return date.toLocaleString(undefined, {
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+};
+
+export const getDraftTime = (d: any): number => {
+  const val = d?.lastModified ?? d?.updatedAt ?? d?.createdAt;
+  if (!val) return 0;
+  if (typeof val === 'number') {
+    return val > 4102444800 ? val : val * 1000;
+  }
+  if (typeof val === 'string') {
+    let str = val.trim();
+    if (/^\d+$/.test(str)) {
+      const num = parseInt(str, 10);
+      return num > 4102444800 ? num : num * 1000;
+    }
+    if (str.includes('T') && !str.endsWith('Z') && !/[+-]\d{2}:\d{2}$/.test(str)) {
+      str += 'Z';
+    } else if (!str.includes('T') && /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}/.test(str)) {
+      str = str.replace(' ', 'T') + 'Z';
+    }
+    const parsed = new Date(str).getTime();
+    return isNaN(parsed) ? 0 : parsed;
+  }
+  const parsed = new Date(val).getTime();
+  return isNaN(parsed) ? 0 : parsed;
+};
+
+export const findExistingDraft = (drafts: any[], flatData: any): any => {
+  if (!drafts || !Array.isArray(drafts) || !flatData) return null;
+  
+  const targetDrugName = (flatData.drugName || flatData.ProductOverview?.drugName || "").trim().toLowerCase();
+  const targetCid = flatData.cid ? String(flatData.cid) : null;
+  const targetId = flatData._id || flatData.id ? String(flatData._id || flatData.id) : null;
+
+  return drafts.find((d: any) => {
+    if (!d) return false;
+    const fData = d.formData || {};
+    
+    // 1. Match by drug ID in formData
+    if (targetId && (String(fData._id) === targetId || String(fData.id) === targetId)) return true;
+    
+    // 2. Match by CID in formData
+    if (targetCid && fData.cid && String(fData.cid) === targetCid) return true;
+    
+    // 3. Match by drugName
+    const dName = (d.drugName || fData.drugName || fData.ProductOverview?.drugName || "").trim().toLowerCase();
+    if (targetDrugName && dName && dName === targetDrugName) return true;
+
+    return false;
+  });
+};
+
+export const getNextVersion = (currentVer: any): string => {
+  if (!currentVer && currentVer !== 0) return "1.1";
+  const str = String(currentVer).trim();
+  const num = parseFloat(str);
+  if (!isNaN(num)) {
+    const next = (num + 0.1).toFixed(1);
+    return next;
+  }
+  return str;
+};
+
 /**
  * Converts a Unix timestamp (seconds) to a readable date string (Jan-DD-YYYY).
  */

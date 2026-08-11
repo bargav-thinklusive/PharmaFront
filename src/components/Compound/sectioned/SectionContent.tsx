@@ -1,5 +1,5 @@
 import { normalizeValue, toTitleCase } from '../../../utils/utils';
-import { KeyValueDisplay, DataTable } from '../shared/renderValue';
+import { KeyValueDisplay, DataTable, DrugSubstanceSpecificationsTable, renderLink } from '../shared/renderValue';
 
 interface SectionContentProps {
     data: any;
@@ -89,22 +89,35 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
         const baseIndex = index.split('.').slice(0, -1).join('.');
 
         return (
-            <div className="space-y-8">
+            <div className="space-y-6">
                 {items.map((item, i) => {
-                    const subIdx = `${baseIndex}.${i + 1}`;
-                    const label = typeof item === 'object' ? (item.appendix || item.name || `Appendix ${i + 1}`) : item;
-                    const content = typeof item === 'object' ? (item.content || item.appendix) : item;
-                    const isContentSameAsLabel = content === label;
+                    const subIdx = baseIndex ? `${baseIndex}.${i + 1}` : `${index}.${i + 1}`;
+                    let titleText = `Appendix ${i + 1}`;
+                    let bodyText = "";
+
+                    if (typeof item === 'string') {
+                        bodyText = item;
+                    } else if (typeof item === 'object' && item !== null) {
+                        if (item.appendix && item.content && item.appendix !== item.content) {
+                            titleText = item.appendix;
+                            bodyText = item.content;
+                        } else {
+                            bodyText = item.content || item.appendix || item.name || JSON.stringify(item);
+                            if (item.appendix && item.appendix.length < 40 && !item.content) {
+                                titleText = item.appendix;
+                            }
+                        }
+                    } else {
+                        bodyText = String(item);
+                    }
 
                     return (
-                        <div key={i} className="space-y-4">
-                            <h2 className="text-lg font-bold text-gray-800 border-primary border-b-2 pb-1">{subIdx} {label}</h2>
-                            <div className="p-4 border border-primary/20 rounded bg-primary-light/50 min-h-[100px] text-gray-700 whitespace-pre-wrap">
-                                {isContentSameAsLabel ? (
-                                    <span className="text-gray-400 italic">No additional content provided for this appendix.</span>
-                                ) : (
-                                    content
-                                )}
+                        <div key={i} className="space-y-3">
+                            <h2 className="text-lg font-bold text-slate-800 border-[#0e8a67] border-b-2 pb-1 font-display">
+                                {subIdx} {titleText}
+                            </h2>
+                            <div className="p-4 border border-emerald-200/60 rounded-xl bg-emerald-50/40 text-slate-800 text-sm whitespace-pre-wrap leading-relaxed shadow-xs">
+                                {renderLink(normalizeValue(bodyText))}
                             </div>
                         </div>
                     );
@@ -113,18 +126,110 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
         );
     }
 
+    if (normalizedTitle.includes('drugsubstancespecifications') || normalizedTitle.includes('drug substance specifications')) {
+        return (
+            <div className="space-y-4">
+                <h2 className="text-lg font-bold text-slate-800 border-[#0e8a67] border-b-2 pb-1 font-display">
+                    {index} {toTitleCase(title)}
+                </h2>
+                <DrugSubstanceSpecificationsTable data={data} />
+            </div>
+        );
+    }
+
     if (normalizedTitle.includes('manufacturingroutes') || normalizedTitle.includes('manufacturing routes')) {
         const steps = Array.isArray(data) ? data : [data];
         return (
             <div className="space-y-4">
-                <h2 className="text-lg font-bold text-gray-800 border-primary border-b-2 pb-1">{index} {toTitleCase(title)}</h2>
+                <h2 className="text-lg font-bold text-slate-800 border-[#0e8a67] border-b-2 pb-1 font-display">{index} {toTitleCase(title)}</h2>
                 <div className="space-y-4">
                     {steps.map((item, i) => (
-                        <div key={i} className="p-4 border border-primary/20 rounded bg-primary-light/50">
-                            <h3 className="font-bold text-primary-hover mb-1 italic">Step {i + 1}</h3>
-                            <div className="text-gray-700 whitespace-pre-wrap">{item.step || (typeof item === 'string' ? item : JSON.stringify(item))}</div>
+                        <div key={i} className="p-4 border border-emerald-200/60 rounded-xl bg-emerald-50/40 shadow-xs">
+                            <h3 className="font-bold text-[#0e8a67] mb-1 italic">Step {i + 1}</h3>
+                            <div className="text-slate-800 text-sm whitespace-pre-wrap">{item.step || (typeof item === 'string' ? item : JSON.stringify(item))}</div>
                         </div>
                     ))}
+                </div>
+            </div>
+        );
+    }
+
+    if (normalizedTitle.includes('sources') || normalizedTitle.includes('source')) {
+        let items: any[] = [];
+        if (Array.isArray(data)) {
+            items = data;
+        } else if (typeof data === 'string' && data.trim()) {
+            items = data.split('\n').filter(s => s.trim()).map(s => ({ source: s.trim() }));
+        } else if (typeof data === 'object' && data !== null) {
+            items = [data];
+        }
+
+        if (items.length === 0) {
+            return (
+                <div className="space-y-4">
+                    <h2 className="text-lg font-bold text-slate-800 border-[#0e8a67] border-b-2 pb-1 font-display">{index} {toTitleCase(title)}</h2>
+                    <div className="p-4 border border-slate-200 rounded-xl bg-slate-50 text-slate-500 text-sm italic">No sources available.</div>
+                </div>
+            );
+        }
+
+        return (
+            <div className="space-y-4">
+                <h2 className="text-lg font-bold text-slate-800 border-[#0e8a67] border-b-2 pb-1 font-display">{index} {toTitleCase(title)}</h2>
+                <div className="space-y-4">
+                    {items.map((item, i) => {
+                        const val = typeof item === 'object' && item !== null ? (item.source || item.url || item.reference || Object.values(item)[0]) : item;
+                        return (
+                            <div key={i} className="p-4 border border-emerald-200/60 rounded-xl bg-emerald-50/40 shadow-xs">
+                                <h3 className="font-bold text-[#0e8a67] mb-1.5 text-xs uppercase tracking-wider">Source {i + 1}</h3>
+                                <div className="text-slate-800 text-sm whitespace-pre-wrap">{renderLink(normalizeValue(val))}</div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    }
+
+    if (normalizedTitle.includes('glossary')) {
+        let items: any[] = [];
+        if (Array.isArray(data)) {
+            items = data;
+        } else if (typeof data === 'string' && data.trim()) {
+            items = data.split('\n').filter(s => s.trim()).map(s => {
+                const parts = s.split(':');
+                if (parts.length > 1) {
+                    return { term: parts[0].trim(), definition: parts.slice(1).join(':').trim() };
+                }
+                return { term: `Term`, definition: s.trim() };
+            });
+        } else if (typeof data === 'object' && data !== null) {
+            items = Object.entries(data).map(([t, d]) => ({ term: t, definition: d }));
+        }
+
+        if (items.length === 0) {
+            return (
+                <div className="space-y-4">
+                    <h2 className="text-lg font-bold text-slate-800 border-[#0e8a67] border-b-2 pb-1 font-display">{index} {toTitleCase(title)}</h2>
+                    <div className="p-4 border border-slate-200 rounded-xl bg-slate-50 text-slate-500 text-sm italic">No glossary items available.</div>
+                </div>
+            );
+        }
+
+        return (
+            <div className="space-y-4">
+                <h2 className="text-lg font-bold text-slate-800 border-[#0e8a67] border-b-2 pb-1 font-display">{index} {toTitleCase(title)}</h2>
+                <div className="space-y-4">
+                    {items.map((item, i) => {
+                        const term = typeof item === 'object' && item !== null ? (item.term || item.key || `Term ${i + 1}`) : `Item ${i + 1}`;
+                        const def = typeof item === 'object' && item !== null ? (item.definition || item.value || Object.values(item)[0]) : item;
+                        return (
+                            <div key={i} className="p-4 border border-emerald-200/60 rounded-xl bg-emerald-50/40 shadow-xs">
+                                <h3 className="font-bold text-[#0e8a67] mb-1 text-sm font-display">{i + 1}. {toTitleCase(term)}</h3>
+                                <div className="text-slate-700 text-xs sm:text-sm whitespace-pre-wrap leading-relaxed">{renderLink(normalizeValue(def))}</div>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         );
@@ -179,6 +284,11 @@ export default function SectionContent({ data, sectionIndex }: SectionContentPro
     entries.forEach(([key, value]) => {
         // Skip metadata fields in the nested views
         if (['_id', 'cid', 'version'].includes(key)) return;
+
+        if (key === 'drugSubstanceSpecifications') {
+            complexFields.push([key, value]);
+            return;
+        }
 
         if (Array.isArray(value)) {
             complexFields.push([key, value]);

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import { AgGridReact } from 'ag-grid-react';
 import type { ColDef, GridReadyEvent } from 'ag-grid-community';
@@ -24,6 +24,8 @@ import {
   FiDownload,
   FiDatabase,
   FiChevronDown,
+  FiX,
+  FiFilter,
 } from 'react-icons/fi';
 import Loader from '../Loader';
 import useGet from '../../hooks/useGet';
@@ -76,11 +78,17 @@ const valueFormatter = (params: { value?: any; colDef?: any }): string => {
 
 const DrugsTable: React.FC = () => {
   const navigate = useNavigate();
-  const { searchtext } = useParams();
+  const { ccategory, searchtext } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const gridRef = useRef<AgGridReact<any>>(null);
   const { drugsData, drugsLoading, refetchDrugs } = useUser();
   const { fetchData } = useGet();
   const [bookmarks, setBookmarks] = useState<any[]>([]);
+  const [showBookmarksOnly, setShowBookmarksOnly] = useState<boolean>(false);
+
+  const companyFilter = searchParams.get('company') || '';
+  const regionFilter = searchParams.get('region') || '';
+  const activeCategory = ccategory || 'all';
 
   const categoryArr: any[] = drugsData;
 
@@ -103,8 +111,17 @@ const DrugsTable: React.FC = () => {
 
   const uniqueCategoryArr = Array.isArray(categoryArr)
     ? categoryArr.filter((item, idx, arr) =>
-        arr.findIndex((i) => i._id === item._id || i.cid === item.cid) === idx
-      )
+      arr.findIndex((i) => {
+        if (item._id && i._id) return String(i._id) === String(item._id);
+        if (item.cid != null && item.cid !== "" && i.cid != null && i.cid !== "") {
+          return String(i.cid) === String(item.cid);
+        }
+        const itemName = item?.ProductOverview?.drugName || item?.drugName || item?.brandName;
+        const iName = i?.ProductOverview?.drugName || i?.drugName || i?.brandName;
+        if (itemName && iName) return itemName === iName;
+        return i === item;
+      }) === idx
+    )
     : [];
 
   function getAllSearchableStrings(item: any): string[] {
@@ -126,7 +143,7 @@ const DrugsTable: React.FC = () => {
     const q = query.toLowerCase().trim();
     if (!q) return false;
     if (n.includes(q)) return true; // exact match or exact substring match
-    
+
     // Fuzzy match: all chars of query appear in order inside name
     let qi = 0;
     for (let i = 0; i < n.length && qi < q.length; i++) {
@@ -135,17 +152,62 @@ const DrugsTable: React.FC = () => {
     return qi === q.length;
   };
 
+  const displayQuery = searchtext && searchtext !== 'all' ? decodeURIComponent(searchtext) : '';
+
   const results = useMemo(() => {
-    if (searchtext && searchtext.trim()) {
-      const search = (searchtext || '').toLowerCase();
-      return uniqueCategoryArr.filter((item: any) =>
-        getAllSearchableStrings(item).some(
-          (str) => typeof str === 'string' && fuzzyMatch(str, search)
-        )
-      );
-    }
-    return uniqueCategoryArr.slice(0, 10);
-  }, [searchtext, uniqueCategoryArr]);
+    return uniqueCategoryArr.filter((item: any) => {
+      // 1. Text & Category filter
+      if (displayQuery.trim()) {
+        const query = displayQuery.trim();
+        let matchesCategory = false;
+
+        if (activeCategory === 'all') {
+          matchesCategory = getAllSearchableStrings(item).some(
+            (str) => typeof str === 'string' && fuzzyMatch(str, query)
+          );
+        } else if (activeCategory === 'drugName') {
+          const text = item?.ProductOverview?.drugName || item?.ProductOverview?.brandName || item?.drugName || '';
+          matchesCategory = fuzzyMatch(text, query);
+        } else if (activeCategory === 'apiName') {
+          const text = item?.ProductOverview?.apiName || item?.apiName || '';
+          matchesCategory = fuzzyMatch(text, query);
+        } else if (activeCategory === 'iupacName') {
+          const text = item?.PhysicalChemicalProperties?.iupacName || '';
+          matchesCategory = fuzzyMatch(text, query);
+        } else if (activeCategory === 'innName') {
+          const text = item?.PhysicalChemicalProperties?.innName || '';
+          matchesCategory = fuzzyMatch(text, query);
+        } else if (activeCategory === 'cid') {
+          const text = item?.cid ? String(item.cid) : '';
+          matchesCategory = fuzzyMatch(text, query);
+        }
+
+        if (!matchesCategory) return false;
+      }
+
+      // 2. Company filter
+      if (companyFilter.trim()) {
+        const itemCompany = item?.ProductOverview?.companyName || item?.company || item?.companyName || '';
+        if (!itemCompany.toLowerCase().includes(companyFilter.trim().toLowerCase())) {
+          return false;
+        }
+      }
+
+      // 3. Region filter
+      if (regionFilter.trim()) {
+        const itemRegion =
+          item?.ProductOverview?.firstApprovedRegion ||
+          item?.RegulatoryInsights?.regionalApproval ||
+          item?.region ||
+          item?.firstApprovedRegion || '';
+        if (!itemRegion.toLowerCase().includes(regionFilter.trim().toLowerCase())) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [displayQuery, activeCategory, companyFilter, regionFilter, uniqueCategoryArr]);
 
   // Results count
 
@@ -167,6 +229,17 @@ const DrugsTable: React.FC = () => {
     });
   }, [results, bookmarks]);
 
+  const bookmarkedCount = useMemo(() => {
+    return resultsWithBookmarks.filter((item: any) => item.isBookmarked).length;
+  }, [resultsWithBookmarks]);
+
+  const displayRows = useMemo(() => {
+    if (!showBookmarksOnly) {
+      return resultsWithBookmarks;
+    }
+    return resultsWithBookmarks.filter((item: any) => item.isBookmarked);
+  }, [resultsWithBookmarks, showBookmarksOnly]);
+
   // Column definitions matching the screenshot
   const columnDefs = useMemo<ColDef[]>(() => [
     { headerName: 'Bookmark', field: 'bookmark', cellRenderer: BookmarkCellRenderer, width: 110, sortable: false, filter: true, suppressColumnsToolPanel: true },
@@ -174,9 +247,11 @@ const DrugsTable: React.FC = () => {
     { headerName: 'Drug Name', field: 'ProductOverview.drugName', cellRenderer: BrandNameCellRenderer, width: 160, sortable: true, filter: true, autoHeight: true, cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' } },
     { headerName: 'API Name', field: 'ProductOverview.apiName', width: 150, sortable: true, filter: true, autoHeight: true, cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' }, valueFormatter },
     { headerName: 'IUPAC Name', field: 'PhysicalChemicalProperties.iupacName', width: 160, sortable: true, filter: true, autoHeight: true, cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' }, valueFormatter },
+    { headerName: 'Company', field: 'ProductOverview.companyName', width: 160, sortable: true, filter: true, autoHeight: true, valueFormatter: (params: any) => params.value || params.data?.company || params.data?.companyName || '-' },
+    { headerName: 'Region', field: 'ProductOverview.firstApprovedRegion', width: 150, sortable: true, filter: true, autoHeight: true, valueFormatter: (params: any) => params.value || params.data?.RegulatoryInsights?.regionalApproval || params.data?.region || params.data?.firstApprovedRegion || '-' },
     { headerName: 'Molecular Formula', field: 'PhysicalChemicalProperties.molecularFormula', minWidth: 220, flex: 1, sortable: true, filter: true, autoHeight: true, cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' }, valueFormatter },
     { headerName: 'Molecular Weight', field: 'PhysicalChemicalProperties.molecularWeight', minWidth: 200, flex: 1, sortable: true, filter: true, autoHeight: true, cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' }, valueFormatter },
-    
+
     // More columns hidden by default
     { headerName: 'CAS Number', field: 'PhysicalChemicalProperties.casNumber', width: 140, sortable: true, filter: true, hide: true, valueFormatter },
     { headerName: 'Chemical Name', field: 'PhysicalChemicalProperties.chemicalName', width: 160, sortable: true, filter: true, hide: true, valueFormatter },
@@ -184,7 +259,7 @@ const DrugsTable: React.FC = () => {
     { headerName: 'Description', field: 'ExecutiveSummary', width: 400, sortable: true, filter: true, hide: true, autoHeight: true, cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' }, valueFormatter },
     { headerName: 'Created Date', field: 'createdAt', width: 150, sortable: true, filter: true, hide: true, valueFormatter },
     { headerName: 'Updated Date', field: 'updatedAt', width: 150, sortable: true, filter: true, hide: true, valueFormatter },
-    
+
     // Actions column pinned to the right
     {
       headerName: 'Actions',
@@ -208,14 +283,34 @@ const DrugsTable: React.FC = () => {
     if (gridRef.current) gridRef.current.api.exportDataAsExcel();
   }, []);
 
-  const handleSearchHistory = () => navigate('/bookmark');
 
-  const displayQuery = searchtext ? decodeURIComponent(searchtext) : '';
+  const removeCompanyFilter = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete('company');
+    setSearchParams(params);
+  };
+
+  const removeRegionFilter = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete('region');
+    setSearchParams(params);
+  };
+
+  const removeCategoryFilter = () => {
+    const searchPart = searchtext ? encodeURIComponent(searchtext) : 'all';
+    const queryString = searchParams.toString() ? `?${searchParams.toString()}` : '';
+    navigate(`/all/${searchPart}${queryString}`);
+  };
+
+  const removeQueryFilter = () => {
+    const queryString = searchParams.toString() ? `?${searchParams.toString()}` : '';
+    navigate(`/${activeCategory}/all${queryString}`);
+  };
 
   return (
     <div className="min-h-screen bg-page font-sans">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+
         {/* ── Breadcrumbs ── */}
         <div className="flex items-center gap-2 text-xs text-body mb-3 select-none">
           <FiDatabase className="w-3.5 h-3.5" />
@@ -232,7 +327,11 @@ const DrugsTable: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
           <div>
             <h2 className="text-[28px] font-bold text-gray-900 leading-tight">
-              {displayQuery ? (
+              {showBookmarksOnly ? (
+                <>
+                  My <span className="text-[#0E8A67]">Bookmarked</span> Compounds
+                </>
+              ) : displayQuery ? (
                 <>
                   Results for <span className="text-[#0E8A67]">"{displayQuery}"</span>
                 </>
@@ -241,19 +340,26 @@ const DrugsTable: React.FC = () => {
               )}
             </h2>
             <p className="text-[13.5px] text-gray-500 mt-1 font-medium">
-              Showing {results.length} {results.length === 1 ? 'compound' : 'compounds'} found
+              Showing {displayRows.length} {displayRows.length === 1 ? 'compound' : 'compounds'} {showBookmarksOnly ? 'bookmarked' : 'found'}
             </p>
           </div>
-          
+
           {/* Top-Bar Action Buttons */}
           <div className="flex items-center gap-3">
             <button
-              onClick={handleSearchHistory}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-700 text-[13.5px] font-semibold hover:bg-gray-50 transition-all shadow-sm cursor-pointer"
+              onClick={() => setShowBookmarksOnly((prev) => !prev)}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-[13.5px] transition-all shadow-sm cursor-pointer border ${showBookmarksOnly
+                ? "bg-[#0E8A67] text-white border-[#0E8A67] shadow-md"
+                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                }`}
+              title={showBookmarksOnly ? "Show All Compounds" : "Show Bookmarks Only"}
             >
-              <FiBookmark className="w-4 h-4 text-gray-500" />
-              <span>Saved Views</span>
-              <FiChevronDown className="w-3.5 h-3.5 text-gray-400" />
+              <FiBookmark className={`w-4 h-4 ${showBookmarksOnly ? "fill-white text-white" : "text-gray-500"}`} />
+              <span>{showBookmarksOnly ? "Showing Bookmarks" : "Bookmarks"}</span>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${showBookmarksOnly ? "bg-white/25 text-white" : "bg-emerald-50 text-[#0E8A67] border border-emerald-200"
+                }`}>
+                {bookmarkedCount}
+              </span>
             </button>
 
             <button
@@ -267,6 +373,75 @@ const DrugsTable: React.FC = () => {
           </div>
         </div>
 
+        {/* ── Active Filter Badges ── */}
+        {(displayQuery || companyFilter || regionFilter || (activeCategory && activeCategory !== 'all')) && (
+          <div className="flex flex-wrap items-center gap-2 mb-4 bg-white p-3.5 rounded-2xl border border-border-main shadow-xs">
+            <span className="text-xs font-bold text-gray-500 flex items-center gap-1.5 mr-1">
+              <FiFilter className="w-3.5 h-3.5 text-primary" /> Active Filters:
+            </span>
+
+            {displayQuery && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-bold text-xs border border-primary/20">
+                Keyword: "{displayQuery}"
+                <button onClick={removeQueryFilter} className="hover:text-red-600 cursor-pointer ml-0.5">
+                  <FiX className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+
+            {activeCategory && activeCategory !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold text-xs border border-blue-200">
+                Category: {activeCategory}
+                <button onClick={removeCategoryFilter} className="hover:text-red-600 cursor-pointer ml-0.5">
+                  <FiX className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+
+            {companyFilter && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 font-bold text-xs border border-amber-200">
+                Company: {companyFilter}
+                <button onClick={removeCompanyFilter} className="hover:text-red-600 cursor-pointer ml-0.5">
+                  <FiX className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+
+            {regionFilter && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 font-bold text-xs border border-emerald-200">
+                Region: {regionFilter}
+                <button onClick={removeRegionFilter} className="hover:text-red-600 cursor-pointer ml-0.5">
+                  <FiX className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+
+            <button
+              onClick={() => navigate('/all/all')}
+              className="text-xs font-semibold text-gray-400 hover:text-red-600 underline ml-auto cursor-pointer"
+            >
+              Clear All Filters
+            </button>
+          </div>
+        )}
+
+        {/* ── Bookmarks Empty State Notice ── */}
+        {showBookmarksOnly && displayRows.length === 0 && (
+          <div className="bg-emerald-50 border border-emerald-200 text-[#0E8A67] px-6 py-6 rounded-2xl mb-4 text-center animate-fade-in">
+            <FiBookmark className="w-8 h-8 mx-auto mb-2 opacity-60" />
+            <h4 className="text-base font-bold">No Bookmarked Compounds Yet</h4>
+            <p className="text-xs text-gray-600 mt-1 max-w-md mx-auto">
+              Click the bookmark star icon in the "Bookmark" column of any compound row to add it to your bookmarks table.
+            </p>
+            <button
+              onClick={() => setShowBookmarksOnly(false)}
+              className="mt-3 px-4 py-2 bg-[#0E8A67] text-white text-xs font-bold rounded-xl shadow-xs hover:bg-[#0A7557] transition-colors cursor-pointer border-0"
+            >
+              View All Compounds
+            </button>
+          </div>
+        )}
+
         {/* ── Table Container Card ── */}
         <div className="w-full bg-white rounded-2xl shadow-sm border border-border-main overflow-hidden flex flex-col">
           <div
@@ -275,14 +450,18 @@ const DrugsTable: React.FC = () => {
           >
             <AgGridReact
               ref={gridRef}
-              rowData={resultsWithBookmarks}
+              rowData={displayRows}
               columnDefs={columnDefs}
-              getRowId={(params) =>
-                String(
-                  params.data?._id ??
-                    (params.data?.cid ? `${params.data.cid}-${params.data?.version ?? ''}` : '')
-                )
-              }
+              context={{ refreshBookmarks: getBookmarks }}
+              getRowId={(params) => {
+                if (params.data?._id) return String(params.data._id);
+                if (params.data?.cid != null && params.data?.cid !== '') {
+                  return `${params.data.cid}-${params.data?.version ?? '1.0'}`;
+                }
+                if (params.data?.ProductOverview?.drugName) return String(params.data.ProductOverview.drugName);
+                if (params.data?.drugName) return String(params.data.drugName);
+                return String(Math.random());
+              }}
               onGridReady={onGridReady}
               pagination={true}
               paginationPageSize={20}

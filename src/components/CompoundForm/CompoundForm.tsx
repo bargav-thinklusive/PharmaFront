@@ -1,19 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import DynamicFormBuilder from "../shared";
 import { addExecutiveSummary, addProductOverview, addPhysicalChemicalProperties, addDrugSubstance, addDrugProductInformation, addAppendices, addRegulatoryInsights, addLabelingInformation, addGenericEntrants, addBaBeStudies, addSources, addGlossary } from "./columns";
 import { formatCreatedDrug } from "./helper";
 import usePost from "../../hooks/usePost";
+import usePut from "../../hooks/usePut";
 import DrugService from "../../services/DrugService";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import useDraft from "../../hooks/useDraft";
+import TokenService from "../../services/shared/TokenService";
 import { useUser } from "../../context/UserContext";
 import { CompoundFormHeader } from "./CompoundFormHeader";
 import { CompoundFormSidebar } from "./CompoundFormSidebar";
 import { CompoundFormActions } from "./CompoundFormActions";
-import { ConfirmSubmitModal } from "./ConfirmSubmitModal";
-import { SaveDraftModal } from "./SaveDraftModal";
+import { ConfirmModal } from "../shared/ConfirmModal";
+import { FiSave, FiSend } from "react-icons/fi";
+import { therapeuticAreasData } from "../../data/therapeuticAreasData";
 
 const drugService = new DrugService();
 
@@ -34,10 +36,12 @@ const stepDescriptions: { [key: string]: string } = {
 
 const CompoundForm = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
     const { postData } = usePost();
+    const { putData } = usePut();
     const { saveDraft, loadDraft, clearDraft } = useDraft();
-    const { refetchDrugs } = useUser();
+    const { refetchDrugs, refetchDrafts, setSelectedList, user, drafts } = useUser();
 
     const draftId = searchParams.get("draftId");
 
@@ -48,8 +52,7 @@ const CompoundForm = () => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showSaveDraftConfirm, setShowSaveDraftConfirm] = useState(false);
     const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
-
-
+    const [loadedDraftId, setLoadedDraftId] = useState<string | null>(null);
 
     const formDataRef = useRef<any>(formData);
 
@@ -57,20 +60,30 @@ const CompoundForm = () => {
         formDataRef.current = formData;
     }, [formData]);
 
-    const initialDraftId = useRef(searchParams.get("draftId"));
     useEffect(() => {
-        if (initialDraftId.current) {
-            const draft = loadDraft(initialDraftId.current);
-            if (draft && draft.formData && Object.keys(draft.formData).length > 0) {
-                formDataRef.current = draft.formData;
-                setFormData(draft.formData);
-                setCurrentStep(draft.currentStep ?? 0);
-            } else {
-                setSearchParams({}, { replace: true });
-            }
+        if (location.state?.initialData && Object.keys(location.state.initialData).length > 0) {
+            formDataRef.current = location.state.initialData;
+            setFormData(location.state.initialData);
+            if (draftId) setLoadedDraftId(draftId);
+            return;
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+
+        if (!draftId) {
+            setLoadedDraftId(null);
+            return;
+        }
+        if (draftId === loadedDraftId) return;
+
+        const draft = loadDraft(draftId);
+        if (draft && draft.formData && Object.keys(draft.formData).length > 0) {
+            formDataRef.current = draft.formData;
+            setFormData(draft.formData);
+            if (draft.currentStep !== undefined) {
+                setCurrentStep(draft.currentStep);
+            }
+            setLoadedDraftId(draftId);
+        }
+    }, [draftId, drafts, loadDraft, loadedDraftId, location.state]);
 
     const steps = [
         { title: "Product Overview", fields: addProductOverview },
@@ -104,32 +117,82 @@ const CompoundForm = () => {
         return isValid;
     };
 
-    const executeSaveDraft = async () => {
+    const validateRequiredFieldsForDraft = () => {
+        const newErrors: { [key: string]: string } = {};
+        let isValid = true;
+
+        // Mandatory identification fields required for a valid draft
+        const requiredDraftFields = [
+            { key: "drugName", label: "Drug Name" },
+            { key: "apiName", label: "API Name" },
+        ];
+
+        requiredDraftFields.forEach(({ key }) => {
+            const val = formDataRef.current[key];
+            if (!val || (typeof val === "string" && val.trim() === "")) {
+                newErrors[key] = "Required";
+                isValid = false;
+            }
+        });
+
+        // Also check required fields of the current step
+        const currentStepRequired = steps[currentStep].fields.filter((f) => f.required);
+        currentStepRequired.forEach((field) => {
+            const val = formDataRef.current[field.key];
+            if (!val || (typeof val === "string" && val.trim() === "")) {
+                newErrors[field.key] = "Required";
+                isValid = false;
+            }
+        });
+
+        if (!isValid) {
+            setErrors(newErrors);
+            if ((newErrors["drugName"] || newErrors["apiName"]) && currentStep !== 0) {
+                setCurrentStep(0);
+            }
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        return isValid;
+    };
+
+    const executeSaveDraft = async (): Promise<boolean> => {
+        if (!validateRequiredFieldsForDraft()) {
+            toast.error("Please fill in the required fields (Drug Name & API Name) before saving a draft.", { autoClose: 5000 });
+            return false;
+        }
+
         setIsSavingDraft(true);
         try {
             const newDraftId = await saveDraft(formDataRef.current, currentStep, draftId);
             if (!draftId) setSearchParams({ draftId: newDraftId }, { replace: true });
-            toast.success("✅ Draft saved successfully!", { autoClose: 3000 });
+            toast.success("Draft saved successfully!", { autoClose: 3000 });
+            return true;
         } catch (err) {
             console.error("Save draft error:", err);
             toast.error("Failed to save draft. Please try again.");
+            return false;
         } finally {
             setIsSavingDraft(false);
         }
     };
 
     const handleSaveDraftClick = () => {
+        if (!validateRequiredFieldsForDraft()) {
+            toast.error("Please fill in the required fields (Drug Name & API Name) before saving a draft.", { autoClose: 5000 });
+            return;
+        }
         setShowSaveDraftConfirm(true);
     };
 
     useEffect(() => {
-        (window as any).executeSaveDraftGlobal = () => {
-            executeSaveDraft();
+        (window as any).executeSaveDraftGlobal = async () => {
+            return await executeSaveDraft();
         };
         return () => {
             delete (window as any).executeSaveDraftGlobal;
         };
-    }, [currentStep, draftId]);
+    }, [currentStep, draftId, formData]);
 
 
 
@@ -155,12 +218,34 @@ const CompoundForm = () => {
 
     const submitForm = async () => {
         try {
-            const formattedData = await formatCreatedDrug(formDataRef.current);
-            await postData(drugService.createDrug(), formattedData);
+            const currentUser = user?.data || TokenService.decodeToken();
+            const formattedData = await formatCreatedDrug(formDataRef.current, currentUser);
+            
+            const originalId = formDataRef.current._id || formDataRef.current.original_id || formDataRef.current.id;
+            const originalVersion = formDataRef.current.originalVersion;
+            const currentVersion = formattedData.ProductOverview?.version || formDataRef.current.version;
+
+            // Scenario 1: If version is NOT updated/changed, overwrite existing drug (PUT).
+            // Scenario 2: If version IS updated/changed, save as a new drug record (POST).
+            let isUpdate = false;
+            if (originalId) {
+                if (!originalVersion || String(currentVersion).trim() === String(originalVersion).trim()) {
+                    isUpdate = true;
+                }
+            }
+
+            if (isUpdate && originalId) {
+                await putData(drugService.updateDrug(originalId), formattedData);
+            } else {
+                await postData(drugService.createDrug(), formattedData);
+            }
+
             if (draftId) await clearDraft(draftId);
-            await refetchDrugs();
-            toast.success("Drug Entry successfully submitted");
-            navigate("/home");
+            if (setSelectedList) setSelectedList('cmcintel');
+            if (refetchDrugs) await refetchDrugs();
+            if (refetchDrafts) await refetchDrafts();
+            toast.success(isUpdate ? "Drug entry successfully updated" : "Drug entry successfully submitted");
+            navigate("/drugsList");
         } catch (error: any) {
             console.error(error);
             if (error.response?.status === 400) {
@@ -199,6 +284,43 @@ const CompoundForm = () => {
             setFormData((prev: any) => ({ ...prev, ...values }));
         },
         getFieldError: (key: string) => errors[key],
+    };
+
+    const { masterData, refetchMasterData } = useUser();
+
+    useEffect(() => {
+        if (!masterData?.therapeuticAreas || Object.keys(masterData.therapeuticAreas).length === 0) {
+            refetchMasterData?.();
+        }
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const activeTherapeuticAreas = (masterData?.therapeuticAreas && Object.keys(masterData.therapeuticAreas).length > 0)
+        ? masterData.therapeuticAreas
+        : therapeuticAreasData;
+
+    const selectedTherapeuticArea = formData.therapeuticArea || formData.ProductOverview?.therapeuticArea;
+
+    const availableIndications = selectedTherapeuticArea && activeTherapeuticAreas[selectedTherapeuticArea]
+        ? activeTherapeuticAreas[selectedTherapeuticArea]
+        : [];
+
+    const activeRegionsCountries = masterData?.regionsCountries || {};
+    const activeAuthorities: any[] = masterData?.regulatoryAuthorities || [];
+
+    const allCountries = (activeAuthorities.length > 0)
+        ? Array.from(new Set(activeAuthorities.map((r: any) => r.country))).sort()
+        : [];
+
+    const dynamicOptions: Record<string, { label: string; value: string }[]> = {
+        therapeuticArea: Object.keys(activeTherapeuticAreas).map((ta) => ({ label: ta, value: ta })),
+        approvedIndications: availableIndications.map((ind: string) => ({ label: ind, value: ind })),
+        firstApprovedRegion: allCountries.map((c: string) => ({ label: c, value: c })),
+        region: Object.keys(activeRegionsCountries).map((r) => ({ label: r, value: r })),
+        country: allCountries.map((c: string) => ({ label: c, value: c })),
+        regulatoryBody: activeAuthorities.map((r: any) => ({
+            label: `${r.abbreviation ? `${r.abbreviation} - ` : ''}${r.authority} (${r.country})`,
+            value: r.abbreviation ? `${r.authority} (${r.abbreviation})` : r.authority
+        })),
     };
 
     const getStepStatus = (stepIndex: number) => {
@@ -308,8 +430,11 @@ const CompoundForm = () => {
             <div className="max-w-7xl mx-auto w-full flex flex-col gap-6">
                 {/* ── Full-Width Top Header Card ── */}
                 <CompoundFormHeader
-                    drugName={formData.drugName}
-                    drugId={formData.drugId}
+                    drugName={formData.drugName || formData.ProductOverview?.drugName}
+                    drugId={formData.drugId || formData._id}
+                    cid={formData.cid || formData.ProductOverview?.cid}
+                    version={formData.version || formData.ProductOverview?.version}
+                    lastUpdated={loadedDraftId ? (loadDraft(loadedDraftId)?.lastModified) : (formData.updatedAt || formData.createdAt)}
                     overallProgressPct={overallProgressPct}
                     completedStepsCount={completedStepsCount}
                     totalStepsCount={steps.length}
@@ -375,6 +500,7 @@ const CompoundForm = () => {
                             <DynamicFormBuilder
                                 fields={steps[currentStep].fields}
                                 form={formWithErrors}
+                                dynamicOptions={dynamicOptions}
                                 columns={currentStep === 1 ? 4 : 5}
                             />
                         ) : (
@@ -396,6 +522,7 @@ const CompoundForm = () => {
                                     <DynamicFormBuilder
                                         fields={steps[currentStep].fields}
                                         form={formWithErrors}
+                                        dynamicOptions={dynamicOptions}
                                         columns={5}
                                     />
                                 </div>
@@ -416,23 +543,35 @@ const CompoundForm = () => {
             </div>
 
             {/* ── Confirmation Modal ── */}
-            <ConfirmSubmitModal
+            <ConfirmModal
                 isOpen={showConfirm}
                 onClose={() => setShowConfirm(false)}
                 onConfirm={() => {
                     setShowConfirm(false);
                     submitForm();
                 }}
+                title="Submit Drug Data"
+                description="Are you sure you want to submit this drug entry? Please review all steps before proceeding."
+                confirmText="Yes, Submit"
+                icon={<FiSend className="w-6 h-6 text-primary" />}
+                iconBgColor="bg-primary-light border-primary/30"
+                confirmButtonColor="bg-primary hover:bg-primary-hover"
             />
 
             {/* ── Save Draft Confirmation Modal ── */}
-            <SaveDraftModal
+            <ConfirmModal
                 isOpen={showSaveDraftConfirm}
                 onClose={() => setShowSaveDraftConfirm(false)}
                 onConfirm={() => {
                     setShowSaveDraftConfirm(false);
                     executeSaveDraft();
                 }}
+                title="Save Draft"
+                description="Are you sure you want to save this draft? You can reload your draft anytime from the header menu."
+                confirmText="Yes, Save"
+                icon={<FiSave className="w-6 h-6 text-amber-500" />}
+                iconBgColor="bg-amber-50 border-amber-200"
+                confirmButtonColor="bg-amber-500 hover:bg-amber-600"
             />
         </div>
     );

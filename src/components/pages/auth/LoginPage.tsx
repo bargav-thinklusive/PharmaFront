@@ -3,8 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { FiMail, FiLock, FiArrowRight, FiShield } from "react-icons/fi";
 import AuthService from "../../../services/AuthService";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import { useUser } from "../../../context/UserContext";
 import CompanyLogo from "../../../assets/CMCINTELLOGO.png";
 
@@ -120,18 +119,6 @@ const Login: React.FC = () => {
 
   return (
     <>
-      <ToastContainer
-        position="bottom-right"
-        autoClose={4000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        style={{ zIndex: 99999 }}
-      />
 
       <div className="fixed inset-0 flex min-h-screen w-screen font-sans overflow-hidden">
 
