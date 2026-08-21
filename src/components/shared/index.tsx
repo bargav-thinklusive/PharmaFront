@@ -232,8 +232,6 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
 
     const handleSwitch = (key: string, checked: boolean) => handleFieldChange(key, checked);
 
-    const selectClass = `${baseInput} appearance-none cursor-pointer`;
-
     const renderFieldComponent = (field: FieldConfig) => {
         const {
             key, type = "text", required, placeholder, disabled, options = [],

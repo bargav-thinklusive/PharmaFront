@@ -20,7 +20,6 @@ export const CompoundFormSidebar: React.FC<CompoundFormSidebarProps> = ({
     isSidebarExpanded,
     setIsSidebarExpanded,
     getStepStatus,
-    getSubsectionStats,
     validateCurrentStep,
     setErrors,
 }) => {
@@ -96,7 +95,6 @@ export const CompoundFormSidebar: React.FC<CompoundFormSidebarProps> = ({
                         {steps.map((step, index) => {
                             const isActive = index === currentStep;
                             const status = getStepStatus(index);
-                            const stats = getSubsectionStats(index);
                             
                             let circleClass = "bg-transparent border-slate-300 text-slate-400 group-hover:border-slate-500 group-hover:text-slate-600";
                             let statusBadge = null;

@@ -218,7 +218,6 @@ const UsersTable: React.FC = () => {
                 containerClassName="w-40"
               />
             </div>
-            </div>
           </div>
         </div>
 
