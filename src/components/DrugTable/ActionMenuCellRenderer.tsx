@@ -2,13 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { FiMoreVertical, FiEdit, FiTrash2 } from 'react-icons/fi';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { useAppDispatch } from '../../store/hooks';
 import { fetchDrugs } from '../../store/slices/drugsSlice';
 import useDelete from '../../hooks/useDelete';
 import DrugService from '../../services/DrugService';
-import useDraft from '../../hooks/useDraft';
 import { flattenDrug } from '../CompoundForm/helper';
-import { findExistingDraft, } from '../../utils/utils';
 import { toast } from 'react-toastify';
 import useRoles from '../../hooks/useRoles';
 import { ConfirmModal } from '../shared/ConfirmModal';
@@ -16,10 +14,8 @@ import { ConfirmModal } from '../shared/ConfirmModal';
 const ActionMenuCellRenderer: React.FC<any> = (params) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const drafts = useAppSelector((state) => state.drafts.drafts);
   const refetchDrugs = () => dispatch(fetchDrugs());
   const { deleteData } = useDelete();
-  const { saveDraft } = useDraft();
   const { canEditDrug, canDeleteDrug } = useRoles();
   const drugService = new DrugService();
 
@@ -51,29 +47,28 @@ const ActionMenuCellRenderer: React.FC<any> = (params) => {
     return () => window.removeEventListener('click', handleClose);
   }, [isOpen]);
 
-  const handleEdit = async (e: React.MouseEvent) => {
+  const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsOpen(false);
 
     const data = params.data?.drug || params.data;
-    if (!data?.cid && !data?._id) {
+    const drugId = data?._id || data?.id;
+    if (!drugId) {
       toast.error("Invalid drug data for editing");
       return;
     }
 
     try {
       const flatData = flattenDrug(data);
-      flatData.original_id = data._id || data.id;
+      flatData._id = drugId;
+      flatData.original_id = drugId;
       flatData.originalVersion = flatData.version || data.version || "1.0";
       if (!flatData.version) {
         flatData.version = "1.0";
       }
-      const existingDraft = findExistingDraft(drafts, flatData);
-      const targetDraftId = existingDraft ? (existingDraft.id || existingDraft._id) : null;
-      const newDraftId = await saveDraft(flatData, 0, targetDraftId);
-      navigate(`/drug-form?draftId=${newDraftId}`, { state: { initialData: flatData } });
+      navigate(`/drug-form?drugId=${drugId}`, { state: { initialData: flatData } });
     } catch (err) {
-      console.error("Error creating draft:", err);
+      console.error("Error opening edit page:", err);
       toast.error("Failed to edit drug");
     }
   };

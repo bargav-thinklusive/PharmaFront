@@ -2,28 +2,24 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit } from 'react-icons/fa';
 import { flattenDrug } from '../CompoundForm/helper';
-import { findExistingDraft, getNextVersion } from '../../utils/utils';
-import useDraft from '../../hooks/useDraft';
 import useRoles from '../../hooks/useRoles';
-import { useAppSelector } from '../../store/hooks';
 
 const ActionCellRenderer: React.FC<any> = (params) => {
     const navigate = useNavigate();
-    const { saveDraft } = useDraft();
-    const drafts = useAppSelector((state) => state.drafts.drafts);
     const { canEditDrug } = useRoles();
 
-    const handleEdit = async () => {
+    const handleEdit = () => {
         const data = params.data;
-        if (!data?.cid && !data?._id) return;
+        const drugId = data?._id || data?.id;
+        if (!drugId) return;
         const flatData = flattenDrug(data);
-        if (!flatData.version || flatData.version === "1.0" || flatData.version === 1) {
-            flatData.version = getNextVersion(flatData.version || "1.0");
+        flatData._id = drugId;
+        flatData.original_id = drugId;
+        flatData.originalVersion = flatData.version || data.version || "1.0";
+        if (!flatData.version) {
+            flatData.version = "1.0";
         }
-        const existingDraft = findExistingDraft(drafts, flatData);
-        const targetDraftId = existingDraft ? (existingDraft.id || existingDraft._id) : null;
-        const newDraftId = await saveDraft(flatData, 0, targetDraftId);
-        navigate(`/drug-form?draftId=${newDraftId}`, { state: { initialData: flatData } });
+        navigate(`/drug-form?drugId=${drugId}`, { state: { initialData: flatData } });
     };
 
     if (!canEditDrug(params.data)) {

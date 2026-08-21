@@ -8,7 +8,7 @@ import usePut from "../../hooks/usePut";
 import DrugService from "../../services/DrugService";
 import { toast } from "react-toastify";
 import useDraft from "../../hooks/useDraft";
-import TokenService from "../../services/shared/TokenService";
+import axiosInstance from "../../services/shared/AxiosService";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchDrugs, setSelectedList } from "../../store/slices/drugsSlice";
 import { fetchDrafts } from "../../store/slices/draftsSlice";
@@ -42,7 +42,6 @@ const CompoundForm = () => {
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
     const dispatch = useAppDispatch();
-    const user = useAppSelector((state) => state.user.user);
     const drafts = useAppSelector((state) => state.drafts.drafts);
     const masterData = useAppSelector((state) => state.masterData);
 
@@ -71,12 +70,27 @@ const CompoundForm = () => {
         formDataRef.current = formData;
     }, [formData]);
 
+    const drugId = searchParams.get("drugId") || searchParams.get("id");
+
     useEffect(() => {
         if (location.state?.initialData && Object.keys(location.state.initialData).length > 0) {
             const flattened = flattenDrug(location.state.initialData);
             formDataRef.current = flattened;
             setFormData(flattened);
-            if (draftId) setLoadedDraftId(draftId);
+            return;
+        }
+
+        if (drugId) {
+            axiosInstance.get(drugService.getDrugById(drugId)).then((res: any) => {
+                const data = res?.data?.data || res?.data || res;
+                if (data) {
+                    const flattened = flattenDrug(data);
+                    formDataRef.current = flattened;
+                    setFormData(flattened);
+                }
+            }).catch((err: any) => {
+                console.error("Error fetching drug details for edit:", err);
+            });
             return;
         }
 
@@ -96,7 +110,7 @@ const CompoundForm = () => {
             }
             setLoadedDraftId(draftId);
         }
-    }, [draftId, drafts, loadDraft, loadedDraftId, location.state]);
+    }, [draftId, drugId, drafts, loadDraft, loadedDraftId, location.state]);
 
     const steps = [
         { title: "Product Overview", fields: addProductOverview },
@@ -231,8 +245,7 @@ const CompoundForm = () => {
 
     const submitForm = async () => {
         try {
-            const currentUser = user?.data || TokenService.decodeToken();
-            const formattedData = await formatCreatedDrug(formDataRef.current, currentUser);
+            const formattedData = await formatCreatedDrug(formDataRef.current);
             
             const originalId = formDataRef.current._id || formDataRef.current.original_id || formDataRef.current.id;
             const originalVersion = formDataRef.current.originalVersion;

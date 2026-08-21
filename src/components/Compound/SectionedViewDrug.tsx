@@ -3,8 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchDrugs } from '../../store/slices/drugsSlice';
 import { flattenDrug } from '../CompoundForm/helper';
-import { findExistingDraft, unixToDate, trackDrugSearch } from '../../utils/utils';
-import useDraft from '../../hooks/useDraft';
+import { unixToDate, trackDrugSearch } from '../../utils/utils';
 import useDelete from '../../hooks/useDelete';
 import DrugService from '../../services/DrugService';
 import { toast } from 'react-toastify';
@@ -41,10 +40,8 @@ export default function SectionedViewDrug() {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const drugsData = useAppSelector((state) => state.drugs.drugsData);
-    const drafts = useAppSelector((state) => state.drafts.drafts);
     const refetchDrugs = () => dispatch(fetchDrugs());
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const { saveDraft } = useDraft();
     const { deleteData } = useDelete();
     const { canEditDrug, canDeleteDrug } = useRoles();
 
@@ -132,20 +129,19 @@ export default function SectionedViewDrug() {
         setCurrentStep(id);
     };
 
-    const handleEdit = async () => {
+    const handleEdit = () => {
         try {
             const flatData = flattenDrug(drugToDisplay);
-            flatData.original_id = drugToDisplay._id || drugToDisplay.id;
+            const drugId = drugToDisplay._id || drugToDisplay.id;
+            flatData._id = drugId;
+            flatData.original_id = drugId;
             flatData.originalVersion = flatData.version || drugToDisplay.version || "1.0";
             if (!flatData.version) {
                 flatData.version = "1.0";
             }
-            const existingDraft = findExistingDraft(drafts, flatData);
-            const targetDraftId = existingDraft ? (existingDraft.id || existingDraft._id) : null;
-            const newDraftId = await saveDraft(flatData, 0, targetDraftId);
-            navigate(`/drug-form?draftId=${newDraftId}`, { state: { initialData: flatData } });
+            navigate(`/drug-form?drugId=${drugId}`, { state: { initialData: flatData } });
         } catch (err) {
-            console.error("Error creating draft for edit:", err);
+            console.error("Error opening edit page:", err);
             toast.error("Failed to edit drug entry.");
         }
     };
