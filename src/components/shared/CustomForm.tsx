@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import PhoneInput from "react-phone-input-2";
-import { FiTrash2, FiEdit2, FiChevronUp, FiChevronRight, FiCheck } from "react-icons/fi";
+import { FiTrash2, FiEdit2, FiChevronUp, FiChevronRight, } from "react-icons/fi";
 import type { FieldConfig } from "./index";
-import { useUser } from "../../context/UserContext";
+import CustomSelect from "./CustomSelect";
+import { useAppSelector } from "../../store/hooks";
 
 interface CustomFormProps {
     field: FieldConfig;
@@ -11,15 +12,20 @@ interface CustomFormProps {
 
 const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
     const { key, dynamicFields, label: cleanLabel } = field;
-    const { masterData } = useUser() || {};
+    const masterData = useAppSelector((state) => state.masterData);
 
     const activeTherapeuticAreas = masterData?.therapeuticAreas || {};
-    // const activeRegionsCountries = masterData?.regionsCountries || {};
+    const activeRegionsCountries = masterData?.regionsCountries || {};
     const activeAuthorities: any[] = masterData?.regulatoryAuthorities || [];
 
-    const allCountries = (activeAuthorities.length > 0)
-        ? Array.from(new Set(activeAuthorities.map((r: any) => r.country))).sort()
-        : [];
+    // Extract all unique country names strictly from API responses
+    const allCountries = Array.from(
+        new Set([
+            ...activeAuthorities.map((r: any) => r.country || r.region),
+            ...Object.keys(activeRegionsCountries),
+            ...Object.values(activeRegionsCountries).flat(),
+        ].filter((c): c is string => typeof c === 'string' && Boolean(c.trim())))
+    ).sort();
 
     // Build an empty row object from the dynamic field definitions
     const getEmptyRow = () => {
@@ -46,14 +52,14 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
         }
         if (fieldKey === "regulatoryBody" || fieldKey === "regulatoryAuthority" || fieldKey === "regulatorBody" || fieldKey === "regulatoryBodies") {
             const selectedCountry = inputRow?.country || inputRow?.region;
-            if (!selectedCountry || selectedCountry.trim() === "") {
-                return []; // Empty list first until country/region is selected
+            let filtered = activeAuthorities;
+            if (selectedCountry && selectedCountry.trim() !== "") {
+                filtered = activeAuthorities.filter((r: any) => r.country?.toLowerCase() === selectedCountry.toLowerCase());
             }
-            const filtered = activeAuthorities.filter((r: any) => r.country?.toLowerCase() === selectedCountry.toLowerCase());
 
             return filtered.map((r: any) => ({
-                label: r.abbreviation || r.authority,
-                value: r.abbreviation || r.authority
+                label: `${r.abbreviation ? `${r.abbreviation} - ` : ''}${r.authority}`,
+                value: r.abbreviation ? `${r.authority} (${r.abbreviation})` : r.authority
             }));
         }
         if (fieldKey === "region" || fieldKey === "firstApprovedRegion") {
@@ -172,20 +178,17 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                 );
 
             case "dropdown": {
-                const optionsList = getFieldOptions(dynamicField);
+                const optionsList = getFieldOptions(dynamicField).map((opt: any) => ({
+                    label: opt.label || opt.value,
+                    value: opt.value || opt.label,
+                }));
                 return (
-                    <select
+                    <CustomSelect
                         value={value || ""}
-                        onChange={(e) => onChange(e.target.value)}
-                        className={commonClasses}
-                    >
-                        <option value="">{dynamicField.placeholder || "Select"}</option>
-                        {optionsList.map((option: any, idx: number) => (
-                            <option key={idx} value={option.value || option.label}>
-                                {option.label || option.value}
-                            </option>
-                        ))}
-                    </select>
+                        onChange={(v) => onChange(v)}
+                        options={optionsList}
+                        placeholder={dynamicField.placeholder || "Select"}
+                    />
                 );
             }
 
@@ -241,54 +244,6 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
 
 
 
-    const isInputRowActive = Object.entries(inputRow).some(([k, v]) => {
-        if (k === "phone" && v === "+1") return false;
-        return v !== "" && v !== undefined && v !== null;
-    });
-
-    const hasRows = tableRows.length > 0;
-
-    let status = "Not Started";
-    if (hasRows) {
-        status = isInputRowActive ? "In Progress" : "Complete";
-    } else {
-        status = isInputRowActive ? "In Progress" : "Not Started";
-    }
-
-    let statusIcon = null;
-    let statusBadge = null;
-
-    if (status === "Complete") {
-        statusIcon = (
-            <div className="w-6 h-6 rounded-full bg-[#0e8a67] flex items-center justify-center text-white flex-shrink-0">
-                <FiCheck className="w-3.5 h-3.5 stroke-[3]" />
-            </div>
-        );
-        statusBadge = (
-            <span className="text-[10px] font-semibold text-[#0e8a67] bg-[#e6f4f0] border border-[#0e8a67]/20 px-2 py-0.5 rounded-md">
-                Complete
-            </span>
-        );
-    } else if (status === "In Progress") {
-        statusIcon = (
-            <div className="w-6 h-6 rounded-full border-2 border-amber-500 bg-transparent flex-shrink-0" />
-        );
-        statusBadge = (
-            <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 border border-amber-500/20 px-2 py-0.5 rounded-md">
-                In Progress
-            </span>
-        );
-    } else {
-        statusIcon = (
-            <div className="w-6 h-6 rounded-full border-2 border-slate-300 bg-transparent flex-shrink-0" />
-        );
-        statusBadge = (
-            <span className="text-[10px] font-semibold text-slate-500 bg-slate-50 border border-slate-300/30 px-2 py-0.5 rounded-md">
-                Not Started
-            </span>
-        );
-    }
-
     return (
         <div className="space-y-4 mb-6 text-left">
             {/* Accordion Box */}
@@ -296,14 +251,12 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                 {/* Accordion Trigger Header */}
                 <div
                     onClick={() => setAccordionOpen(!accordionOpen)}
-                    className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-alt/10 transition-colors"
+                    className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-alt/10 transition-colors bg-slate-50/50"
                 >
                     <div className="flex items-center gap-3.5">
-                        {statusIcon}
-                        <span className="text-sm font-bold text-main font-display">
+                        <span className="text-sm font-bold text-slate-800 font-display">
                             {editingIndex !== null ? `Editing: ${cleanLabel}` : cleanLabel}
                         </span>
-                        {statusBadge}
                     </div>
                     {accordionOpen ? (
                         <FiChevronUp className="w-4 h-4 text-slate-500" />
@@ -315,25 +268,28 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                 {/* Collapsible Input Form */}
                 {accordionOpen && (
                     <div className="px-6 pb-6 pt-5 border-t border-border-main bg-white">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+                        <div className="divide-y divide-slate-100 mb-4">
                             {dynamicFields?.map((dynamicField) => {
-                                const isTextarea = dynamicField.type === "textarea";
                                 return (
                                     <div
                                         key={dynamicField.key}
-                                        className={`flex flex-col ${isTextarea ? "col-span-full" : ""}`}
+                                        className="py-3 flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-6"
                                     >
-                                        <label className="block text-xs font-semibold text-main uppercase tracking-wide mb-1.5">
-                                            {dynamicField.label}
-                                            {dynamicField.required && (
-                                                <span className="text-red-500 ml-0.5">*</span>
+                                        <div className="w-full sm:w-48 shrink-0 pt-2">
+                                            <label className="text-xs font-semibold text-slate-700 uppercase tracking-wide">
+                                                {dynamicField.label}
+                                                {dynamicField.required && (
+                                                    <span className="text-red-500 ml-0.5">*</span>
+                                                )}
+                                            </label>
+                                        </div>
+                                        <div className="w-full max-w-sm min-w-0">
+                                            {renderInput(
+                                                dynamicField,
+                                                inputRow[dynamicField.key],
+                                                (v) => handleInputChange(dynamicField.key, v)
                                             )}
-                                        </label>
-                                        {renderInput(
-                                            dynamicField,
-                                            inputRow[dynamicField.key],
-                                            (v) => handleInputChange(dynamicField.key, v)
-                                        )}
+                                        </div>
                                     </div>
                                 );
                             })}

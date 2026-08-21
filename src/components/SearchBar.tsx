@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { RxCross2 } from "react-icons/rx";
-import { useUser } from "../context/UserContext";
+import { useAppSelector } from "../store/hooks";
 import { debounce } from "lodash";
 import { FiChevronDown } from "react-icons/fi";
 import { trackDrugSearch } from "../utils/utils";
@@ -29,7 +29,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ compact = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const { drugsData } = useUser();
+  const drugsData = useAppSelector((state) => state.drugs.drugsData);
 
   const computeSuggestions = useCallback(() => {
     setShowSuggestions(false);

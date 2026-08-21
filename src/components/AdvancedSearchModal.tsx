@@ -1,7 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useLayoutEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { FiSearch, FiX, FiSliders, FiBriefcase, FiGlobe, FiTag, FiRotateCcw } from 'react-icons/fi';
-import { useUser } from '../context/UserContext';
+import { FiSearch, FiX, FiSliders, FiBriefcase, FiGlobe, FiTag, FiRotateCcw, FiActivity, FiLayers, FiPackage, FiChevronDown } from 'react-icons/fi';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { fetchMasterData } from '../store/slices/masterDataSlice';
+import { therapeuticAreasData } from '../data/therapeuticAreasData';
 import { trackDrugSearch } from '../utils/utils';
 
 interface AdvancedSearchModalProps {
@@ -11,6 +14,9 @@ interface AdvancedSearchModalProps {
   initialCategory?: string;
   initialCompany?: string;
   initialRegion?: string;
+  initialTherapeuticArea?: string;
+  initialBcsClass?: string;
+  initialDosageForm?: string;
 }
 
 const CATEGORIES = [
@@ -22,6 +28,186 @@ const CATEGORIES = [
   { value: "cid", label: "CID" },
 ];
 
+const BCS_CLASSES = ["Class I", "Class II", "Class III", "Class IV"];
+
+interface SearchableFilterInputProps {
+  value: string;
+  onChange: (val: string) => void;
+  options: string[];
+  placeholder: string;
+  icon?: React.ReactNode;
+}
+
+const SearchableFilterInput: React.FC<SearchableFilterInputProps> = ({
+  value,
+  onChange,
+  options,
+  placeholder,
+  icon,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [coords, setCoords] = useState<{ top: number; left: number; width: number }>({
+    top: 0,
+    left: 0,
+    width: 0,
+  });
+
+  const updateCoords = () => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setCoords({
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+      });
+    }
+  };
+
+  useLayoutEffect(() => {
+    if (isOpen) updateCoords();
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleScrollOrResize = (e: Event) => {
+      if (dropdownRef.current && dropdownRef.current.contains(e.target as Node)) return;
+      updateCoords();
+    };
+
+    const handleClickOutside = (e: MouseEvent) => {
+      const isClickInContainer = containerRef.current && containerRef.current.contains(e.target as Node);
+      const isClickInDropdown = dropdownRef.current && dropdownRef.current.contains(e.target as Node);
+      if (!isClickInContainer && !isClickInDropdown) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScrollOrResize, true);
+    window.addEventListener("resize", handleScrollOrResize);
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      window.removeEventListener("scroll", handleScrollOrResize, true);
+      window.removeEventListener("resize", handleScrollOrResize);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  // Filter options based on input value. If empty, show ALL options.
+  const filteredOptions = useMemo(() => {
+    if (!value.trim()) return options;
+    const q = value.trim().toLowerCase();
+    return options.filter((opt) => opt.toLowerCase().includes(q));
+  }, [options, value]);
+
+  const openDropdown = () => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setCoords({
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+      });
+    }
+    setIsOpen(true);
+  };
+
+  const handleSelectOption = (opt: string) => {
+    onChange(opt);
+    setIsOpen(false);
+  };
+
+  return (
+    <div ref={containerRef} className="relative w-full">
+      <div className="relative flex items-center">
+        {icon && (
+          <div className="absolute left-3.5 text-primary pointer-events-none">
+            {icon}
+          </div>
+        )}
+        <input
+          type="text"
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => {
+            onChange(e.target.value);
+            openDropdown();
+          }}
+          onFocus={openDropdown}
+          className={`w-full ${icon ? 'pl-10' : 'pl-3.5'} pr-10 py-2.5 rounded-xl border border-border-main focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm font-medium text-main outline-none transition-all placeholder:text-gray-400 bg-white`}
+        />
+        <div className="absolute right-3 flex items-center gap-1">
+          {value && (
+            <button
+              type="button"
+              onClick={() => onChange("")}
+              className="text-gray-400 hover:text-red-500 transition-colors p-0.5 cursor-pointer"
+              title="Clear"
+            >
+              <FiX className="w-3.5 h-3.5" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              if (isOpen) {
+                setIsOpen(false);
+              } else {
+                openDropdown();
+              }
+            }}
+            className="text-gray-400 hover:text-primary transition-colors p-0.5 cursor-pointer"
+          >
+            <FiChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180 text-primary' : ''}`} />
+          </button>
+        </div>
+      </div>
+
+      {/* Options Dropdown Menu Portal */}
+      {isOpen && coords.width > 0 && ReactDOM.createPortal(
+        <div
+          ref={dropdownRef}
+          style={{
+            position: "fixed",
+            top: coords.top,
+            left: coords.left,
+            width: coords.width,
+          }}
+          className="bg-white border border-border-main rounded-xl shadow-2xl z-[999999] max-h-60 overflow-y-auto py-1 animate-in fade-in zoom-in-95 duration-150"
+        >
+          {filteredOptions.length === 0 ? (
+            <div className="px-3.5 py-2 text-xs text-gray-400 text-center font-medium">
+              No matching options found
+            </div>
+          ) : (
+            filteredOptions.map((opt, idx) => {
+              const isSelected = opt.toLowerCase() === value.trim().toLowerCase();
+              return (
+                <div
+                  key={`${opt}-${idx}`}
+                  onClick={() => handleSelectOption(opt)}
+                  className={`px-3.5 py-2 cursor-pointer text-xs font-semibold transition-colors flex items-center justify-between ${
+                    isSelected
+                      ? "bg-primary-light/40 text-primary"
+                      : "text-main hover:bg-slate-50"
+                  }`}
+                >
+                  <span className="truncate">{opt}</span>
+                  {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
+                </div>
+              );
+            })
+          )}
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+};
+
 const AdvancedSearchModal: React.FC<AdvancedSearchModalProps> = ({
   isOpen,
   onClose,
@@ -29,14 +215,29 @@ const AdvancedSearchModal: React.FC<AdvancedSearchModalProps> = ({
   initialCategory = "all",
   initialCompany = "",
   initialRegion = "",
+  initialTherapeuticArea = "",
+  initialBcsClass = "",
+  initialDosageForm = "",
 }) => {
   const navigate = useNavigate();
-  const { drugsData } = useUser();
+  const dispatch = useAppDispatch();
+  const drugsData = useAppSelector((state) => state.drugs.drugsData);
+  const masterData = useAppSelector((state) => state.masterData);
 
   const [query, setQuery] = useState(initialQuery);
   const [category, setCategory] = useState(initialCategory);
   const [company, setCompany] = useState(initialCompany);
   const [region, setRegion] = useState(initialRegion);
+  const [therapeuticArea, setTherapeuticArea] = useState(initialTherapeuticArea);
+  const [bcsClass, setBcsClass] = useState(initialBcsClass);
+  const [dosageForm, setDosageForm] = useState(initialDosageForm);
+
+  // Proactively fetch master data when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      dispatch(fetchMasterData());
+    }
+  }, [isOpen, dispatch]);
 
   // Extract unique companies from drugsData dynamically
   const availableCompanies = useMemo(() => {
@@ -50,9 +251,34 @@ const AdvancedSearchModal: React.FC<AdvancedSearchModalProps> = ({
     return Array.from(set).sort();
   }, [drugsData]);
 
-  // Extract unique regions from drugsData dynamically
+  // Extract unique regions & countries dynamically from masterData API and drugsData
   const availableRegions = useMemo(() => {
     const set = new Set<string>();
+
+    // 1. From masterData.regionsCountries API response
+    if (masterData?.regionsCountries && Object.keys(masterData.regionsCountries).length > 0) {
+      Object.entries(masterData.regionsCountries).forEach(([regName, countries]) => {
+        if (regName && regName.trim()) set.add(regName.trim());
+        if (Array.isArray(countries)) {
+          countries.forEach((country) => {
+            if (country && typeof country === 'string' && country.trim()) {
+              set.add(country.trim());
+            }
+          });
+        }
+      });
+    }
+
+    // 2. From masterData.regulatoryAuthorities API response
+    if (Array.isArray(masterData?.regulatoryAuthorities)) {
+      masterData.regulatoryAuthorities.forEach((item: any) => {
+        if (item?.country && typeof item.country === 'string' && item.country.trim()) {
+          set.add(item.country.trim());
+        }
+      });
+    }
+
+    // 3. From drugsData records
     (drugsData || []).forEach((item: any) => {
       const reg =
         item?.ProductOverview?.firstApprovedRegion ||
@@ -61,7 +287,7 @@ const AdvancedSearchModal: React.FC<AdvancedSearchModalProps> = ({
         item?.firstApprovedRegion;
       if (reg && typeof reg === 'string' && reg.trim()) {
         const cleanReg = reg.trim();
-        if (cleanReg.length < 30) {
+        if (cleanReg.length < 35) {
           set.add(cleanReg);
         } else {
           if (cleanReg.toLowerCase().includes('usa') || cleanReg.toLowerCase().includes('us')) set.add('USA');
@@ -73,9 +299,67 @@ const AdvancedSearchModal: React.FC<AdvancedSearchModalProps> = ({
         }
       }
     });
+
     if (set.size === 0) {
-      ['USA', 'EU', 'Germany', 'Global', 'India', 'Japan'].forEach(r => set.add(r));
+      ['USA', 'EU', 'North America', 'Europe', 'Asia-Pacific', 'Germany', 'Global', 'India', 'Japan', 'United Kingdom'].forEach(r => set.add(r));
     }
+    return Array.from(set).sort();
+  }, [drugsData, masterData]);
+
+  // Extract unique therapeutic areas dynamically from masterData API, fallback data, and drugsData
+  const availableTherapeuticAreas = useMemo(() => {
+    const set = new Set<string>();
+
+    // 1. From masterData.therapeuticAreas API response
+    if (masterData?.therapeuticAreas && Object.keys(masterData.therapeuticAreas).length > 0) {
+      Object.entries(masterData.therapeuticAreas).forEach(([area, indications]) => {
+        if (area && area.trim()) set.add(area.trim());
+        if (Array.isArray(indications)) {
+          indications.forEach((ind) => {
+            if (ind && typeof ind === 'string' && ind.trim()) {
+              set.add(ind.trim());
+            }
+          });
+        }
+      });
+    }
+
+    // 2. From local therapeuticAreasData fallback
+    if (therapeuticAreasData) {
+      Object.entries(therapeuticAreasData).forEach(([area, indications]) => {
+        if (area && area.trim()) set.add(area.trim());
+        if (Array.isArray(indications)) {
+          indications.forEach((ind) => {
+            if (ind && typeof ind === 'string' && ind.trim()) {
+              set.add(ind.trim());
+            }
+          });
+        }
+      });
+    }
+
+    // 3. From drugsData records
+    (drugsData || []).forEach((item: any) => {
+      const ta = item?.ProductOverview?.therapeuticArea || item?.therapeuticArea;
+      if (ta && typeof ta === 'string' && ta.trim()) {
+        set.add(ta.trim());
+      }
+    });
+
+    return Array.from(set).sort();
+  }, [drugsData, masterData]);
+
+  // Extract unique dosage forms from drugsData dynamically
+  const availableDosageForms = useMemo(() => {
+    const set = new Set<string>();
+    (drugsData || []).forEach((item: any) => {
+      const df = item?.ProductOverview?.dosageForms || item?.dosageForms;
+      if (df && typeof df === 'string' && df.trim()) {
+        df.split(',').forEach((s: string) => {
+          if (s && s.trim()) set.add(s.trim());
+        });
+      }
+    });
     return Array.from(set).sort();
   }, [drugsData]);
 
@@ -86,6 +370,9 @@ const AdvancedSearchModal: React.FC<AdvancedSearchModalProps> = ({
     setCategory("all");
     setCompany("");
     setRegion("");
+    setTherapeuticArea("");
+    setBcsClass("");
+    setDosageForm("");
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -101,6 +388,9 @@ const AdvancedSearchModal: React.FC<AdvancedSearchModalProps> = ({
 
     if (company) params.set("company", company);
     if (region) params.set("region", region);
+    if (therapeuticArea) params.set("therapeuticArea", therapeuticArea);
+    if (bcsClass) params.set("bcsClass", bcsClass);
+    if (dosageForm) params.set("dosageForm", dosageForm);
 
     const queryString = params.toString() ? `?${params.toString()}` : "";
     const targetUrl = `/${category}/${searchText}${queryString}`;
@@ -112,7 +402,7 @@ const AdvancedSearchModal: React.FC<AdvancedSearchModalProps> = ({
   return (
     <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
-        className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-border-main overflow-hidden flex flex-col max-h-[90vh]"
+        className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-border-main overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -123,7 +413,7 @@ const AdvancedSearchModal: React.FC<AdvancedSearchModalProps> = ({
             </div>
             <div>
               <h2 className="text-xl font-extrabold text-main font-display">Advanced Search</h2>
-              <p className="text-xs text-body font-medium">Search with detailed parameters, company, and region filters</p>
+              <p className="text-xs text-body font-medium">Search & filter drugs by keyword, manufacturer, region, therapeutic area, and properties</p>
             </div>
           </div>
           <button
@@ -189,74 +479,72 @@ const AdvancedSearchModal: React.FC<AdvancedSearchModalProps> = ({
 
           {/* Company & Region Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Company Filter */}
+            {/* Company Filter Dropdown */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-main mb-2 flex items-center gap-1.5">
                 <FiBriefcase className="w-3.5 h-3.5 text-primary" /> Company / Manufacturer
               </label>
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  placeholder="Type company name..."
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border-main focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm font-medium text-main outline-none transition-all placeholder:text-gray-400 bg-white"
-                />
-                {availableCompanies.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-slate-50 rounded-lg border border-slate-200/80">
-                    <span className="text-[10px] font-bold text-gray-400 w-full px-1">Quick Select:</span>
-                    {availableCompanies.slice(0, 8).map((comp) => (
-                      <button
-                        key={comp}
-                        type="button"
-                        onClick={() => setCompany(company === comp ? "" : comp)}
-                        className={`text-[11px] px-2 py-0.5 rounded-md font-semibold transition-colors cursor-pointer ${
-                          company.toLowerCase() === comp.toLowerCase()
-                            ? 'bg-primary text-white'
-                            : 'bg-white text-main hover:bg-primary-light hover:text-primary border border-slate-200'
-                        }`}
-                      >
-                        {comp}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <SearchableFilterInput
+                value={company}
+                onChange={setCompany}
+                options={availableCompanies}
+                placeholder="Select or search company..."
+              />
             </div>
 
-            {/* Region Filter */}
+            {/* Region Filter Dropdown */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-main mb-2 flex items-center gap-1.5">
                 <FiGlobe className="w-3.5 h-3.5 text-primary" /> Approved Region / Country
               </label>
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  placeholder="Type region (e.g. USA, EU...)"
-                  value={region}
-                  onChange={(e) => setRegion(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border-main focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm font-medium text-main outline-none transition-all placeholder:text-gray-400 bg-white"
-                />
-                {availableRegions.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-slate-50 rounded-lg border border-slate-200/80">
-                    <span className="text-[10px] font-bold text-gray-400 w-full px-1">Quick Select:</span>
-                    {availableRegions.slice(0, 8).map((reg) => (
-                      <button
-                        key={reg}
-                        type="button"
-                        onClick={() => setRegion(region === reg ? "" : reg)}
-                        className={`text-[11px] px-2 py-0.5 rounded-md font-semibold transition-colors cursor-pointer ${
-                          region.toLowerCase() === reg.toLowerCase()
-                            ? 'bg-primary text-white'
-                            : 'bg-white text-main hover:bg-primary-light hover:text-primary border border-slate-200'
-                        }`}
-                      >
-                        {reg}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <SearchableFilterInput
+                value={region}
+                onChange={setRegion}
+                options={availableRegions}
+                placeholder="Select or search region..."
+              />
+            </div>
+          </div>
+
+          {/* Therapeutic Area & BCS Class & Dosage Form */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-100 pt-4">
+            {/* Therapeutic Area Dropdown */}
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-main mb-2 flex items-center gap-1.5">
+                <FiActivity className="w-3.5 h-3.5 text-primary" /> Therapeutic Area
+              </label>
+              <SearchableFilterInput
+                value={therapeuticArea}
+                onChange={setTherapeuticArea}
+                options={availableTherapeuticAreas}
+                placeholder="Select or search area..."
+              />
+            </div>
+
+            {/* BCS Class Dropdown */}
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-main mb-2 flex items-center gap-1.5">
+                <FiLayers className="w-3.5 h-3.5 text-primary" /> BCS Class
+              </label>
+              <SearchableFilterInput
+                value={bcsClass}
+                onChange={setBcsClass}
+                options={BCS_CLASSES}
+                placeholder="Select BCS Class..."
+              />
+            </div>
+
+            {/* Dosage Form Dropdown */}
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-main mb-2 flex items-center gap-1.5">
+                <FiPackage className="w-3.5 h-3.5 text-primary" /> Dosage Form
+              </label>
+              <SearchableFilterInput
+                value={dosageForm}
+                onChange={setDosageForm}
+                options={availableDosageForms}
+                placeholder="Select or search form..."
+              />
             </div>
           </div>
         </form>

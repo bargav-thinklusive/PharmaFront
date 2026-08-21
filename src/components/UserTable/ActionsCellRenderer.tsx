@@ -1,4 +1,5 @@
 import { FiTrash2 } from "react-icons/fi";
+import CustomSelect from "../shared/CustomSelect";
 
 export const NameCellRenderer = (params: any) => {
   const name = params.data?.name || "Unnamed User";
@@ -31,15 +32,16 @@ export const RoleCellRenderer = (params: any) => {
 
   return (
     <div className="flex items-center h-full w-full">
-      <select
+      <CustomSelect
         value={primaryRole}
-        onChange={(e) => params.context.onUpdateRole(params.data._id, e.target.value)}
-        className="bg-[#F8FAFC] border border-border-main rounded-md px-2.5 py-1.5 text-xs font-semibold text-text-main hover:border-primary focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent transition-all cursor-pointer capitalize font-sans"
-      >
-        <option value="admin">Admin</option>
-        <option value="editor">Editor</option>
-        <option value="subscriber">Subscriber</option>
-      </select>
+        onChange={(val) => params.context.onUpdateRole(params.data._id, val)}
+        options={[
+          { label: "Admin", value: "admin" },
+          { label: "Editor", value: "editor" },
+          { label: "Subscriber", value: "subscriber" },
+        ]}
+        className="py-1 px-2.5 text-xs font-semibold capitalize font-sans"
+      />
     </div>
   );
 };

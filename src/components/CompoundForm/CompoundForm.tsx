@@ -9,7 +9,10 @@ import DrugService from "../../services/DrugService";
 import { toast } from "react-toastify";
 import useDraft from "../../hooks/useDraft";
 import TokenService from "../../services/shared/TokenService";
-import { useUser } from "../../context/UserContext";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { fetchDrugs, setSelectedList } from "../../store/slices/drugsSlice";
+import { fetchDrafts } from "../../store/slices/draftsSlice";
+import { fetchMasterData } from "../../store/slices/masterDataSlice";
 import { CompoundFormHeader } from "./CompoundFormHeader";
 import { CompoundFormSidebar } from "./CompoundFormSidebar";
 import { CompoundFormActions } from "./CompoundFormActions";
@@ -38,10 +41,18 @@ const CompoundForm = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
+    const dispatch = useAppDispatch();
+    const user = useAppSelector((state) => state.user.user);
+    const drafts = useAppSelector((state) => state.drafts.drafts);
+    const masterData = useAppSelector((state) => state.masterData);
+
     const { postData } = usePost();
     const { putData } = usePut();
     const { saveDraft, loadDraft, clearDraft } = useDraft();
-    const { refetchDrugs, refetchDrafts, setSelectedList, user, drafts } = useUser();
+
+    const refetchDrugs = () => dispatch(fetchDrugs());
+    const refetchDrafts = () => dispatch(fetchDrafts());
+    const refetchMasterData = () => dispatch(fetchMasterData());
 
     const draftId = searchParams.get("draftId");
 
@@ -286,8 +297,6 @@ const CompoundForm = () => {
         getFieldError: (key: string) => errors[key],
     };
 
-    const { masterData, refetchMasterData } = useUser();
-
     useEffect(() => {
         if (!masterData?.therapeuticAreas || Object.keys(masterData.therapeuticAreas).length === 0) {
             refetchMasterData?.();
@@ -307,9 +316,18 @@ const CompoundForm = () => {
     const activeRegionsCountries = masterData?.regionsCountries || {};
     const activeAuthorities: any[] = masterData?.regulatoryAuthorities || [];
 
-    const allCountries = (activeAuthorities.length > 0)
-        ? Array.from(new Set(activeAuthorities.map((r: any) => r.country))).sort()
-        : [];
+    const allCountries = Array.from(
+        new Set([
+            ...activeAuthorities.map((r: any) => r.country || r.region),
+            ...Object.keys(activeRegionsCountries),
+            ...Object.values(activeRegionsCountries).flat(),
+        ].filter((c): c is string => typeof c === 'string' && Boolean(c.trim())))
+    ).sort();
+
+    const selectedCountry = formData.country || formData.firstApprovedRegion;
+    const filteredAuthorities = (selectedCountry && selectedCountry.trim())
+        ? activeAuthorities.filter((r: any) => r.country?.toLowerCase() === selectedCountry.trim().toLowerCase())
+        : activeAuthorities;
 
     const dynamicOptions: Record<string, { label: string; value: string }[]> = {
         therapeuticArea: Object.keys(activeTherapeuticAreas).map((ta) => ({ label: ta, value: ta })),
@@ -317,8 +335,8 @@ const CompoundForm = () => {
         firstApprovedRegion: allCountries.map((c: string) => ({ label: c, value: c })),
         region: Object.keys(activeRegionsCountries).map((r) => ({ label: r, value: r })),
         country: allCountries.map((c: string) => ({ label: c, value: c })),
-        regulatoryBody: activeAuthorities.map((r: any) => ({
-            label: `${r.abbreviation ? `${r.abbreviation} - ` : ''}${r.authority} (${r.country})`,
+        regulatoryBody: filteredAuthorities.map((r: any) => ({
+            label: `${r.abbreviation ? `${r.abbreviation} - ` : ''}${r.authority}`,
             value: r.abbreviation ? `${r.authority} (${r.abbreviation})` : r.authority
         })),
     };
@@ -467,33 +485,6 @@ const CompoundForm = () => {
                                     {stepDescriptions[steps[currentStep].title] || "Please fill in the details for this section."}
                                 </p>
                             </div>
-                            
-                            {(() => {
-                                const stats = getSubsectionStats(currentStep);
-                                if (!stats.hasSubsections) return null;
-                                return (
-                                    <div className="flex flex-wrap items-center gap-3 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-xs">
-                                        {stats.complete > 0 && (
-                                            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0e8a67]">
-                                                <span className="w-2 h-2 rounded-full bg-[#0e8a67]" />
-                                                {stats.complete} Complete
-                                            </span>
-                                        )}
-                                        {stats.inProgress > 0 && (
-                                            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-500">
-                                                <span className="w-2 h-2 rounded-full bg-amber-500" />
-                                                {stats.inProgress} In Progress
-                                            </span>
-                                        )}
-                                        {stats.notStarted > 0 && (
-                                            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500">
-                                                <span className="w-2 h-2 rounded-full bg-slate-400" />
-                                                {stats.notStarted} Not Started
-                                            </span>
-                                        )}
-                                    </div>
-                                );
-                            })()}
                         </div>
 
                         {steps[currentStep].fields.some((f) => f.type === "header" || f.type === "dynamic") ? (
@@ -501,7 +492,7 @@ const CompoundForm = () => {
                                 fields={steps[currentStep].fields}
                                 form={formWithErrors}
                                 dynamicOptions={dynamicOptions}
-                                columns={currentStep === 1 ? 4 : 5}
+                                columns={1}
                             />
                         ) : (
                             <div className="bg-white rounded-2xl shadow-sm border border-border-main overflow-hidden">
@@ -523,7 +514,7 @@ const CompoundForm = () => {
                                         fields={steps[currentStep].fields}
                                         form={formWithErrors}
                                         dynamicOptions={dynamicOptions}
-                                        columns={5}
+                                        columns={1}
                                     />
                                 </div>
                             </div>

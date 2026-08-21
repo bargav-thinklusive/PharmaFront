@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useUser } from '../../context/UserContext';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchDrugs } from '../../store/slices/drugsSlice';
 import { flattenDrug } from '../CompoundForm/helper';
 import { findExistingDraft, unixToDate, trackDrugSearch } from '../../utils/utils';
 import useDraft from '../../hooks/useDraft';
@@ -15,7 +16,6 @@ import {
     FiDownload,
     FiMoreHorizontal,
     FiActivity,
-    FiLayers,
     FiFileText,
     FiTarget,
     FiInfo,
@@ -23,31 +23,26 @@ import {
     FiDatabase,
     FiBriefcase,
     FiTrash2,
-    FiShield,
     FiUsers,
-    FiCpu,
-    FiPackage,
     FiBarChart2,
     FiShare2,
-    FiDroplet,
-    FiTag,
-    FiClipboard,
-    FiLink,
-    FiBookOpen,
-    FiPaperclip
 } from 'react-icons/fi';
 import './SectionedViewDrug.css';
 
 import SectionHeader from './sectioned/SectionHeader';
 import SectionContent from './sectioned/SectionContent';
 import { ConfirmModal } from '../shared/ConfirmModal';
+import { SECTIONS } from './sectioned/sectionsConfig';
 
 const drugService = new DrugService();
 
 export default function SectionedViewDrug() {
     const { cid, version } = useParams();
     const navigate = useNavigate();
-    const { drugsData, refetchDrugs, drafts } = useUser();
+    const dispatch = useAppDispatch();
+    const drugsData = useAppSelector((state) => state.drugs.drugsData);
+    const drafts = useAppSelector((state) => state.drafts.drafts);
+    const refetchDrugs = () => dispatch(fetchDrugs());
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const { saveDraft } = useDraft();
     const { deleteData } = useDelete();
@@ -92,24 +87,6 @@ export default function SectionedViewDrug() {
         return flattenDrug(drugToDisplay);
     }, [drugToDisplay]);
 
-    // Build section list for navigation
-    const sections = useMemo(() => {
-        return [
-            { id: 1, key: 'ProductOverview', title: 'Product Overview', icon: <FiLayers className="w-3.5 h-3.5" /> },
-            { id: 2, key: 'ExecutiveSummary', title: 'Executive Summary', icon: <FiFileText className="w-3.5 h-3.5" /> },
-            { id: 3, key: 'RegulatoryInsights', title: 'Regulatory Insights', icon: <FiShield className="w-3.5 h-3.5" /> },
-            { id: 4, key: 'GenericEntrants', title: 'Generic Entrants', icon: <FiUsers className="w-3.5 h-3.5" /> },
-            { id: 5, key: 'PhysicalChemicalProperties', title: 'Physical & Chemical Properties', icon: <FiDroplet className="w-3.5 h-3.5" /> },
-            { id: 6, key: 'DrugSubstance', title: 'Drug Substance', icon: <FiCpu className="w-3.5 h-3.5" /> },
-            { id: 7, key: 'DrugProductInformation', title: 'Drug Product Information', icon: <FiPackage className="w-3.5 h-3.5" /> },
-            { id: 8, key: 'LabelingInformation', title: 'Labeling Information', icon: <FiTag className="w-3.5 h-3.5" /> },
-            { id: 9, key: 'BaBeStudies', title: 'BA/BE Studies', icon: <FiClipboard className="w-3.5 h-3.5" /> },
-            { id: 10, key: 'Sources', title: 'Sources', icon: <FiLink className="w-3.5 h-3.5" /> },
-            { id: 11, key: 'Glossary', title: 'Glossary', icon: <FiBookOpen className="w-3.5 h-3.5" /> },
-            { id: 12, key: 'Appendices', title: 'Appendices', icon: <FiPaperclip className="w-3.5 h-3.5" /> },
-        ];
-    }, []);
-
     // Cleanup dropdown listeners
     useEffect(() => {
         const clickHandler = (e: MouseEvent) => {
@@ -149,7 +126,7 @@ export default function SectionedViewDrug() {
         );
     }
 
-    const currentSection = sections.find(s => s.id === currentStep);
+    const currentSection = SECTIONS.find(s => s.id === currentStep);
 
     const handleNavigateById = (id: number) => {
         setCurrentStep(id);
@@ -243,6 +220,11 @@ export default function SectionedViewDrug() {
 
     const patentExpiry = getPatentExpiry();
     const lastUpdatedDate = drugToDisplay.updatedAt ? unixToDate(drugToDisplay.updatedAt) : "May 20, 2024";
+
+    const getSectionData = (key?: string) => {
+        if (!key || !drugToDisplay) return null;
+        return drugToDisplay[key] ?? displayData?.[key] ?? null;
+    };
 
     return (
         <div className="sectioned-view-container bg-slate-50/50 min-h-screen text-slate-800">
@@ -379,7 +361,7 @@ export default function SectionedViewDrug() {
                 {/* ── Tabs Navigation ── */}
                 <div className="screen-only">
                     <SectionHeader
-                        sections={sections}
+                        sections={SECTIONS}
                         currentStep={currentStep}
                         onNavigate={handleNavigateById}
                     />
@@ -495,7 +477,7 @@ export default function SectionedViewDrug() {
                                             <span className="font-bold text-slate-800">{cid}</span>
                                         </div>
                                         <div className="flex justify-between py-2.5">
-                                            <span className="font-semibold text-slate-400">Drug Name</span>
+                                            <span className="font-semibold text-slate-400">Brand Name</span>
                                             <span className="font-bold text-slate-800">{flatDrug.drugName || "—"}</span>
                                         </div>
                                         <div className="flex justify-between py-2.5">
@@ -504,189 +486,127 @@ export default function SectionedViewDrug() {
                                         </div>
                                         <div className="flex justify-between py-2.5">
                                             <span className="font-semibold text-slate-400">IUPAC Name</span>
-                                            <span className="font-bold text-slate-800 truncate max-w-[180px]" title={flatDrug.iupacName}>{flatDrug.iupacName || "—"}</span>
-                                        </div>
-                                        <div className="flex justify-between py-2.5">
-                                            <span className="font-semibold text-slate-400">INN Name</span>
-                                            <span className="font-bold text-slate-800">{flatDrug.innName || "—"}</span>
+                                            <span className="font-bold text-slate-800 text-right max-w-[180px] truncate" title={flatDrug.iupacName}>{flatDrug.iupacName || "—"}</span>
                                         </div>
                                         <div className="flex justify-between py-2.5">
                                             <span className="font-semibold text-slate-400">CAS Number</span>
-                                            <span className="font-bold text-slate-800">{drugToDisplay.PhysicalChemicalProperties?.casNumber || "103-90-2"}</span>
-                                        </div>
-                                        <div className="flex justify-between py-2.5">
-                                            <span className="font-semibold text-slate-400">Molecular Formula</span>
-                                            <span className="font-bold text-slate-800">{flatDrug.molecularFormula || "—"}</span>
-                                        </div>
-                                        <div className="flex justify-between py-2.5">
-                                            <span className="font-semibold text-slate-400">Molecular Weight</span>
-                                            <span className="font-bold text-slate-800">{flatDrug.molecularWeight ? `${flatDrug.molecularWeight} g/mol` : "—"}</span>
+                                            <span className="font-bold text-slate-800">{flatDrug.casNumber || "—"}</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Column 2: Development Status */}
+                                {/* Column 2: Regulatory & Exclusivity */}
                                 <div className="border border-slate-200 rounded-2xl p-5 bg-white shadow-xs space-y-4">
                                     <h3 className="text-xs font-extrabold text-[#0e8a67] uppercase tracking-wider flex items-center gap-1.5 font-display border-b border-slate-100 pb-2">
-                                        <FiActivity className="w-4 h-4" />
-                                        Development Status
+                                        <FiCalendar className="w-4 h-4" />
+                                        Regulatory & Exclusivity
                                     </h3>
                                     <div className="divide-y divide-slate-100/70 text-xs">
                                         <div className="flex justify-between py-2.5">
-                                            <span className="font-semibold text-slate-400">Development Phase</span>
-                                            <span className="font-bold text-slate-800">{drugToDisplay.ProductOverview?.developmentPhase || "—"}</span>
-                                        </div>
-                                        <div className="flex justify-between py-2.5">
-                                            <span className="font-semibold text-slate-400">First Approval Year</span>
+                                            <span className="font-semibold text-slate-400">First Approval</span>
                                             <span className="font-bold text-slate-800">{firstApprovedYear}</span>
                                         </div>
                                         <div className="flex justify-between py-2.5">
-                                            <span className="font-semibold text-slate-400">Patent Expiry</span>
+                                            <span className="font-semibold text-slate-400">First Approved Region</span>
+                                            <span className="font-bold text-slate-800">{flatDrug.firstApprovedRegion || "USFDA"}</span>
+                                        </div>
+                                        <div className="flex justify-between py-2.5">
+                                            <span className="font-semibold text-slate-400">Patent / Exclusivity Expiry</span>
                                             <span className="font-bold text-slate-800">{patentExpiry}</span>
                                         </div>
                                         <div className="flex justify-between py-2.5">
-                                            <span className="font-semibold text-slate-400">Market Exclusivity</span>
-                                            <span className="font-bold text-slate-800">—</span>
+                                            <span className="font-semibold text-slate-400">Generic Status</span>
+                                            <span className="font-bold text-slate-800">{flatDrug.genericEntrants && flatDrug.genericEntrants.length > 0 ? "Generic Available" : "Single Source"}</span>
                                         </div>
-                                        <div className="flex justify-between py-2.5 items-center">
-                                            <span className="font-semibold text-slate-400">Orphan Drug</span>
-                                            <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200">No</span>
-                                        </div>
-                                        <div className="flex justify-between py-2.5 items-center">
-                                            <span className="font-semibold text-slate-400">High Alert Medicine</span>
-                                            <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200">No</span>
+                                        <div className="flex justify-between py-2.5">
+                                            <span className="font-semibold text-slate-400">Special Designation</span>
+                                            <span className="font-bold text-slate-800">{flatDrug.specialDesignations && flatDrug.specialDesignations.length > 0 ? flatDrug.specialDesignations[0].designationType || "Standard" : "Standard"}</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Column 3: Quick Links */}
+                                {/* Column 3: Commercial & Supply Chain */}
                                 <div className="border border-slate-200 rounded-2xl p-5 bg-white shadow-xs space-y-4">
                                     <h3 className="text-xs font-extrabold text-[#0e8a67] uppercase tracking-wider flex items-center gap-1.5 font-display border-b border-slate-100 pb-2">
-                                        <FiLayers className="w-4 h-4" />
-                                        Quick Links
+                                        <FiUsers className="w-4 h-4" />
+                                        Commercial & Supply
                                     </h3>
-                                    <div className="flex flex-col text-xs font-bold text-slate-700 divide-y divide-slate-100/70">
-                                        <div
-                                            onClick={() => handleNavigateById(2)}
-                                            className="flex items-center justify-between py-3 hover:text-[#0e8a67] transition-colors cursor-pointer"
-                                        >
-                                            <span>Product Overview</span>
-                                            <FiChevronRight className="w-4 h-4 text-slate-400" />
+                                    <div className="divide-y divide-slate-100/70 text-xs">
+                                        <div className="flex justify-between py-2.5">
+                                            <span className="font-semibold text-slate-400">Innovator / Company</span>
+                                            <span className="font-bold text-slate-800">{flatDrug.companyName || "—"}</span>
                                         </div>
-                                        <div
-                                            onClick={() => handleNavigateById(3)}
-                                            className="flex items-center justify-between py-3 hover:text-[#0e8a67] transition-colors cursor-pointer"
-                                        >
-                                            <span>Regulatory Insights</span>
-                                            <FiChevronRight className="w-4 h-4 text-slate-400" />
+                                        <div className="flex justify-between py-2.5">
+                                            <span className="font-semibold text-slate-400">Global Annual Revenue</span>
+                                            <span className="font-bold text-slate-800">{flatDrug.globalAnnualRevenue || "—"}</span>
                                         </div>
-                                        <div
-                                            onClick={() => handleNavigateById(6)}
-                                            className="flex items-center justify-between py-3 hover:text-[#0e8a67] transition-colors cursor-pointer"
-                                        >
-                                            <span>Drug Substance</span>
-                                            <FiChevronRight className="w-4 h-4 text-slate-400" />
+                                        <div className="flex justify-between py-2.5">
+                                            <span className="font-semibold text-slate-400">DMF Vendors Count</span>
+                                            <span className="font-bold text-slate-800">{flatDrug.availableDmfVendors ? flatDrug.availableDmfVendors.length : 0} Vendors</span>
                                         </div>
-                                        <div
-                                            onClick={() => handleNavigateById(7)}
-                                            className="flex items-center justify-between py-3 hover:text-[#0e8a67] transition-colors cursor-pointer"
-                                        >
-                                            <span>Drug Product Information</span>
-                                            <FiChevronRight className="w-4 h-4 text-slate-400" />
+                                        <div className="flex justify-between py-2.5">
+                                            <span className="font-semibold text-slate-400">Active Formulations</span>
+                                            <span className="font-bold text-slate-800">{flatDrug.dosageFormAndStrength ? flatDrug.dosageFormAndStrength.length : 1} Formulations</span>
                                         </div>
-                                        <div
-                                            onClick={() => handleNavigateById(8)}
-                                            className="flex items-center justify-between py-3 hover:text-[#0e8a67] transition-colors cursor-pointer"
-                                        >
-                                            <span>Labeling Information</span>
-                                            <FiChevronRight className="w-4 h-4 text-slate-400" />
-                                        </div>
-                                        <div
-                                            onClick={() => handleNavigateById(10)}
-                                            className="flex items-center justify-between py-3 hover:text-[#0e8a67] transition-colors cursor-pointer"
-                                        >
-                                            <span>Sources</span>
-                                            <FiChevronRight className="w-4 h-4 text-slate-400" />
+                                        <div className="flex justify-between py-2.5">
+                                            <span className="font-semibold text-slate-400">Last Profile Update</span>
+                                            <span className="font-bold text-slate-800">{lastUpdatedDate}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Info Curation Footer Banner */}
-                            <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-xl text-xs text-slate-500 gap-4 mt-6">
-                                <div className="flex items-center gap-2">
-                                    <FiInfo className="w-4 h-4 text-[#0e8a67] flex-shrink-0" />
-                                    <span>Information is curated from reliable and authoritative sources.</span>
-                                </div>
-                                <div className="flex items-center gap-4 flex-wrap">
-                                    <span className="flex items-center gap-1.5">
-                                        <FiCalendar className="w-3.5 h-3.5 text-slate-400" />
-                                        Last updated on {lastUpdatedDate}
-                                    </span>
-                                    <span className="flex items-center gap-1.5">
-                                        <FiDatabase className="w-3.5 h-3.5 text-slate-400" />
-                                        Source: Multiple
-                                    </span>
-                                </div>
+                            {/* Executive Summary Rich Text Box */}
+                            <div className="border border-slate-200 rounded-2xl p-6 bg-slate-50/50 space-y-3">
+                                <h3 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider font-display">
+                                    Overview & Summary
+                                </h3>
+                                <p className="text-xs text-slate-600 leading-relaxed font-normal whitespace-pre-line">
+                                    {flatDrug.executiveSummary || `${flatDrug.drugName || "This compound"} is a synthetic small-molecule pharmaceutical drug classified primarily under ${therapeuticClass}. It is approved for ${approvedIndications.toLowerCase()} via ${mechanismOfAction.toLowerCase()}`}
+                                </p>
                             </div>
                         </div>
                     ) : (
-                        /* Standard Sections Rendering */
-                        <div>
-                            <h1 className="text-xl font-bold border-l-4 border-[#0e8a67] pl-3.5 pb-0.5 mb-6 text-slate-900 font-display">
-                                {currentStep}. {currentSection?.title}
-                            </h1>
-                            {displayData && currentSection && (
-                                <SectionContent
-                                    data={displayData[currentSection.key]}
-                                    sectionIndex={`${currentStep}`}
-                                />
-                            )}
-                        </div>
+                        /* Standard Section Content Renderer for Tabs 2 to 12 */
+                        <SectionContent
+                            section={currentSection}
+                            sectionIndex={String(currentStep)}
+                            data={getSectionData(currentSection?.key)}
+                        />
                     )}
                 </main>
 
-                {/* ── Full Printable View (Renders ALL 12 sections during window.print()) ── */}
-                <div className="hidden print:block print-all p-8 bg-white text-slate-900 font-sans space-y-10">
-                    {/* Document Header */}
-                    <div className="border-b border-slate-300 pb-6 mb-8 flex items-center justify-between">
+                {/* ── Print / PDF Layout (Hidden on Screen, Visible on Print) ── */}
+                <div className="print-only hidden print:block space-y-8 bg-white p-4">
+                    <div className="border-b border-slate-300 pb-4 mb-6 flex justify-between items-end">
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-900 font-display">
-                                {flatDrug.drugName || drugToDisplay.ProductOverview?.drugName || "Drug Entry"}
-                            </h1>
-                            <p className="text-xs text-slate-600 mt-1 font-medium">
-                                Comprehensive Technical Dossier &amp; Drug Information Report
-                            </p>
+                            <h1 className="text-2xl font-bold text-slate-900">{flatDrug.drugName || "Drug Entry"}</h1>
+                            <p className="text-xs text-slate-500">CID: {cid} | Version: {version}</p>
                         </div>
-                        <div className="text-right text-xs text-slate-500 font-medium">
-                            <div>CID: {flatDrug.cid || drugToDisplay.cid || "—"}</div>
-                            <div>Version: {flatDrug.version || drugToDisplay.version || "1.0"}</div>
-                            <div>Printed On: {new Date().toLocaleDateString()}</div>
-                        </div>
+                        <p className="text-xs text-slate-400">CMCIntel Intelligence Report</p>
                     </div>
 
-                    {/* All 12 Sections Iteration */}
-                    {displayData && sections.map((sec) => (
-                        <div key={sec.id} className="page-break-after pb-8 border-b border-slate-200 last:border-b-0">
-                            <h2 className="text-lg font-bold text-[#0e8a67] border-l-4 border-[#0e8a67] pl-3 mb-4 font-display">
+                    {SECTIONS.map((sec) => (
+                        <div key={sec.id} className="page-break-inside-avoid mb-6">
+                            <h2 className="text-base font-bold text-[#0e8a67] border-b border-slate-200 pb-2 mb-3">
                                 {sec.id}. {sec.title}
                             </h2>
-                            <SectionContent
-                                data={displayData[sec.key]}
-                                sectionIndex={`${sec.id}`}
-                            />
+                            <SectionContent section={sec} sectionIndex={String(sec.id)} data={getSectionData(sec.key)} />
                         </div>
                     ))}
                 </div>
 
             </div>
+
+            {/* Delete Confirmation Modal */}
             <ConfirmModal
                 isOpen={showDeleteModal}
                 onClose={() => setShowDeleteModal(false)}
                 onConfirm={handleConfirmDelete}
                 title="Delete Drug Record"
-                description="Are you sure you want to delete this drug record? This action cannot be undone."
-                confirmText="Yes, Delete"
+                description={`Are you sure you want to delete "${flatDrug.drugName || 'this drug entry'}"? This action cannot be undone.`}
+                confirmText="Delete Record"
+                cancelText="Cancel"
                 icon={<FiTrash2 className="w-6 h-6 text-red-500" />}
                 iconBgColor="bg-red-50 border-red-200"
                 confirmButtonColor="bg-red-600 hover:bg-red-700"

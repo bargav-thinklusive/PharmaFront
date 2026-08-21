@@ -1,7 +1,8 @@
 import { useCallback } from "react";
 import DraftService from "../services/DraftService";
 import axiosInstance from "../services/shared/AxiosService";
-import { useUser } from "../context/UserContext";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { fetchDrafts } from "../store/slices/draftsSlice";
 
 const draftService = new DraftService();
 
@@ -16,14 +17,19 @@ export interface DraftState {
 
 /**
  * Fallback standalone helper (for backwards compatibility/typing).
- * Active code should retrieve drafts from UserContext instead.
+ * Active code should retrieve drafts from Redux store instead.
  */
 export function getAllDrafts(): DraftState[] {
     return [];
 }
 
 const useDraft = () => {
-    const { drafts, refetchDrafts } = useUser();
+    const dispatch = useAppDispatch();
+    const drafts = useAppSelector((state) => state.drafts.drafts);
+
+    const refetchDrafts = useCallback(async () => {
+        await dispatch(fetchDrafts());
+    }, [dispatch]);
 
     /** Persist current form state to secure backend database */
     const saveDraft = useCallback(async (formData: any, currentStep: number, existingDraftId?: string | null): Promise<string> => {

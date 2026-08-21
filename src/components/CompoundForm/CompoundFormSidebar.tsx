@@ -105,17 +105,7 @@ export const CompoundFormSidebar: React.FC<CompoundFormSidebarProps> = ({
                             if (isActive) {
                                 circleClass = "bg-transparent border-amber-500 text-amber-500 font-bold ring-2 ring-amber-500/20";
                                 rowBg = "bg-slate-50 border-l-4 border-[#0e8a67] text-[#0e8a67] font-bold shadow-xs";
-                                
-                                let pct = 0;
-                                if (stats.hasSubsections) {
-                                    const total = stats.complete + stats.inProgress + stats.notStarted;
-                                    pct = total > 0 ? Math.round((stats.complete / total) * 100) : 0;
-                                }
-                                statusBadge = (
-                                    <span className="text-[9px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 whitespace-nowrap">
-                                        {pct}%
-                                    </span>
-                                );
+                                statusBadge = null;
                             } else if (status === "Completed") {
                                 circleClass = "bg-[#0e8a67] border-[#0e8a67] text-white";
                                 rowBg = "text-slate-800 hover:bg-slate-50";
@@ -127,29 +117,9 @@ export const CompoundFormSidebar: React.FC<CompoundFormSidebarProps> = ({
                             } else if (status === "In Progress") {
                                 circleClass = "bg-transparent border-amber-500 text-amber-500";
                                 rowBg = "text-slate-700 hover:bg-slate-50";
-                                
-                                let pct = 0;
-                                if (stats.hasSubsections) {
-                                    const total = stats.complete + stats.inProgress + stats.notStarted;
-                                    pct = total > 0 ? Math.round((stats.complete / total) * 100) : 0;
-                                    statusBadge = (
-                                        <span className="text-[9px] font-bold text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20 whitespace-nowrap">
-                                            {pct}%
-                                        </span>
-                                    );
-                                } else {
-                                    statusBadge = (
-                                        <span className="text-[9px] font-bold text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20 whitespace-nowrap">
-                                            In Progress
-                                        </span>
-                                    );
-                                }
+                                statusBadge = null;
                             } else {
-                                statusBadge = (
-                                    <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 whitespace-nowrap">
-                                        Not Started
-                                    </span>
-                                );
+                                statusBadge = null;
                             }
                             
                             return (

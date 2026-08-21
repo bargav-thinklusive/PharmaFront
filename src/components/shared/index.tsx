@@ -1,11 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
+import ReactDOM from "react-dom";
 import { renderArrayInput } from "./renderingArray";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import get from "lodash.get";
 import TagsInput from "./TagSelector";
-import { FiInfo, FiChevronDown, FiChevronRight, FiChevronUp, FiCheck } from "react-icons/fi";
+import { FiInfo, FiChevronDown, FiChevronRight, FiChevronUp } from "react-icons/fi";
 import ToggleSwitch from "./Switch";
+import CustomSelect from "./CustomSelect";
 
 // ─── Shared input class strings ───────────────────────────────────────────────
 const baseInput =
@@ -32,18 +34,60 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
     const [inputValue, setInputValue] = useState(value);
     const [filteredOptions, setFilteredOptions] = useState(options);
     const containerRef = useRef<HTMLDivElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    const [coords, setCoords] = useState<{ top: number; left: number; width: number }>({
+        top: 0, left: 0, width: 0,
+    });
 
     useEffect(() => { setInputValue(value); }, [value]);
     useEffect(() => {
         setFilteredOptions(options.filter((o) => o.label.toLowerCase().includes(inputValue.toLowerCase())));
     }, [inputValue, options]);
+
+    const updateCoords = () => {
+        if (containerRef.current) {
+            const rect = containerRef.current.getBoundingClientRect();
+            setCoords({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+        }
+    };
+
+    useLayoutEffect(() => {
+        if (isOpen) updateCoords();
+    }, [isOpen]);
+
     useEffect(() => {
-        const handler = (e: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(e.target as Node)) setIsOpen(false);
+        if (!isOpen) return;
+
+        const handleScrollOrResize = (e: Event) => {
+            if (dropdownRef.current && dropdownRef.current.contains(e.target as Node)) return;
+            updateCoords();
         };
-        document.addEventListener("mousedown", handler);
-        return () => document.removeEventListener("mousedown", handler);
-    }, []);
+
+        const handleClickOutside = (e: MouseEvent) => {
+            const isClickInContainer = containerRef.current && containerRef.current.contains(e.target as Node);
+            const isClickInDropdown = dropdownRef.current && dropdownRef.current.contains(e.target as Node);
+            if (!isClickInContainer && !isClickInDropdown) setIsOpen(false);
+        };
+
+        window.addEventListener("scroll", handleScrollOrResize, true);
+        window.addEventListener("resize", handleScrollOrResize);
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            window.removeEventListener("scroll", handleScrollOrResize, true);
+            window.removeEventListener("resize", handleScrollOrResize);
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isOpen]);
+
+    const openDropdown = () => {
+        if (disabled) return;
+        if (containerRef.current) {
+            const rect = containerRef.current.getBoundingClientRect();
+            setCoords({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+        }
+        setIsOpen(true);
+    };
 
     return (
         <div ref={containerRef} className="relative w-full">
@@ -51,8 +95,8 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
                 <input
                     type="text"
                     value={inputValue}
-                    onChange={(e) => { setInputValue(e.target.value); setIsOpen(true); onChange?.(e.target.value); }}
-                    onFocus={() => setIsOpen(true)}
+                    onChange={(e) => { setInputValue(e.target.value); openDropdown(); onChange?.(e.target.value); }}
+                    onFocus={openDropdown}
                     placeholder={placeholder}
                     disabled={disabled}
                     className={`${baseInput} pr-10 ${disabled ? disabledInput : ""}`}
@@ -61,8 +105,12 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
                     className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-body transition-transform ${isOpen ? "rotate-180" : ""}`}
                 />
             </div>
-            {isOpen && filteredOptions.length > 0 && !disabled && (
-                <div className="absolute z-50 w-full mt-1 bg-white border border-border-main rounded-md shadow-lg max-h-60 overflow-auto">
+            {isOpen && coords.width > 0 && filteredOptions.length > 0 && !disabled && ReactDOM.createPortal(
+                <div
+                    ref={dropdownRef}
+                    style={{ position: "fixed", top: coords.top, left: coords.left, width: coords.width }}
+                    className="bg-white border border-border-main rounded-xl shadow-2xl z-[999999] max-h-60 overflow-auto py-1 animate-in fade-in zoom-in-95 duration-150"
+                >
                     {filteredOptions.map((option, index) => (
                         <div
                             key={`${option.value}-${index}`}
@@ -72,12 +120,18 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
                             {option.label}
                         </div>
                     ))}
-                </div>
+                </div>,
+                document.body
             )}
-            {isOpen && filteredOptions.length === 0 && inputValue && !disabled && (
-                <div className="absolute z-50 w-full mt-1 bg-white border border-border-main rounded-md shadow-lg">
+            {isOpen && coords.width > 0 && filteredOptions.length === 0 && inputValue && !disabled && ReactDOM.createPortal(
+                <div
+                    ref={dropdownRef}
+                    style={{ position: "fixed", top: coords.top, left: coords.left, width: coords.width }}
+                    className="bg-white border border-border-main rounded-xl shadow-2xl z-[999999] py-1"
+                >
                     <div className="px-3.5 py-2.5 text-sm text-body">No options found</div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );
@@ -125,7 +179,7 @@ interface DynamicFormBuilderProps {
 
 // ─── DynamicFormBuilder ───────────────────────────────────────────────────────
 const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
-    fields, form, columns = 1, dynamicOptions = {}, onChange,
+    fields, form, dynamicOptions = {}, onChange,
 }) => {
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [openHeaders, setOpenHeaders] = useState<{ [key: string]: boolean }>({});
@@ -219,30 +273,28 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
                 );
 
             case "dropdown":
-            case "select":
+            case "select": {
+                const formattedOptions = allOptions?.map((option) => {
+                    const val = typeof option === "string" ? option : (type === "select" ? get(option, labelKey) : (option[valueKey] ?? option.value ?? option.label));
+                    const lbl = typeof option === "string" ? option : (option[labelKey] ?? option.label ?? option.value);
+                    return { label: String(lbl), value: val };
+                }) || [];
+
+                const computedPlaceholder = (!fieldValue && (key === "regulatoryBody" || key === "regulatoryBodies") && (!allOptions || allOptions.length === 0))
+                    ? "Select Country First"
+                    : (placeholder || "Select…");
+
                 return render ? render(fieldValue, fieldOnChange) : (
-                    <div className="relative">
-                        <select
-                            value={fieldValue}
-                            onChange={(e) => fieldOnChange(e.target.value)}
-                            disabled={disabled}
-                            required={required}
-                            className={`${selectClass} ${disabled ? disabledInput : ""}`}
-                        >
-                            <option value="">{placeholder || "Select…"}</option>
-                            {allOptions?.map((option, idx) => {
-                                const val = typeof option === "string" ? option : (type === "select" ? get(option, labelKey) : (option[valueKey] ?? option.value ?? option.label));
-                                const lbl = typeof option === "string" ? option : (option[labelKey] ?? option.label ?? option.value);
-                                return (
-                                    <option key={idx} value={val}>
-                                        {lbl}
-                                    </option>
-                                );
-                            })}
-                        </select>
-                        <FiChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-body" />
-                    </div>
+                    <CustomSelect
+                        value={fieldValue}
+                        onChange={fieldOnChange}
+                        options={formattedOptions}
+                        placeholder={computedPlaceholder}
+                        disabled={disabled}
+                        required={required}
+                    />
                 );
+            }
 
             case "autocomplete":
                 return (
@@ -351,11 +403,10 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
                 return (
                     <div className="flex flex-wrap gap-3 mt-1">
                         {allOptions?.map((option, idx) => (
-                            <label key={idx} className={`flex items-center gap-2 cursor-pointer px-3.5 py-2 rounded-xl border text-sm font-medium transition-all duration-150 ${
-                                fieldValue === option[valueKey]
+                            <label key={idx} className={`flex items-center gap-2 cursor-pointer px-3.5 py-2 rounded-xl border text-sm font-medium transition-all duration-150 ${fieldValue === option[valueKey]
                                     ? "border-primary bg-primary-light text-primary"
                                     : "border-border-main bg-white text-main hover:border-primary/40"
-                            }`}>
+                                }`}>
                                 <input
                                     type="radio"
                                     value={option[valueKey]}
@@ -433,33 +484,6 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
         }
     };
 
-    const getSubsectionStatus = (groupFields: FieldConfig[]) => {
-        if (groupFields.length === 0) return "Not Started";
-        
-        let filledCount = 0;
-        let totalCount = 0;
-        
-        groupFields.forEach(f => {
-            if (f.type === "dynamic") {
-                const val = form.getFieldValue ? form.getFieldValue(f.key) : form[f.key];
-                totalCount++;
-                if (Array.isArray(val) && val.length > 0) {
-                    filledCount++;
-                }
-            } else {
-                const val = form.getFieldValue ? form.getFieldValue(f.key) : form[f.key];
-                totalCount++;
-                if (val !== undefined && val !== null && String(val).trim() !== "") {
-                    filledCount++;
-                }
-            }
-        });
-        
-        if (filledCount === 0) return "Not Started";
-        if (filledCount === totalCount) return "Complete";
-        return "In Progress";
-    };
-
     // Group fields by header
     const groups: { header: FieldConfig | null; fields: FieldConfig[] }[] = [];
     let currentGroup: { header: FieldConfig | null; fields: FieldConfig[] } = { header: null, fields: [] };
@@ -480,7 +504,7 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
 
     const renderFieldsGrid = (groupFields: FieldConfig[]) => {
         const gridItems = groupFields.map((field, idx) => {
-            const { key, label, required, singleFieldInRow, fullRowWidth, tooltip, type } = field;
+            const { key, label, required, tooltip, type } = field;
 
             if (type === "dynamic") {
                 return (
@@ -490,33 +514,30 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
                 );
             }
 
-            const colSpan = (fullRowWidth || singleFieldInRow) ? "col-span-full" : "";
             const error = form.getFieldError?.(key) || get(errors, key);
 
             return (
-                <React.Fragment key={`${key}-${idx}`}>
-                    <div className={colSpan}>
-                        <div className="mb-4">
-                            {/* Label row */}
-                            <div className="flex items-center gap-1.5 mb-1.5">
-                                <label className="block text-xs font-semibold text-main uppercase tracking-wide">
-                                    {label}
-                                    {required && <span className="text-red-500 ml-0.5">*</span>}
-                                </label>
-                                {tooltip && (
-                                    <div className="group relative">
-                                        <FiInfo className="w-3.5 h-3.5 text-body cursor-help" />
-                                        <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-2.5 text-xs text-white bg-navy rounded-xl shadow-xl z-50">
-                                            {tooltip}
-                                        </div>
+                <div key={`${key}-${idx}`} className="col-span-full py-3 border-b border-slate-100 last:border-b-0">
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-6">
+                        {/* Key (Label) - Left Side */}
+                        <div className="w-full sm:w-48 md:w-56 shrink-0 flex items-center gap-1.5 pt-2">
+                            <label className="text-sm font-semibold text-slate-700">
+                                {label}
+                                {required && <span className="text-red-500 ml-1">*</span>}
+                            </label>
+                            {tooltip && (
+                                <div className="group relative">
+                                    <FiInfo className="w-3.5 h-3.5 text-slate-400 cursor-help" />
+                                    <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-2.5 text-xs text-white bg-slate-800 rounded-xl shadow-xl z-50">
+                                        {tooltip}
                                     </div>
-                                )}
-                            </div>
+                                </div>
+                            )}
+                        </div>
 
-                            {/* Field */}
+                        {/* Value (Control) - Right Side */}
+                        <div className="w-full max-w-sm min-w-0">
                             {renderFieldComponent(field)}
-
-                            {/* Error */}
                             {error && (
                                 <p className="mt-1 text-xs text-red-500 font-medium flex items-center gap-1">
                                     <span className="w-1 h-1 rounded-full bg-red-500 inline-block" />
@@ -525,16 +546,12 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
                             )}
                         </div>
                     </div>
-                    {singleFieldInRow && <div key={`spacer-${idx}`} className={colSpan} />}
-                </React.Fragment>
+                </div>
             );
         });
 
         return (
-            <div
-                className="grid gap-x-5 gap-y-1"
-                style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
-            >
+            <div className="divide-y divide-slate-100">
                 {gridItems}
             </div>
         );
@@ -551,41 +568,6 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
                 const header = group.header;
                 if (!header) return null;
                 const isOpen = !!openHeaders[header.key];
-                const status = getSubsectionStatus(group.fields);
-                
-                let statusIcon = null;
-                let statusBadge = null;
-                
-                if (status === "Complete") {
-                    statusIcon = (
-                        <div className="w-6 h-6 rounded-full bg-[#0e8a67] flex items-center justify-center text-white flex-shrink-0">
-                            <FiCheck className="w-3.5 h-3.5 stroke-[3]" />
-                        </div>
-                    );
-                    statusBadge = (
-                        <span className="text-[10px] font-semibold text-[#0e8a67] bg-[#e6f4f0] border border-[#0e8a67]/20 px-2 py-0.5 rounded-md">
-                            Complete
-                        </span>
-                    );
-                } else if (status === "In Progress") {
-                    statusIcon = (
-                        <div className="w-6 h-6 rounded-full border-2 border-amber-500 bg-transparent flex-shrink-0" />
-                    );
-                    statusBadge = (
-                        <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 border border-amber-500/20 px-2 py-0.5 rounded-md">
-                            In Progress
-                        </span>
-                    );
-                } else {
-                    statusIcon = (
-                        <div className="w-6 h-6 rounded-full border-2 border-slate-300 bg-transparent flex-shrink-0" />
-                    );
-                    statusBadge = (
-                        <span className="text-[10px] font-semibold text-slate-500 bg-slate-50 border border-slate-300/30 px-2 py-0.5 rounded-md">
-                            Not Started
-                        </span>
-                    );
-                }
 
                 return (
                     <div
@@ -595,14 +577,12 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
                         {/* Accordion trigger header */}
                         <div
                             onClick={() => toggleHeader(header.key)}
-                            className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-alt/10 transition-colors"
+                            className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-alt/10 transition-colors bg-slate-50/50"
                         >
                             <div className="flex items-center gap-3.5">
-                                {statusIcon}
-                                <span className="text-sm font-bold text-main font-display">
+                                <span className="text-sm font-bold text-slate-800 font-display">
                                     {header.label}
                                 </span>
-                                {statusBadge}
                             </div>
                             {isOpen ? (
                                 <FiChevronUp className="w-4 h-4 text-slate-500" />
@@ -631,3 +611,4 @@ export { default as ToggleSwitch } from './Switch';
 export { default as TagsInput } from './TagSelector';
 export { renderArrayInput } from './renderingArray';
 export { default as CustomForm } from './CustomForm';
+export { default as CustomSelect } from './CustomSelect';

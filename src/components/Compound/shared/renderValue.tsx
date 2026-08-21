@@ -227,29 +227,124 @@ export function KeyValueDisplay({ data, className = '' }: { data: Record<string,
     );
 }
 
+const parseStringToRows = (textStr: string): { key: string; value: any }[] => {
+    if (!textStr || typeof textStr !== 'string') return [];
+    const lines = textStr.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    const resultRows: { key: string; value: any }[] = [];
+
+    const knownKeys = [
+        "appearance", "identity", "polymorphic form", "polymorphic", "water content",
+        "sulphated ash/residue on ignition", "sulphated ash", "residue on ignition",
+        "related substances", "related substance", "assay", "residual solvent",
+        "residual solvents", "degradants", "microbial limits", "microbial limit",
+        "melting point", "solubility", "description", "heavy metals", "loss on drying"
+    ];
+
+    lines.forEach((line) => {
+        // 1. Try colon separator "Key : Value" or "Key: Value"
+        if (line.includes(':')) {
+            const colonIdx = line.indexOf(':');
+            const k = line.substring(0, colonIdx).trim();
+            const v = line.substring(colonIdx + 1).trim();
+            if (k && v) {
+                resultRows.push({ key: formatKey(k), value: v });
+                return;
+            }
+        }
+
+        // 2. Try tab or 2+ spaces separator "Key   Value"
+        const spaceMatch = line.match(/^(.+?)(?:\t+|\s{2,})(.*)$/);
+        if (spaceMatch) {
+            const k = spaceMatch[1].trim();
+            const v = spaceMatch[2].trim();
+            if (k && v) {
+                resultRows.push({ key: formatKey(k), value: v });
+                return;
+            }
+        }
+
+        // 3. Match known parameter names at start of line (case-insensitive)
+        const lowerLine = line.toLowerCase();
+        for (const kk of knownKeys) {
+            if (lowerLine.startsWith(kk)) {
+                const k = line.substring(0, kk.length).trim();
+                const v = line.substring(kk.length).trim();
+                if (k && v) {
+                    resultRows.push({ key: formatKey(k), value: v });
+                    return;
+                }
+            }
+        }
+
+        // 4. Fallback: Split on single space if word count > 1
+        const singleSpaceIdx = line.indexOf(' ');
+        if (singleSpaceIdx > 0) {
+            const k = line.substring(0, singleSpaceIdx).trim();
+            const v = line.substring(singleSpaceIdx + 1).trim();
+            resultRows.push({ key: formatKey(k), value: v });
+        } else {
+            resultRows.push({ key: 'Specification', value: line });
+        }
+    });
+
+    return resultRows;
+};
+
 export function DrugSubstanceSpecificationsTable({ data }: { data: any }) {
     if (!data) return null;
     let rows: { key: string; value: any }[] = [];
 
-    if (Array.isArray(data)) {
-        rows = data.map((item: any) => {
-            if (typeof item === 'object' && item !== null) {
-                return {
-                    key: item.key || item.parameter || item.property || item.name || Object.keys(item)[0] || '',
-                    value: item.value || item.specification || item.val || Object.values(item)[0] || ''
-                };
+    const processItem = (item: any): { key: string; value: any }[] => {
+        if (!item) return [];
+        if (typeof item === 'string') {
+            try {
+                const parsed = JSON.parse(item);
+                if (typeof parsed === 'object' && parsed !== null) {
+                    return processItem(parsed);
+                }
+            } catch {
+                // Ignore JSON parse error
             }
-            return { key: 'Specification', value: String(item) };
-        });
-    } else if (typeof data === 'object' && data !== null) {
-        rows = Object.entries(data).map(([k, v]) => ({ key: formatKey(k), value: v }));
-    } else if (typeof data === 'string') {
-        try {
-            const parsed = JSON.parse(data);
-            if (typeof parsed === 'object') return <DrugSubstanceSpecificationsTable data={parsed} />;
-        } catch {
-            rows = [{ key: 'Specification Details', value: data }];
+            return parseStringToRows(item);
         }
+        if (typeof item === 'object' && item !== null) {
+            const res: { key: string; value: any }[] = [];
+            Object.entries(item).forEach(([k, v]) => {
+                const lowerK = k.toLowerCase().replace(/[^a-z]/g, "");
+                const isGenericKey = lowerK === "specificationdetails" || lowerK === "specifications" || lowerK === "specification" || lowerK === "details";
+
+                if (typeof v === 'string') {
+                    const parsedLines = parseStringToRows(v);
+                    if (parsedLines.length > 0) {
+                        res.push(...parsedLines);
+                        return;
+                    }
+                }
+                if (!isGenericKey) {
+                    res.push({ key: formatKey(k), value: v });
+                }
+            });
+            return res;
+        }
+        return [{ key: 'Specification', value: String(item) }];
+    };
+
+    if (Array.isArray(data)) {
+        data.forEach((item: any) => {
+            if (typeof item === 'object' && item !== null) {
+                const extractedKey = item.key || item.parameter || item.property || item.name || item.test;
+                const extractedValue = item.value || item.specification || item.val || item.acceptanceCriteria || item.result;
+                if (extractedKey && extractedValue !== undefined) {
+                    rows.push({ key: formatKey(String(extractedKey)), value: extractedValue });
+                } else {
+                    rows.push(...processItem(item));
+                }
+            } else {
+                rows.push(...processItem(item));
+            }
+        });
+    } else {
+        rows = processItem(data);
     }
 
     if (rows.length === 0) return null;
@@ -266,7 +361,7 @@ export function DrugSubstanceSpecificationsTable({ data }: { data: any }) {
                 <tbody className="divide-y divide-slate-200 bg-white">
                     {rows.map((row, idx) => (
                         <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                            <td className="px-6 py-3.5 font-semibold text-slate-900 border-r border-slate-200/60 whitespace-pre-wrap">
+                            <td className="px-6 py-3.5 font-semibold text-slate-900 border-r border-slate-200/60 whitespace-pre-wrap w-1/3">
                                 {row.key}
                             </td>
                             <td className="px-6 py-3.5 text-slate-700 whitespace-pre-wrap">

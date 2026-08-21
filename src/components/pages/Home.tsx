@@ -4,7 +4,7 @@ import AddDrugModal from '../CompoundForm/AddDrugModal';
 import DraftsListModal from '../CompoundForm/DraftsListModal';
 import AdvancedSearchModal from '../AdvancedSearchModal';
 import MoleculeBackground from '../shared/MoleculeBackground';
-import { useUser } from '../../context/UserContext';
+import { useAppSelector } from '../../store/hooks';
 import { useNavigate } from 'react-router-dom';
 import { FiPlus, FiFileText, FiZap, FiArrowRight, FiSliders } from 'react-icons/fi';
 import useRoles from '../../hooks/useRoles';
@@ -13,7 +13,9 @@ const Home: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [showDraftsModal, setShowDraftsModal] = useState(false);
   const [showAdvancedSearchModal, setShowAdvancedSearchModal] = useState(false);
-  const { user, drugsData, drafts } = useUser();
+  const user = useAppSelector((state) => state.user.user);
+  const drugsData = useAppSelector((state) => state.drugs.drugsData);
+  const drafts = useAppSelector((state) => state.drafts.drafts);
   const { canEditDrugs } = useRoles();
   const navigate = useNavigate();
 

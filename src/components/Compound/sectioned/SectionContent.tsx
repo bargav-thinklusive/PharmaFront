@@ -3,7 +3,8 @@ import { KeyValueDisplay, DataTable, DrugSubstanceSpecificationsTable, renderLin
 
 interface SectionContentProps {
     data: any;
-    sectionIndex: string;
+    sectionIndex?: string;
+    section?: any;
 }
 
 /**
@@ -266,7 +267,8 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
 /**
  * Handles rendering of fields within a section.
  */
-export default function SectionContent({ data, sectionIndex }: SectionContentProps) {
+export default function SectionContent({ data, sectionIndex, section }: SectionContentProps) {
+    const activeSectionIndex = sectionIndex || (section ? String(section.id) : "1");
     if (data === null || data === undefined) {
         return (
             <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -315,7 +317,7 @@ export default function SectionContent({ data, sectionIndex }: SectionContentPro
         <div className="space-y-8">
             {Object.keys(simpleFields).length > 0 && <KeyValueDisplay data={simpleFields} />}
             {complexFields.map(([key, value], idx) => (
-                <SubsectionRenderer key={key} title={key} data={value} index={`${sectionIndex}.${idx + 1}`} />
+                <SubsectionRenderer key={key} title={key} data={value} index={`${activeSectionIndex}.${idx + 1}`} />
             ))}
         </div>
     );

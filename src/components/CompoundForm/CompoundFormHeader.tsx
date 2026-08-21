@@ -32,9 +32,6 @@ export const CompoundFormHeader: React.FC<CompoundFormHeaderProps> = ({
                     <GiPill className="w-6 h-6" />
                 </div>
                 <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 text-slate-400 text-xs font-semibold mb-1">
-                        <span>Editing Drug Entry</span>
-                    </div>
                     <div className="flex items-center gap-2.5 min-w-0">
                         <h2 className="text-xl font-extrabold text-slate-800 font-display truncate leading-tight py-0.5">
                             {drugName || "New Drug Entry"}

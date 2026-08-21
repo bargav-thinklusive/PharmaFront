@@ -5,12 +5,12 @@ import { flattenDrug } from '../CompoundForm/helper';
 import { findExistingDraft, getNextVersion } from '../../utils/utils';
 import useDraft from '../../hooks/useDraft';
 import useRoles from '../../hooks/useRoles';
-import { useUser } from '../../context/UserContext';
+import { useAppSelector } from '../../store/hooks';
 
 const ActionCellRenderer: React.FC<any> = (params) => {
     const navigate = useNavigate();
     const { saveDraft } = useDraft();
-    const { drafts } = useUser();
+    const drafts = useAppSelector((state) => state.drafts.drafts);
     const { canEditDrug } = useRoles();
 
     const handleEdit = async () => {

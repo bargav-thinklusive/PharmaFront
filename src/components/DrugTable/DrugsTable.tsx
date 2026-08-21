@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useUser } from '../../context/UserContext';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchDrugs } from '../../store/slices/drugsSlice';
 import { AgGridReact } from 'ag-grid-react';
 import type { ColDef, GridReadyEvent } from 'ag-grid-community';
 import {
@@ -81,13 +82,22 @@ const DrugsTable: React.FC = () => {
   const { ccategory, searchtext } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const gridRef = useRef<AgGridReact<any>>(null);
-  const { drugsData, drugsLoading, refetchDrugs } = useUser();
+  const dispatch = useAppDispatch();
+  const drugsData = useAppSelector((state) => state.drugs.drugsData);
+  const drugsLoading = useAppSelector((state) => state.drugs.drugsLoading);
+
+  const refetchDrugs = useCallback(() => {
+    dispatch(fetchDrugs());
+  }, [dispatch]);
   const { fetchData } = useGet();
   const [bookmarks, setBookmarks] = useState<any[]>([]);
   const [showBookmarksOnly, setShowBookmarksOnly] = useState<boolean>(false);
 
   const companyFilter = searchParams.get('company') || '';
   const regionFilter = searchParams.get('region') || '';
+  const therapeuticAreaFilter = searchParams.get('therapeuticArea') || '';
+  const bcsClassFilter = searchParams.get('bcsClass') || '';
+  const dosageFormFilter = searchParams.get('dosageForm') || '';
   const activeCategory = ccategory || 'all';
 
   const categoryArr: any[] = drugsData;
@@ -205,9 +215,33 @@ const DrugsTable: React.FC = () => {
         }
       }
 
+      // 4. Therapeutic Area filter
+      if (therapeuticAreaFilter.trim()) {
+        const itemTA = item?.ProductOverview?.therapeuticArea || item?.therapeuticArea || '';
+        if (!itemTA.toLowerCase().includes(therapeuticAreaFilter.trim().toLowerCase())) {
+          return false;
+        }
+      }
+
+      // 5. BCS Class filter
+      if (bcsClassFilter.trim()) {
+        const itemBCS = item?.PhysicalChemicalProperties?.bcsClass || item?.bcsClass || '';
+        if (!itemBCS.toLowerCase().includes(bcsClassFilter.trim().toLowerCase())) {
+          return false;
+        }
+      }
+
+      // 6. Dosage Form filter
+      if (dosageFormFilter.trim()) {
+        const itemDF = item?.ProductOverview?.dosageForms || item?.dosageForms || '';
+        if (!itemDF.toLowerCase().includes(dosageFormFilter.trim().toLowerCase())) {
+          return false;
+        }
+      }
+
       return true;
     });
-  }, [displayQuery, activeCategory, companyFilter, regionFilter, uniqueCategoryArr]);
+  }, [displayQuery, activeCategory, companyFilter, regionFilter, therapeuticAreaFilter, bcsClassFilter, dosageFormFilter, uniqueCategoryArr]);
 
   // Results count
 
@@ -296,6 +330,24 @@ const DrugsTable: React.FC = () => {
     setSearchParams(params);
   };
 
+  const removeTherapeuticAreaFilter = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete('therapeuticArea');
+    setSearchParams(params);
+  };
+
+  const removeBcsClassFilter = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete('bcsClass');
+    setSearchParams(params);
+  };
+
+  const removeDosageFormFilter = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete('dosageForm');
+    setSearchParams(params);
+  };
+
   const removeCategoryFilter = () => {
     const searchPart = searchtext ? encodeURIComponent(searchtext) : 'all';
     const queryString = searchParams.toString() ? `?${searchParams.toString()}` : '';
@@ -305,6 +357,10 @@ const DrugsTable: React.FC = () => {
   const removeQueryFilter = () => {
     const queryString = searchParams.toString() ? `?${searchParams.toString()}` : '';
     navigate(`/${activeCategory}/all${queryString}`);
+  };
+
+  const removeAllFilters = () => {
+    navigate('/all/all');
   };
 
   return (
@@ -374,7 +430,7 @@ const DrugsTable: React.FC = () => {
         </div>
 
         {/* ── Active Filter Badges ── */}
-        {(displayQuery || companyFilter || regionFilter || (activeCategory && activeCategory !== 'all')) && (
+        {(displayQuery || companyFilter || regionFilter || therapeuticAreaFilter || bcsClassFilter || dosageFormFilter || (activeCategory && activeCategory !== 'all')) && (
           <div className="flex flex-wrap items-center gap-2 mb-4 bg-white p-3.5 rounded-2xl border border-border-main shadow-xs">
             <span className="text-xs font-bold text-gray-500 flex items-center gap-1.5 mr-1">
               <FiFilter className="w-3.5 h-3.5 text-primary" /> Active Filters:
@@ -416,8 +472,35 @@ const DrugsTable: React.FC = () => {
               </span>
             )}
 
+            {therapeuticAreaFilter && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-800 font-bold text-xs border border-purple-200">
+                Therapeutic Area: {therapeuticAreaFilter}
+                <button onClick={removeTherapeuticAreaFilter} className="hover:text-red-600 cursor-pointer ml-0.5">
+                  <FiX className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+
+            {bcsClassFilter && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-800 font-bold text-xs border border-indigo-200">
+                BCS Class: {bcsClassFilter}
+                <button onClick={removeBcsClassFilter} className="hover:text-red-600 cursor-pointer ml-0.5">
+                  <FiX className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+
+            {dosageFormFilter && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-800 font-bold text-xs border border-rose-200">
+                Dosage Form: {dosageFormFilter}
+                <button onClick={removeDosageFormFilter} className="hover:text-red-600 cursor-pointer ml-0.5">
+                  <FiX className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+
             <button
-              onClick={() => navigate('/all/all')}
+              onClick={removeAllFilters}
               className="text-xs font-semibold text-gray-400 hover:text-red-600 underline ml-auto cursor-pointer"
             >
               Clear All Filters
