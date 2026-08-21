@@ -768,13 +768,6 @@ export const addDrugSubstance: FieldConfig[] = [
                 placeholder: "Select Storage Condition",
             },
             {
-                key: "strength",
-                label: "Strength",
-                type: "text",
-                required: false,
-                placeholder: "Enter Strength",
-            },
-            {
                 key: "lastTimePointDataAvailable",
                 label: "Last Time Point Data Available",
                 // type: "dropdown",
@@ -1220,13 +1213,6 @@ export const addDrugProductInformation: FieldConfig[] = [
                 type: "text",
                 required: false,
                 placeholder: "Select Storage Condition",
-            },
-            {
-                key: "strength",
-                label: "Strength",
-                type: "text",
-                required: false,
-                placeholder: "Enter Strength",
             },
             {
                 key: "lastTimePointDataAvailable",

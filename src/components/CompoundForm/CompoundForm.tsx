@@ -362,27 +362,32 @@ const CompoundForm = () => {
 
         let filledCount = 0;
         let totalCount = 0;
+        let requiredCount = 0;
+        let filledRequiredCount = 0;
 
         stepFields.forEach(f => {
-            if (f.type === "dynamic") {
-                // For dynamic list fields, we check if rows have been added
-                const val = formData[f.key];
-                totalCount++;
-                if (Array.isArray(val) && val.length > 0) {
-                    filledCount++;
-                }
+            const val = formData[f.key];
+            totalCount++;
+            let isFilled = false;
+            if (f.type === "dynamic" || Array.isArray(val)) {
+                if (Array.isArray(val) && val.length > 0) isFilled = true;
             } else {
-                const val = formData[f.key];
-                totalCount++;
-                if (val !== undefined && val !== null && String(val).trim() !== "") {
-                    filledCount++;
-                }
+                if (val !== undefined && val !== null && String(val).trim() !== "") isFilled = true;
+            }
+
+            if (isFilled) filledCount++;
+            if (f.required) {
+                requiredCount++;
+                if (isFilled) filledRequiredCount++;
             }
         });
 
         if (filledCount === 0) return "Not Started";
-        if (filledCount === totalCount) return "Completed";
-        return "In Progress";
+        if (requiredCount > 0) {
+            if (filledRequiredCount === requiredCount) return "Completed";
+            return "In Progress";
+        }
+        return "Completed";
     };
 
     const getSubsectionStats = (stepIndex: number) => {

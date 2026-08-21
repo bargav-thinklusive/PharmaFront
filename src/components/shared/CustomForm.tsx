@@ -82,9 +82,15 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
 
     // On mount: restore only previously saved values (e.g. from localStorage).
     useEffect(() => {
-        const values = form.getFieldValue?.(key) || [];
-        if (values.length > 0) {
-            setTableRows(values);
+        const rawValues = form.getFieldValue?.(key);
+        if (Array.isArray(rawValues)) {
+            setTableRows(rawValues);
+        } else if (rawValues && typeof rawValues === 'object') {
+            setTableRows([rawValues]);
+        } else if (typeof rawValues === 'string' && rawValues.trim()) {
+            setTableRows([{ [key]: rawValues }]);
+        } else {
+            setTableRows([]);
         }
     }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -242,7 +248,8 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
         return value || "—";
     };
 
-    const hasEntries = tableRows.length > 0;
+    const safeTableRows = Array.isArray(tableRows) ? tableRows : [];
+    const hasEntries = safeTableRows.length > 0;
     const headerBg = hasEntries ? "bg-[#0e8a67]/10 border-[#0e8a67]/40 text-[#0e8a67]" : "bg-slate-50/80 border-slate-200 text-slate-800";
     const badgeStyle = hasEntries ? "bg-[#0e8a67] text-white" : "bg-slate-100 text-slate-600 border border-slate-200";
 
@@ -263,7 +270,7 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                             {editingIndex !== null ? `Editing: ${displayMainKey}` : displayMainKey}
                         </span>
                         <span className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full shadow-2xs ${badgeStyle}`}>
-                            {tableRows.length} {tableRows.length === 1 ? "entry" : "entries"}
+                            {safeTableRows.length} {safeTableRows.length === 1 ? "entry" : "entries"}
                         </span>
                     </div>
                     {accordionOpen ? (
@@ -277,10 +284,10 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                 {accordionOpen && (
                     <div className="px-6 pb-6 pt-5 border-t border-border-main bg-white">
                         <div className="divide-y divide-slate-100 mb-4">
-                            {dynamicFields?.map((dynamicField) => {
+                            {dynamicFields?.map((dynamicField, dfIdx) => {
                                 return (
                                     <div
-                                        key={dynamicField.key}
+                                        key={`${dynamicField.key}-${dfIdx}`}
                                         className="py-3 flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-6"
                                     >
                                         {!isSingleField && (
@@ -329,14 +336,14 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
             </div>
 
             {/* ── Committed rows table ── */}
-            {tableRows.length > 0 && (
+            {safeTableRows.length > 0 && (
                 <div className="overflow-x-auto rounded-xl border border-border-main shadow-sm bg-white">
                     <table className="min-w-full text-sm">
                         <thead>
                             <tr className="bg-alt/50 border-b border-border-main">
-                                {dynamicFields?.map((df) => (
+                                {dynamicFields?.map((df, dfIdx) => (
                                     <th
-                                        key={df.key}
+                                        key={`${df.key}-${dfIdx}`}
                                         className="px-4 py-3 text-left text-xs font-bold text-main uppercase tracking-wider whitespace-nowrap"
                                     >
                                         {isSingleField ? displayMainKey : df.label}
@@ -348,7 +355,7 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {tableRows.map((row, rowIndex) => (
+                            {safeTableRows.map((row, rowIndex) => (
                                 <tr
                                     key={rowIndex}
                                     className="border-b border-border-main last:border-0 hover:bg-alt/20 transition-colors"

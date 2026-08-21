@@ -24,15 +24,11 @@ const AddDrugModal: React.FC<AddDrugModalProps> = ({ onClose }) => {
 
     // Fuzzy match: all chars of query appear in order inside name (case-insensitive)
     const fuzzyMatch = (name: string, q: string): boolean => {
+        if (!name || !q) return false;
         const n = name.toLowerCase();
         const query = q.toLowerCase().trim();
         if (!query) return false;
-        if (n.includes(query)) return true; // fast path: exact substring match
-        let qi = 0;
-        for (let i = 0; i < n.length && qi < query.length; i++) {
-            if (n[i] === query[qi]) qi++;
-        }
-        return qi === query.length;
+        return n.includes(query);
     };
 
     const q = query.toLowerCase().trim();

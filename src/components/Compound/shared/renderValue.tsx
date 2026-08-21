@@ -102,6 +102,7 @@ export function renderValue(value: any): React.ReactNode {
                         src={getImgSrc(item)!}
                         alt="item"
                         className="h-10 w-auto inline cursor-pointer border rounded"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
                         onClick={() => window.open(getImgSrc(item)!, '_blank')}
                     />
                 ) : (
@@ -118,6 +119,7 @@ export function renderValue(value: any): React.ReactNode {
                 src={src}
                 alt="value"
                 className="max-w-[200px] h-auto cursor-pointer border rounded shadow-sm hover:scale-[1.05] transition-transform"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 onClick={() => window.open(src, '_blank')}
             />
         );
