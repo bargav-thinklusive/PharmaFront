@@ -8,6 +8,7 @@ import TagsInput from "./TagSelector";
 import { FiInfo, FiChevronDown, FiChevronRight, FiChevronUp } from "react-icons/fi";
 import ToggleSwitch from "./Switch";
 import CustomSelect from "./CustomSelect";
+import { formatDateForInput } from "../CompoundForm/helper";
 
 // ─── Shared input class strings ───────────────────────────────────────────────
 const baseInput =
@@ -309,7 +310,7 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
                 return (
                     <input
                         type={includeTime ? "datetime-local" : "date"}
-                        value={fieldValue}
+                        value={formatDateForInput(fieldValue)}
                         onChange={(e) => fieldOnChange(e.target.value)}
                         disabled={disabled}
                         required={required}
@@ -319,8 +320,8 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
                 );
 
             case "rangepicker": {
-                const rangeStart = fieldValue?.[0] || "";
-                const rangeEnd = fieldValue?.[1] || "";
+                const rangeStart = formatDateForInput(fieldValue?.[0]);
+                const rangeEnd = formatDateForInput(fieldValue?.[1]);
                 return (
                     <div className="flex items-center gap-2">
                         <input
@@ -514,27 +515,31 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
 
             const error = form.getFieldError?.(key) || get(errors, key);
 
+            const isSingleFieldInStep = (groupFields.length === 1 && (key === 'executiveSummary' || field.fullRowWidth)) || key === 'executiveSummary';
+
             return (
                 <div key={`${key}-${idx}`} className="col-span-full py-3 border-b border-slate-100 last:border-b-0">
                     <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-6">
-                        {/* Key (Label) - Left Side */}
-                        <div className="w-full sm:w-48 md:w-56 shrink-0 flex items-center gap-1.5 pt-2">
-                            <label className="text-sm font-semibold text-slate-700">
-                                {label}
-                                {required && <span className="text-red-500 ml-1">*</span>}
-                            </label>
-                            {tooltip && (
-                                <div className="group relative">
-                                    <FiInfo className="w-3.5 h-3.5 text-slate-400 cursor-help" />
-                                    <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-2.5 text-xs text-white bg-slate-800 rounded-xl shadow-xl z-50">
-                                        {tooltip}
+                        {/* Key (Label) - Left Side (Omitted for single-field steps like Executive Summary) */}
+                        {!isSingleFieldInStep && (
+                            <div className="w-full sm:w-48 md:w-56 shrink-0 flex items-center gap-1.5 pt-2">
+                                <label className="text-sm font-semibold text-slate-700">
+                                    {label}
+                                    {required && <span className="text-red-500 ml-1">*</span>}
+                                </label>
+                                {tooltip && (
+                                    <div className="group relative">
+                                        <FiInfo className="w-3.5 h-3.5 text-slate-400 cursor-help" />
+                                        <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-2.5 text-xs text-white bg-slate-800 rounded-xl shadow-xl z-50">
+                                            {tooltip}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-                        </div>
+                                )}
+                            </div>
+                        )}
 
                         {/* Value (Control) - Right Side */}
-                        <div className="w-full max-w-sm min-w-0">
+                        <div className={isSingleFieldInStep ? "w-full min-w-0" : "w-full max-w-sm min-w-0"}>
                             {renderFieldComponent(field)}
                             {error && (
                                 <p className="mt-1 text-xs text-red-500 font-medium flex items-center gap-1">
@@ -567,20 +572,54 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
                 if (!header) return null;
                 const isOpen = !!openHeaders[header.key];
 
+                const groupFields = group.fields.filter(f => f.type !== "header");
+                const totalCount = groupFields.length;
+                let filledCount = 0;
+                groupFields.forEach(f => {
+                    const val = form.getFieldValue ? form.getFieldValue(f.key) : form[f.key];
+                    if (f.type === "dynamic") {
+                        if (Array.isArray(val) && val.length > 0) filledCount++;
+                    } else if (Array.isArray(val)) {
+                        if (val.length > 0) filledCount++;
+                    } else if (val !== undefined && val !== null && String(val).trim() !== "") {
+                        filledCount++;
+                    }
+                });
+
+                let headerBg = "bg-slate-50/80 border-slate-200 text-slate-800";
+                let badgeStyle = "bg-slate-100 text-slate-600 border border-slate-200";
+
+                if (totalCount > 0) {
+                    if (filledCount === totalCount) {
+                        headerBg = "bg-[#0e8a67]/10 border-[#0e8a67]/40 text-[#0e8a67]";
+                        badgeStyle = "bg-[#0e8a67] text-white";
+                    } else if (filledCount > 0) {
+                        headerBg = "bg-amber-50 border-amber-300 text-amber-900";
+                        badgeStyle = "bg-amber-500 text-white";
+                    }
+                }
+
                 return (
                     <div
                         key={header.key || groupIdx}
-                        className="border border-border-main rounded-2xl bg-white shadow-sm overflow-hidden"
+                        className={`border rounded-2xl bg-white shadow-xs overflow-hidden transition-all ${
+                            filledCount === totalCount && totalCount > 0 ? "border-[#0e8a67]/40" : filledCount > 0 ? "border-amber-300" : "border-slate-200"
+                        }`}
                     >
                         {/* Accordion trigger header */}
                         <div
                             onClick={() => toggleHeader(header.key)}
-                            className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-alt/10 transition-colors bg-slate-50/50"
+                            className={`px-6 py-4 flex items-center justify-between cursor-pointer transition-colors ${headerBg}`}
                         >
                             <div className="flex items-center gap-3.5">
-                                <span className="text-sm font-bold text-slate-800 font-display">
+                                <span className="text-sm font-bold font-display">
                                     {header.label}
                                 </span>
+                                {totalCount > 0 && (
+                                    <span className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full shadow-2xs ${badgeStyle}`}>
+                                        {filledCount}/{totalCount}
+                                    </span>
+                                )}
                             </div>
                             {isOpen ? (
                                 <FiChevronUp className="w-4 h-4 text-slate-500" />
@@ -591,7 +630,7 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
 
                         {/* Accordion panel content */}
                         {isOpen && (
-                            <div className="px-6 pb-6 pt-5 border-t border-border-main bg-white">
+                            <div className="px-6 pb-6 pt-5 border-t border-slate-100 bg-white">
                                 {renderFieldsGrid(group.fields)}
                             </div>
                         )}

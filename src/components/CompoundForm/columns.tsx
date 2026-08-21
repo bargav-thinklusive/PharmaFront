@@ -4,7 +4,7 @@ import { CustomForm, type FieldConfig } from "../shared";
 export const addExecutiveSummary: FieldConfig[] = [
     {
         key: "executiveSummary",
-        label: "Executive Summary",
+        label: "Overview & Summary",
         type: "textarea",
         required: false,
         placeholder: "Enter Executive Summary",

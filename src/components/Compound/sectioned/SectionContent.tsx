@@ -41,6 +41,16 @@ const getImgSrc = (item: any): string | null => {
  */
 function SubsectionRenderer({ title, data, index }: { title: string; data: any; index: string }) {
     const normalizedTitle = title.toLowerCase();
+    const isSubSection = index.includes('.');
+
+    const renderHeader = () => {
+        if (!isSubSection) return null;
+        return (
+            <h2 className="text-lg font-bold text-slate-800 border-[#0e8a67] border-b-2 pb-1 font-display">
+                {index} {toTitleCase(title)}
+            </h2>
+        );
+    };
 
     // Check if data is an image or contains images
     const isImageField = normalizedTitle.includes('labeling') ||
@@ -52,9 +62,7 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
         const images = Array.isArray(data) ? data : [data];
         return (
             <div className="space-y-4">
-                <h2 className="text-lg font-bold text-gray-800 border-primary border-b-2 pb-1">
-                    {index} {toTitleCase(title)}
-                </h2>
+                {renderHeader()}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {images.map((item, i) => {
                         const imgSource = getImgSrc(item);
@@ -89,40 +97,52 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
         const items = Array.isArray(data) ? data : [data];
         const baseIndex = index.split('.').slice(0, -1).join('.');
 
+        if (items.length === 0) {
+            return (
+                <div className="space-y-4">
+                    {renderHeader()}
+                    <div className="p-4 border border-slate-200 rounded-xl bg-slate-50 text-slate-500 text-sm italic">No appendices available.</div>
+                </div>
+            );
+        }
+
         return (
             <div className="space-y-6">
-                {items.map((item, i) => {
-                    const subIdx = baseIndex ? `${baseIndex}.${i + 1}` : `${index}.${i + 1}`;
-                    let titleText = `Appendix ${i + 1}`;
-                    let bodyText = "";
+                {renderHeader()}
+                <div className="space-y-4">
+                    {items.map((item, i) => {
+                        const subIdx = baseIndex ? `${baseIndex}.${i + 1}` : `${i + 1}`;
+                        let titleText = `Appendix ${i + 1}`;
+                        let bodyText = "";
 
-                    if (typeof item === 'string') {
-                        bodyText = item;
-                    } else if (typeof item === 'object' && item !== null) {
-                        if (item.appendix && item.content && item.appendix !== item.content) {
-                            titleText = item.appendix;
-                            bodyText = item.content;
-                        } else {
-                            bodyText = item.content || item.appendix || item.name || JSON.stringify(item);
-                            if (item.appendix && item.appendix.length < 40 && !item.content) {
+                        if (typeof item === 'string') {
+                            bodyText = item;
+                        } else if (typeof item === 'object' && item !== null) {
+                            if (item.appendix && item.content && item.appendix !== item.content) {
                                 titleText = item.appendix;
+                                bodyText = item.content;
+                            } else {
+                                bodyText = item.content || item.appendix || item.name || JSON.stringify(item);
+                                if (item.appendix && item.appendix.length < 40 && !item.content) {
+                                    titleText = item.appendix;
+                                }
                             }
+                        } else {
+                            bodyText = String(item);
                         }
-                    } else {
-                        bodyText = String(item);
-                    }
 
-                    return (
-                        <div key={i} className="space-y-3">
-                            <h2 className="text-lg font-bold text-slate-800 border-[#0e8a67] border-b-2 pb-1 font-display">
-                                {subIdx} {titleText}
-                            </h2>
-                            <div className="p-4 border border-emerald-200/60 rounded-xl bg-emerald-50/40 text-slate-800 text-sm whitespace-pre-wrap leading-relaxed shadow-xs">
-                                {renderLink(normalizeValue(bodyText))}
+                        return (
+                            <div key={i} className="p-4 border border-emerald-200/60 rounded-xl bg-emerald-50/40 shadow-xs space-y-2">
+                                <h3 className="font-bold text-[#0e8a67] text-xs uppercase tracking-wider">
+                                    {subIdx}. {titleText}
+                                </h3>
+                                <div className="text-slate-800 text-sm whitespace-pre-wrap leading-relaxed">
+                                    {renderLink(normalizeValue(bodyText))}
+                                </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
+                </div>
             </div>
         );
     }
@@ -130,9 +150,7 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
     if (normalizedTitle.includes('drugsubstancespecifications') || normalizedTitle.includes('drug substance specifications')) {
         return (
             <div className="space-y-4">
-                <h2 className="text-lg font-bold text-slate-800 border-[#0e8a67] border-b-2 pb-1 font-display">
-                    {index} {toTitleCase(title)}
-                </h2>
+                {renderHeader()}
                 <DrugSubstanceSpecificationsTable data={data} />
             </div>
         );
@@ -142,7 +160,7 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
         const steps = Array.isArray(data) ? data : [data];
         return (
             <div className="space-y-4">
-                <h2 className="text-lg font-bold text-slate-800 border-[#0e8a67] border-b-2 pb-1 font-display">{index} {toTitleCase(title)}</h2>
+                {renderHeader()}
                 <div className="space-y-4">
                     {steps.map((item, i) => (
                         <div key={i} className="p-4 border border-emerald-200/60 rounded-xl bg-emerald-50/40 shadow-xs">
@@ -168,7 +186,7 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
         if (items.length === 0) {
             return (
                 <div className="space-y-4">
-                    <h2 className="text-lg font-bold text-slate-800 border-[#0e8a67] border-b-2 pb-1 font-display">{index} {toTitleCase(title)}</h2>
+                    {renderHeader()}
                     <div className="p-4 border border-slate-200 rounded-xl bg-slate-50 text-slate-500 text-sm italic">No sources available.</div>
                 </div>
             );
@@ -176,7 +194,7 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
 
         return (
             <div className="space-y-4">
-                <h2 className="text-lg font-bold text-slate-800 border-[#0e8a67] border-b-2 pb-1 font-display">{index} {toTitleCase(title)}</h2>
+                {renderHeader()}
                 <div className="space-y-4">
                     {items.map((item, i) => {
                         const val = typeof item === 'object' && item !== null ? (item.source || item.url || item.reference || Object.values(item)[0]) : item;
@@ -211,7 +229,7 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
         if (items.length === 0) {
             return (
                 <div className="space-y-4">
-                    <h2 className="text-lg font-bold text-slate-800 border-[#0e8a67] border-b-2 pb-1 font-display">{index} {toTitleCase(title)}</h2>
+                    {renderHeader()}
                     <div className="p-4 border border-slate-200 rounded-xl bg-slate-50 text-slate-500 text-sm italic">No glossary items available.</div>
                 </div>
             );
@@ -219,7 +237,7 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
 
         return (
             <div className="space-y-4">
-                <h2 className="text-lg font-bold text-slate-800 border-[#0e8a67] border-b-2 pb-1 font-display">{index} {toTitleCase(title)}</h2>
+                {renderHeader()}
                 <div className="space-y-4">
                     {items.map((item, i) => {
                         const term = typeof item === 'object' && item !== null ? (item.term || item.key || `Term ${i + 1}`) : `Item ${i + 1}`;
@@ -241,14 +259,14 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
         if (data.length > 0 && typeof data[0] === 'object' && data[0] !== null) {
             return (
                 <div className="space-y-4">
-                    <h2 className="text-lg font-bold text-gray-800 border-primary border-b-2 pb-1">{index} {toTitleCase(title)}</h2>
+                    {renderHeader()}
                     <DataTable data={data} />
                 </div>
             );
         }
         return (
             <div className="space-y-2">
-                <h2 className="text-lg font-bold text-gray-800 border-primary border-b-2 pb-1">{index} {toTitleCase(title)}</h2>
+                {renderHeader()}
                 <div className="p-2 border border-primary/20 rounded bg-primary-light/50">{data.join(', ')}</div>
             </div>
         );
@@ -257,7 +275,7 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
     // Generic object but might contain metadata we want to skip or images
     return (
         <div className="space-y-4">
-            <h2 className="text-lg font-bold text-gray-800 border-primary border-b-2 pb-1">{index} {toTitleCase(title)}</h2>
+            {renderHeader()}
             <SectionContent data={data} sectionIndex={index} />
         </div>
     );
@@ -277,9 +295,47 @@ export default function SectionContent({ data, sectionIndex, section }: SectionC
             </div>
         );
     }
-    if (typeof data !== 'object') return <div className="text-gray-700 p-2">{normalizeValue(data)}</div>;
 
-    const entries = Object.entries(data);
+    let targetData = data;
+    const sectionTitleNormalized = (section?.title || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+    // Unwrap section wrapper objects (e.g. Sources: { sources: [...] } -> [...])
+    if (targetData && typeof targetData === 'object' && !Array.isArray(targetData)) {
+        const rawKeys = Object.keys(targetData).filter(k => !['_id', 'cid', 'version'].includes(k));
+        if (rawKeys.length === 1) {
+            const singleKey = rawKeys[0];
+            const singleKeyNorm = singleKey.toLowerCase().replace(/[^a-z0-9]/g, "");
+            const sectionKeyNorm = (section?.key || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+            if (
+                singleKeyNorm === sectionTitleNormalized ||
+                singleKeyNorm === sectionKeyNorm ||
+                ['sources', 'glossary', 'appendices', 'executivesummary', 'labelinginformation', 'babestudies', 'genericentrants'].includes(singleKeyNorm)
+            ) {
+                targetData = targetData[singleKey];
+            }
+        }
+    }
+
+    if (typeof targetData !== 'object' || targetData === null) {
+        return (
+            <div className="p-4 border border-emerald-200/60 rounded-xl bg-emerald-50/40 text-slate-800 text-sm whitespace-pre-wrap leading-relaxed shadow-xs">
+                {renderLink(normalizeValue(targetData))}
+            </div>
+        );
+    }
+
+    if (Array.isArray(targetData)) {
+        return (
+            <SubsectionRenderer
+                title={section?.title || "Content"}
+                data={targetData}
+                index={activeSectionIndex}
+            />
+        );
+    }
+
+    const entries = Object.entries(targetData);
     const simpleFields: Record<string, any> = {};
     const complexFields: [string, any][] = [];
 
@@ -312,6 +368,18 @@ export default function SectionContent({ data, sectionIndex, section }: SectionC
             simpleFields[key] = value;
         }
     });
+
+    // If there is only one complex field and its name matches the section title or subkey (e.g. Sources -> sources), render it directly without duplicating title
+    if (complexFields.length === 1 && Object.keys(simpleFields).length === 0) {
+        const [singleKey, singleValue] = complexFields[0];
+        const keyNormalized = singleKey.toLowerCase().replace(/[^a-z0-9]/g, "");
+        if (
+            keyNormalized === sectionTitleNormalized ||
+            ['sources', 'glossary', 'appendices', 'executivesummary', 'regulatoryinsights', 'genericentrants', 'labelinginformation', 'babestudies'].includes(keyNormalized)
+        ) {
+            return <SubsectionRenderer title={section?.title || singleKey} data={singleValue} index={activeSectionIndex} />;
+        }
+    }
 
     return (
         <div className="space-y-8">

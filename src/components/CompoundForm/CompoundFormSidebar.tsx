@@ -83,7 +83,7 @@ export const CompoundFormSidebar: React.FC<CompoundFormSidebarProps> = ({
                                     title={step.title}
                                 >
                                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border-2 transition-all flex-shrink-0 ${circleClass}`}>
-                                        {status === "Completed" && !isActive ? <FiCheck className="w-3.5 h-3.5" /> : index + 1}
+                                        {index + 1}
                                     </div>
                                 </button>
                             );
@@ -129,7 +129,7 @@ export const CompoundFormSidebar: React.FC<CompoundFormSidebarProps> = ({
                                 >
                                     <div className="flex items-start gap-3 min-w-0">
                                         <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border-2 transition-all flex-shrink-0 ${circleClass}`}>
-                                            {status === "Completed" && !isActive ? <FiCheck className="w-3.5 h-3.5" /> : index + 1}
+                                            {index + 1}
                                         </div>
                                         <span className="leading-tight py-0.5 break-words">{step.title}</span>
                                     </div>

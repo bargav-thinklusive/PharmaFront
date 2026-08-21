@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import DynamicFormBuilder from "../shared";
 import { addExecutiveSummary, addProductOverview, addPhysicalChemicalProperties, addDrugSubstance, addDrugProductInformation, addAppendices, addRegulatoryInsights, addLabelingInformation, addGenericEntrants, addBaBeStudies, addSources, addGlossary } from "./columns";
-import { formatCreatedDrug } from "./helper";
+import { formatCreatedDrug, flattenDrug } from "./helper";
 import usePost from "../../hooks/usePost";
 import usePut from "../../hooks/usePut";
 import DrugService from "../../services/DrugService";
@@ -73,8 +73,9 @@ const CompoundForm = () => {
 
     useEffect(() => {
         if (location.state?.initialData && Object.keys(location.state.initialData).length > 0) {
-            formDataRef.current = location.state.initialData;
-            setFormData(location.state.initialData);
+            const flattened = flattenDrug(location.state.initialData);
+            formDataRef.current = flattened;
+            setFormData(flattened);
             if (draftId) setLoadedDraftId(draftId);
             return;
         }
@@ -87,8 +88,9 @@ const CompoundForm = () => {
 
         const draft = loadDraft(draftId);
         if (draft && draft.formData && Object.keys(draft.formData).length > 0) {
-            formDataRef.current = draft.formData;
-            setFormData(draft.formData);
+            const flattened = flattenDrug(draft.formData);
+            formDataRef.current = flattened;
+            setFormData(flattened);
             if (draft.currentStep !== undefined) {
                 setCurrentStep(draft.currentStep);
             }
