@@ -21,7 +21,8 @@ import { ColumnsToolPanelModule, ExcelExportModule, ServerSideRowModelApiModule 
 import { FiBookmark, FiDownload, FiChevronDown } from 'react-icons/fi';
 import Loader from '../Loader';
 import { sampleRawData } from '../../sampleData/data';
-import { useUser } from '../../context/UserContext';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchDrugs } from '../../store/slices/drugsSlice';
 import useGet from '../../hooks/useGet';
 import BookMarkService from '../../services/BookmarkService';
 
@@ -44,7 +45,14 @@ const pageSize = 20; // Number of rows per page
 
 const DrugsList = () => {
   const gridRef = useRef<AgGridReact<any>>(null);
-  const { drugsData, drugsLoading, refetchDrugs, selectedList } = useUser();
+  const dispatch = useAppDispatch();
+  const drugsData = useAppSelector((state) => state.drugs.drugsData);
+  const drugsLoading = useAppSelector((state) => state.drugs.drugsLoading);
+  const selectedList = useAppSelector((state) => state.drugs.selectedList);
+
+  const refetchDrugs = useCallback(() => {
+    dispatch(fetchDrugs());
+  }, [dispatch]);
   const { fetchData } = useGet();
   const bookMarkService = new BookMarkService();
   const [bookmarks, setBookmarks] = useState<any[]>([]);

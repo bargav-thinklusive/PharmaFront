@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../../context/UserContext";
+import { useAppSelector } from "../../store/hooks";
+import CustomSelect from "../shared/CustomSelect";
 
 interface AddDrugModalProps {
     onClose: () => void;
@@ -8,7 +9,7 @@ interface AddDrugModalProps {
 
 const AddDrugModal: React.FC<AddDrugModalProps> = ({ onClose }) => {
     const navigate = useNavigate();
-    const { drugsData } = useUser();
+    const drugsData = useAppSelector((state) => state.drugs.drugsData);
 
     const [step, setStep] = useState<"choice" | "existing">("choice");
     const [query, setQuery] = useState("");
@@ -173,22 +174,19 @@ const AddDrugModal: React.FC<AddDrugModalProps> = ({ onClose }) => {
                                         autoFocus
                                         className="flex-1 px-4 py-2.5 border-0 focus:ring-0 focus:outline-none text-sm rounded-l-lg"
                                     />
-                                    <div className="relative border-l border-gray-300 bg-gray-50 rounded-r-lg flex items-center">
-                                        <select
-                                            className="h-full px-3 py-2.5 text-sm bg-transparent border-0 focus:ring-0 focus:outline-none text-gray-700 font-medium appearance-none pr-8 cursor-pointer"
+                                    <div className="w-36 bg-gray-50 rounded-r-lg border-l border-gray-300">
+                                        <CustomSelect
                                             value={category}
-                                            onChange={(e) => { setCategory(e.target.value); setQuery(""); setError(""); }}
-                                        >
-                                            <option value="all">All</option>
-                                            <option value="drugName">Drug Name</option>
-                                            <option value="apiName">API Name</option>
-                                            <option value="iupacName">IUPAC Name</option>
-                                            <option value="innName">INN Name</option>
-                                            <option value="cid">CID</option>
-                                        </select>
-                                        <span className="absolute right-2 pointer-events-none text-gray-600 text-xs">
-                                            ▼
-                                        </span>
+                                            onChange={(val) => { setCategory(val); setQuery(""); setError(""); }}
+                                            options={[
+                                                { label: "All", value: "all" },
+                                                { label: "Drug Name", value: "drugName" },
+                                                { label: "API Name", value: "apiName" },
+                                                { label: "IUPAC Name", value: "iupacName" },
+                                                { label: "INN Name", value: "innName" },
+                                                { label: "CID", value: "cid" },
+                                            ]}
+                                        />
                                     </div>
                                     {/* Dropdown suggestions */}
                                     {suggestions.length > 0 && (

@@ -26,10 +26,8 @@ export const formatDraftDate = (val: any): string => {
       const num = parseInt(str, 10);
       date = num > 4102444800 ? new Date(num) : new Date(num * 1000);
     } else {
-      if (str.includes('T') && !str.endsWith('Z') && !/[+-]\d{2}:\d{2}$/.test(str)) {
-        str += 'Z';
-      } else if (!str.includes('T') && /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}/.test(str)) {
-        str = str.replace(' ', 'T') + 'Z';
+      if (!str.includes('T') && /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}/.test(str)) {
+        str = str.replace(' ', 'T');
       }
       date = new Date(str);
     }
@@ -41,7 +39,9 @@ export const formatDraftDate = (val: any): string => {
     return String(val);
   }
 
-  return date.toLocaleString(undefined, {
+  const userLocale = typeof navigator !== 'undefined' ? navigator.language : undefined;
+
+  return date.toLocaleString(userLocale, {
     month: 'short',
     day: '2-digit',
     year: 'numeric',

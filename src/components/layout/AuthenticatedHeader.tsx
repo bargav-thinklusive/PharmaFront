@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import CompanyLogo from "../../assets/CMCINTELLOGO.png";
 import AuthService from "../../services/AuthService";
-import { useUser } from "../../context/UserContext";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { setSelectedList } from "../../store/slices/drugsSlice";
 import useRoles from "../../hooks/useRoles";
 import useDraft from "../../hooks/useDraft";
 import { FiChevronDown, FiLogOut, FiUser, FiFileText, FiTrash2, FiSave, } from "react-icons/fi";
@@ -17,7 +18,15 @@ interface AuthenticatedHeaderProps {
 const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, drafts, selectedList, setSelectedList } = useUser();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user.user);
+  const drafts = useAppSelector((state) => state.drafts.drafts);
+  const selectedList = useAppSelector((state) => state.drugs.selectedList);
+  const handleSelectOption = (list: 'fda' | 'cmcintel') => {
+    dispatch(setSelectedList(list));
+    setDrugsListDropdownOpen(false);
+    navigate('/drugsList');
+  };
   const { canEditDrugs, canManageUsers, roles } = useRoles();
   const { clearDraft } = useDraft();
 
@@ -192,22 +201,14 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
                   {drugsListDropdownOpen && (
                     <div className="absolute top-full left-0 bg-white border border-border-main rounded-md shadow-xl mt-2 min-w-[200px] overflow-hidden z-50 py-1.5 text-[13.5px] font-semibold text-gray-700">
                       <button
-                        onClick={() => {
-                          setSelectedList('fda');
-                          setDrugsListDropdownOpen(false);
-                          navigate('/drugsList');
-                        }}
+                        onClick={() => handleSelectOption('fda')}
                         className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 transition-colors flex items-center justify-between cursor-pointer ${selectedList === 'fda' ? 'text-primary bg-primary-light/30' : ''
                           }`}
                       >
                         FDA Approved List
                       </button>
                       <button
-                        onClick={() => {
-                          setSelectedList('cmcintel');
-                          setDrugsListDropdownOpen(false);
-                          navigate('/drugsList');
-                        }}
+                        onClick={() => handleSelectOption('cmcintel')}
                         className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 transition-colors border-t border-gray-100 flex items-center justify-between cursor-pointer ${selectedList === 'cmcintel' ? 'text-primary bg-primary-light/30' : ''
                           }`}
                       >

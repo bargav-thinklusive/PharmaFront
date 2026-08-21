@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../../context/UserContext";
+import { useAppSelector } from "../../store/hooks";
 import useDraft from "../../hooks/useDraft";
 import { FiFileText, FiTrash2, FiX, FiPlus } from "react-icons/fi";
 
@@ -14,7 +14,7 @@ interface DraftsListModalProps {
 
 export const DraftsListModal: React.FC<DraftsListModalProps> = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
-    const { drafts } = useUser();
+    const drafts = useAppSelector((state) => state.drafts.drafts);
     const { clearDraft } = useDraft();
     const [deletingDraftId, setDeletingDraftId] = React.useState<string | null>(null);
 

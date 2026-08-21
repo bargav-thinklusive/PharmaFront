@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { FiMoreVertical, FiEdit, FiTrash2 } from 'react-icons/fi';
-import { useUser } from '../../context/UserContext';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchDrugs } from '../../store/slices/drugsSlice';
 import useDelete from '../../hooks/useDelete';
 import DrugService from '../../services/DrugService';
 import useDraft from '../../hooks/useDraft';
@@ -14,7 +15,9 @@ import { ConfirmModal } from '../shared/ConfirmModal';
 
 const ActionMenuCellRenderer: React.FC<any> = (params) => {
   const navigate = useNavigate();
-  const { refetchDrugs, drafts } = useUser();
+  const dispatch = useAppDispatch();
+  const drafts = useAppSelector((state) => state.drafts.drafts);
+  const refetchDrugs = () => dispatch(fetchDrugs());
   const { deleteData } = useDelete();
   const { saveDraft } = useDraft();
   const { canEditDrug, canDeleteDrug } = useRoles();

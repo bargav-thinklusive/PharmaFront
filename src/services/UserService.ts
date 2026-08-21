@@ -39,8 +39,8 @@ class UserService {
   // // Update operation
   updateUser = (id: string) => `${this.baseUrl}/user/${id}`;
 
-  // // Delete operation
-  // deleteUser = () => `${this.baseUrl}/user`;
+  // Delete operation
+  deleteUser = (id: string) => `${this.baseUrl}/user/${id}`;
 }
 
 export default UserService;

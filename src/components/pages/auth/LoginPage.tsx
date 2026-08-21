@@ -4,7 +4,10 @@ import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { FiMail, FiLock, FiArrowRight, FiShield } from "react-icons/fi";
 import AuthService from "../../../services/AuthService";
 import { toast } from "react-toastify";
-import { useUser } from "../../../context/UserContext";
+import { useAppDispatch } from "../../../store/hooks";
+import { checkTokenAndFetchUser } from "../../../store/slices/userSlice";
+import { fetchDrugs } from "../../../store/slices/drugsSlice";
+import { fetchDrafts } from "../../../store/slices/draftsSlice";
 import CompanyLogo from "../../../assets/CMCINTELLOGO.png";
 
 const authService = new AuthService();
@@ -12,7 +15,13 @@ const authService = new AuthService();
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { checkTokenAndGetUser } = useUser();
+  const dispatch = useAppDispatch();
+
+  const checkTokenAndGetUser = async () => {
+    await dispatch(checkTokenAndFetchUser());
+    await dispatch(fetchDrugs());
+    await dispatch(fetchDrafts());
+  };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");

@@ -21,6 +21,15 @@ import {
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 
+import { columns } from "./columns";
+import "../DrugTable/DrugsTable.css";
+import CustomSelect from "../shared/CustomSelect";
+import useGet from "../../hooks/useGet";
+import usePut from "../../hooks/usePut";
+import useDelete from "../../hooks/useDelete";
+import UserService from "../../services/UserService";
+import Loader from "../Loader";
+
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
   NumberFilterModule,
@@ -31,15 +40,6 @@ ModuleRegistry.registerModules([
   PaginationModule,
   RowSelectionModule
 ]);
-
-import { columns } from "./columns";
-import "../DrugTable/DrugsTable.css";
-
-import useGet from "../../hooks/useGet";
-import usePut from "../../hooks/usePut";
-import useDelete from "../../hooks/useDelete";
-import UserService from "../../services/UserService";
-import Loader from "../Loader";
 
 const userService = new UserService();
 const pageSize = 20;
@@ -189,16 +189,17 @@ const UsersTable: React.FC = () => {
                 <FiFilter className="w-4 h-4" />
                 <span>Role:</span>
               </div>
-              <select
+              <CustomSelect
                 value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
-                className="bg-white border border-border-main rounded-md px-4 py-2.5 text-sm text-text-main font-semibold focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer transition-all"
-              >
-                <option value="all">All Roles</option>
-                <option value="admin">Admin</option>
-                <option value="editor">Editor</option>
-                <option value="subscriber">Subscriber</option>
-              </select>
+                onChange={(val) => setRoleFilter(val)}
+                options={[
+                  { label: "All Roles", value: "all" },
+                  { label: "Admin", value: "admin" },
+                  { label: "Editor", value: "editor" },
+                  { label: "Subscriber", value: "subscriber" },
+                ]}
+                containerClassName="w-40"
+              />
             </div>
 
             <div className="flex items-center gap-2">
@@ -206,15 +207,17 @@ const UsersTable: React.FC = () => {
                 <FiFilter className="w-4 h-4" />
                 <span>Status:</span>
               </div>
-              <select
+              <CustomSelect
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-white border border-border-main rounded-md px-4 py-2.5 text-sm text-text-main font-semibold focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer transition-all"
-              >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
+                onChange={(val) => setStatusFilter(val)}
+                options={[
+                  { label: "All Status", value: "all" },
+                  { label: "Active", value: "active" },
+                  { label: "Inactive", value: "inactive" },
+                ]}
+                containerClassName="w-40"
+              />
+            </div>
             </div>
           </div>
         </div>
