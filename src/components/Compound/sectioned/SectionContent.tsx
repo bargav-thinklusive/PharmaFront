@@ -22,18 +22,27 @@ const isImageObject = (obj: any): boolean => {
 };
 
 const getImgSrc = (item: any): string | null => {
-    if (typeof item === 'string') return item;
+    if (typeof item === 'string') {
+        if (item.startsWith('data:image/') || item.startsWith('blob:')) return item;
+        if (item.startsWith('http://') || item.startsWith('https://')) return item;
+        if (item.startsWith('/uploads/')) return `http://localhost:8000${item}`;
+        if (item.startsWith('uploads/')) return `http://localhost:8000/${item}`;
+        return item;
+    }
     if (!item || typeof item !== 'object') return null;
 
-    if (typeof item.imageData === 'string') return item.imageData;
-    if (typeof item.url === 'string') return item.url;
-
-    if (item.image) {
-        if (typeof item.image === 'string') return item.image;
-        if (typeof item.image === 'object') return item.image.imageData || item.image.url || null;
+    let src: any = item.imageData || item.url || item.image || item.src || null;
+    if (typeof src === 'object' && src !== null) {
+        src = src.imageData || src.url || src.image || src.src || null;
     }
 
-    return null;
+    if (typeof src === 'string') {
+        if (src.startsWith('data:image/') || src.startsWith('blob:')) return src;
+        if (src.startsWith('http://') || src.startsWith('https://')) return src;
+        if (src.startsWith('/uploads/')) return `http://localhost:8000${src}`;
+        if (src.startsWith('uploads/')) return `http://localhost:8000/${src}`;
+    }
+    return typeof src === 'string' ? src : null;
 };
 
 /**
@@ -75,8 +84,13 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
                                     className="max-w-full h-auto max-h-[400px] object-contain cursor-pointer hover:scale-[1.02] transition-transform"
                                     onClick={() => window.open(imgSource, '_blank')}
                                     onError={(e: any) => {
-                                        console.error("Image load failed:", imgSource);
-                                        e.target.src = 'https://placehold.co/400x300?text=Image+Not+Found';
+                                        const target = e.target || e.currentTarget;
+                                        if (!target) return;
+                                        const currentSrc = target.src || '';
+                                        if (currentSrc.startsWith('data:image/') || currentSrc.startsWith('blob:')) return;
+                                        if (!currentSrc.includes('placehold.co')) {
+                                            target.src = 'https://placehold.co/400x300?text=Image+Not+Found';
+                                        }
                                     }}
                                 />
                                 {(item.fileName || item.name || item.title) && (

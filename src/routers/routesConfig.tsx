@@ -57,8 +57,11 @@ export const routesConfig = [
     { path: "/drug-preview",                            element: protect(<DrugPreview />) },
 
     // ── Editor + Admin routes ──────────────────────────────────────────────────
-    { path: "/drug-form",     element: protectWithRoles(["editor", "admin"], <CompoundForm />) },
-    { path: "/drugsList",     element: protectWithRoles(["editor", "admin"], <DrugsList />) },
+    { path: "/drug-form",             element: protectWithRoles(["editor", "admin"], <CompoundForm />) },
+    { path: "/drugsList",             element: protectWithRoles(["editor", "admin"], <DrugsList />) },
+    { path: "/drugsList/:listType",     element: protectWithRoles(["editor", "admin"], <DrugsList />) },
+    { path: "/druglist",              element: protectWithRoles(["editor", "admin"], <DrugsList />) },
+    { path: "/druglist/:listType",     element: protectWithRoles(["editor", "admin"], <DrugsList />) },
 
     // ── Admin-only routes ──────────────────────────────────────────────────────
     { path: "/admin",         element: protectWithRoles(["admin"], <UsersTable />) },

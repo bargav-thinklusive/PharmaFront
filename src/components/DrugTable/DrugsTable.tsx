@@ -84,11 +84,6 @@ const DrugsTable: React.FC = () => {
   const gridRef = useRef<AgGridReact<any>>(null);
   const dispatch = useAppDispatch();
   const drugsData = useAppSelector((state) => state.drugs.drugsData);
-  const drugsLoading = useAppSelector((state) => state.drugs.drugsLoading);
-
-  const refetchDrugs = useCallback(() => {
-    dispatch(fetchDrugs());
-  }, [dispatch]);
   const { fetchData } = useGet();
   const [bookmarks, setBookmarks] = useState<any[]>([]);
   const [showBookmarksOnly, setShowBookmarksOnly] = useState<boolean>(false);
@@ -108,16 +103,14 @@ const DrugsTable: React.FC = () => {
   };
 
   useEffect(() => {
-    getBookmarks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    dispatch(fetchDrugs());
+  }, [dispatch]);
 
-  // Proactively fetch list of drugs directly if context is empty and not loading
   useEffect(() => {
-    if (drugsData.length === 0 && !drugsLoading && refetchDrugs) {
-      refetchDrugs();
+    if (showBookmarksOnly && bookmarks.length === 0) {
+      getBookmarks();
     }
-  }, [drugsData.length, drugsLoading, refetchDrugs]);
+  }, [showBookmarksOnly, bookmarks.length]);
 
   const uniqueCategoryArr = Array.isArray(categoryArr)
     ? categoryArr.filter((item, idx, arr) =>

@@ -106,6 +106,15 @@ export const flattenDrug = (drug: any): any => {
         _id: existingId,
         original_id: existingId,
         originalVersion: existingVersion,
+        cid: drug.cid ?? drug.ProductOverview?.cid ?? "",
+        createdBy: drug.createdBy ?? drug.ProductOverview?.createdBy ?? "",
+        createdByName: drug.createdByName ?? drug.ProductOverview?.createdByName ?? "",
+        createdByEmail: drug.createdByEmail ?? drug.ProductOverview?.createdByEmail ?? "",
+        createdAt: drug.createdAt ?? drug.ProductOverview?.createdAt ?? "",
+        updatedAt: drug.updatedAt ?? drug.ProductOverview?.updatedAt ?? "",
+        updatedBy: drug.updatedBy ?? "",
+        updatedByName: drug.updatedByName ?? "",
+        updatedByEmail: drug.updatedByEmail ?? "",
 
         // Executive Summary
         executiveSummary: typeof drug.ExecutiveSummary === 'object' && drug.ExecutiveSummary !== null
@@ -244,6 +253,12 @@ export const formatCreatedDrug = async (formData: any): Promise<any> => {
     const rawResult = {
         _id: formData._id,
         original_id: formData.original_id,
+        cid: formData.cid,
+        createdBy: formData.createdBy,
+        createdByName: formData.createdByName,
+        createdByEmail: formData.createdByEmail,
+        createdAt: formData.createdAt,
+        updatedAt: formData.updatedAt,
         version: formData.version || "1.0",
         ExecutiveSummary: formData.executiveSummary,
         ProductOverview: {
@@ -258,6 +273,9 @@ export const formatCreatedDrug = async (formData: any): Promise<any> => {
             firstApprovedRegion: formData.firstApprovedRegion,
             dosageForms: formData.dosageForms,
             globalAnnualRevenue: formData.globalAnnualRevenue,
+            createdBy: formData.createdBy,
+            createdByName: formData.createdByName,
+            createdByEmail: formData.createdByEmail,
             lossOfExclusivity: formData.exclusivityCode || formData.country || formData.regulatoryBody || formData.expiredDate ? [
                 {
                     exclusivityCode: formData.exclusivityCode,

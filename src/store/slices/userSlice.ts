@@ -24,7 +24,7 @@ const initialState: UserState = {
 
 export const checkTokenAndFetchUser = createAsyncThunk(
   'user/checkTokenAndFetchUser',
-  async (_, { rejectWithValue }) => {
+  async (_force: boolean | void, { rejectWithValue }) => {
     try {
       let token = tokenService.getToken();
       if (!token) {
@@ -40,6 +40,15 @@ export const checkTokenAndFetchUser = createAsyncThunk(
       return null;
     } catch (err: any) {
       return rejectWithValue(err.response?.data || 'Failed to fetch user');
+    }
+  },
+  {
+    condition: (force, { getState }) => {
+      if (force === true) return true;
+      const state = getState() as { user: UserState };
+      if (state.user.userLoading || state.user.user) {
+        return false;
+      }
     }
   }
 );

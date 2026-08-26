@@ -44,6 +44,8 @@ const CompoundForm = () => {
     const dispatch = useAppDispatch();
     const drafts = useAppSelector((state) => state.drafts.drafts);
     const masterData = useAppSelector((state) => state.masterData);
+    const currentUser = useAppSelector((state) => state.user.user?.data || state.user.user);
+    const currentUserName = currentUser?.name || currentUser?.email || "testadmin";
 
     const { postData } = usePost();
     const { putData } = usePut();
@@ -71,6 +73,7 @@ const CompoundForm = () => {
     }, [formData]);
 
     const drugId = searchParams.get("drugId") || searchParams.get("id");
+    const lastFetchedDrugIdRef = useRef<string | null>(null);
 
     useEffect(() => {
         if (location.state?.initialData && Object.keys(location.state.initialData).length > 0) {
@@ -80,7 +83,8 @@ const CompoundForm = () => {
             return;
         }
 
-        if (drugId) {
+        if (drugId && lastFetchedDrugIdRef.current !== drugId) {
+            lastFetchedDrugIdRef.current = drugId;
             axiosInstance.get(drugService.getDrugById(drugId)).then((res: any) => {
                 const data = res?.data?.data || res?.data || res;
                 if (data) {
@@ -267,11 +271,11 @@ const CompoundForm = () => {
             }
 
             if (draftId) await clearDraft(draftId);
-            if (setSelectedList) setSelectedList('cmcintel');
+            dispatch(setSelectedList('cmcintel'));
             if (refetchDrugs) await refetchDrugs();
             if (refetchDrafts) await refetchDrafts();
             toast.success(isUpdate ? "Drug entry successfully updated" : "Drug entry successfully submitted");
-            navigate("/drugsList");
+            navigate("/drugsList/cmcintel");
         } catch (error: any) {
             console.error(error);
             if (error.response?.status === 400) {
@@ -463,6 +467,22 @@ const CompoundForm = () => {
         return val !== undefined && val !== null && String(val).trim() !== "";
     }).length;
 
+    const drugCreator = formData.createdByName || 
+                        formData.createdByEmail || 
+                        (formData.createdBy && String(formData.createdBy).trim()) || 
+                        formData.ProductOverview?.createdByName || 
+                        formData.ProductOverview?.createdByEmail || 
+                        (formData.ProductOverview?.createdBy && String(formData.ProductOverview?.createdBy).trim()) || 
+                        currentUserName;
+
+    const displayCid = formData.cid || 
+                       formData.ProductOverview?.cid || 
+                       (searchParams.get("cid")) || 
+                       (drugId && !/^[0-9a-fA-F]{24}$/.test(drugId) ? drugId : null) || 
+                       formData.drugId || 
+                       formData._id || 
+                       "D001";
+
     return (
         <div className="flex flex-col min-h-[calc(100vh-64px)] bg-[#f8fafc] font-sans p-6 sm:p-8">
             <div className="max-w-7xl mx-auto w-full flex flex-col gap-6">
@@ -470,8 +490,9 @@ const CompoundForm = () => {
                 <CompoundFormHeader
                     drugName={formData.drugName || formData.ProductOverview?.drugName}
                     drugId={formData.drugId || formData._id}
-                    cid={formData.cid || formData.ProductOverview?.cid}
+                    cid={displayCid}
                     version={formData.version || formData.ProductOverview?.version}
+                    createdBy={drugCreator}
                     lastUpdated={loadedDraftId ? (loadDraft(loadedDraftId)?.lastModified) : (formData.updatedAt || formData.createdAt)}
                     overallProgressPct={overallProgressPct}
                     completedStepsCount={completedStepsCount}
