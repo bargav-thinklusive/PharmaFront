@@ -79,9 +79,34 @@ const isImageObject = (obj: any): boolean => {
 };
 
 const getImgSrc = (item: any): string | null => {
-    if (typeof item === 'string') return item;
+    if (typeof item === 'string') {
+        if (item.startsWith('data:image/') || item.startsWith('blob:')) return item;
+        if (item.startsWith('http://') || item.startsWith('https://')) return item;
+        if (item.startsWith('/uploads/')) return `http://localhost:8000${item}`;
+        if (item.startsWith('uploads/')) return `http://localhost:8000/${item}`;
+        return item;
+    }
     if (!item || typeof item !== 'object') return null;
-    return item.imageData || item.image || item.url || null;
+
+    let src: any = item.imageData || item.image || item.url || item.src || null;
+    if (typeof src === 'object' && src !== null) {
+        src = src.imageData || src.url || src.image || src.src || null;
+    }
+    if (typeof src === 'string') {
+        if (src.startsWith('data:image/') || src.startsWith('blob:')) return src;
+        if (src.startsWith('http://') || src.startsWith('https://')) return src;
+        if (src.startsWith('/uploads/')) return `http://localhost:8000${src}`;
+        if (src.startsWith('uploads/')) return `http://localhost:8000/${src}`;
+    }
+    return typeof src === 'string' ? src : null;
+};
+
+const handleImgErrorFallback = (e: any) => {
+    const target = e.target || e.currentTarget;
+    if (!target) return;
+    const currentSrc = target.src || '';
+    if (currentSrc.startsWith('data:image/') || currentSrc.startsWith('blob:')) return;
+    target.style.display = 'none';
 };
 
 export function renderValue(value: any): React.ReactNode {
@@ -102,6 +127,7 @@ export function renderValue(value: any): React.ReactNode {
                         src={getImgSrc(item)!}
                         alt="item"
                         className="h-10 w-auto inline cursor-pointer border rounded"
+                        onError={handleImgErrorFallback}
                         onClick={() => window.open(getImgSrc(item)!, '_blank')}
                     />
                 ) : (
@@ -118,6 +144,7 @@ export function renderValue(value: any): React.ReactNode {
                 src={src}
                 alt="value"
                 className="max-w-[200px] h-auto cursor-pointer border rounded shadow-sm hover:scale-[1.05] transition-transform"
+                onError={handleImgErrorFallback}
                 onClick={() => window.open(src, '_blank')}
             />
         );

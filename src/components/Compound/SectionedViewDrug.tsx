@@ -3,8 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchDrugs } from '../../store/slices/drugsSlice';
 import { flattenDrug } from '../CompoundForm/helper';
-import { findExistingDraft, unixToDate, trackDrugSearch } from '../../utils/utils';
-import useDraft from '../../hooks/useDraft';
+import { trackDrugSearch, formatDraftDate } from '../../utils/utils';
 import useDelete from '../../hooks/useDelete';
 import DrugService from '../../services/DrugService';
 import { toast } from 'react-toastify';
@@ -24,6 +23,8 @@ import {
     FiBriefcase,
     FiTrash2,
     FiUsers,
+    FiUser,
+    FiClock,
     FiBarChart2,
     FiShare2,
 } from 'react-icons/fi';
@@ -34,6 +35,8 @@ import SectionContent from './sectioned/SectionContent';
 import { ConfirmModal } from '../shared/ConfirmModal';
 import { SECTIONS } from './sectioned/sectionsConfig';
 
+import axiosInstance from '../../services/shared/AxiosService';
+
 const drugService = new DrugService();
 
 export default function SectionedViewDrug() {
@@ -41,10 +44,10 @@ export default function SectionedViewDrug() {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const drugsData = useAppSelector((state) => state.drugs.drugsData);
-    const drafts = useAppSelector((state) => state.drafts.drafts);
+    const currentUser = useAppSelector((state) => state.user.user?.data || state.user.user);
+    const currentUserName = currentUser?.name || currentUser?.email || "";
     const refetchDrugs = () => dispatch(fetchDrugs());
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const { saveDraft } = useDraft();
     const { deleteData } = useDelete();
     const { canEditDrug, canDeleteDrug } = useRoles();
 
@@ -52,16 +55,39 @@ export default function SectionedViewDrug() {
     const [editMenuOpen, setEditMenuOpen] = useState(false);
     const [exportMenuOpen, setExportMenuOpen] = useState(false);
     const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+    const [fetchedDrug, setFetchedDrug] = useState<any>(null);
 
     const editBtnRef = useRef<HTMLDivElement>(null);
     const exportBtnRef = useRef<HTMLDivElement>(null);
     const moreBtnRef = useRef<HTMLDivElement>(null);
+    const lastFetchedIdRef = useRef<string | null>(null);
 
-    // Find drug data by cid
-    const drugToDisplay = useMemo(() => {
-        const found = drugsData.find((d: any) => d.cid === cid);
-        return found || null;
+    useEffect(() => {
+        if (cid) {
+            const found = drugsData.find((d: any) => d.cid === cid || d._id === cid);
+            const targetId = found?._id || cid;
+            if (targetId && lastFetchedIdRef.current !== targetId) {
+                lastFetchedIdRef.current = targetId;
+                axiosInstance.get(drugService.getDrugById(targetId))
+                    .then((res: any) => {
+                        const drugObj = res?.data?.data || res?.data;
+                        if (drugObj && typeof drugObj === 'object') {
+                            setFetchedDrug(drugObj);
+                        }
+                    })
+                    .catch(() => {});
+            }
+        }
     }, [cid, drugsData]);
+
+    // Find drug data by cid or _id
+    const drugToDisplay = useMemo(() => {
+        const found = drugsData.find((d: any) => d.cid === cid || d._id === cid);
+        if (fetchedDrug && (fetchedDrug.ProductOverview || fetchedDrug.ExecutiveSummary || fetchedDrug.cid || fetchedDrug._id)) {
+            return fetchedDrug;
+        }
+        return found || null;
+    }, [cid, drugsData, fetchedDrug]);
 
     useEffect(() => {
         if (drugToDisplay) {
@@ -116,7 +142,7 @@ export default function SectionedViewDrug() {
                         No data was found for drug with CID: <span className="font-mono font-bold text-slate-700">{cid}</span>
                     </p>
                     <button
-                        onClick={() => navigate('/drugsList')}
+                        onClick={() => navigate('/drugsList/cmcintel')}
                         className="w-full py-2.5 px-4 bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl transition-colors cursor-pointer text-sm shadow-sm"
                     >
                         Back to Database
@@ -132,20 +158,19 @@ export default function SectionedViewDrug() {
         setCurrentStep(id);
     };
 
-    const handleEdit = async () => {
+    const handleEdit = () => {
         try {
             const flatData = flattenDrug(drugToDisplay);
-            flatData.original_id = drugToDisplay._id || drugToDisplay.id;
+            const drugId = drugToDisplay._id || drugToDisplay.id;
+            flatData._id = drugId;
+            flatData.original_id = drugId;
             flatData.originalVersion = flatData.version || drugToDisplay.version || "1.0";
             if (!flatData.version) {
                 flatData.version = "1.0";
             }
-            const existingDraft = findExistingDraft(drafts, flatData);
-            const targetDraftId = existingDraft ? (existingDraft.id || existingDraft._id) : null;
-            const newDraftId = await saveDraft(flatData, 0, targetDraftId);
-            navigate(`/drug-form?draftId=${newDraftId}`, { state: { initialData: flatData } });
+            navigate(`/drug-form?drugId=${drugId}`, { state: { initialData: flatData } });
         } catch (err) {
-            console.error("Error creating draft for edit:", err);
+            console.error("Error opening edit page:", err);
             toast.error("Failed to edit drug entry.");
         }
     };
@@ -162,7 +187,7 @@ export default function SectionedViewDrug() {
             await deleteData(drugService.deleteDrug(drugToDisplay._id));
             toast.success("Drug record deleted successfully");
             if (refetchDrugs) await refetchDrugs();
-            navigate("/drugsList");
+            navigate("/drugsList/cmcintel");
         } catch (err) {
             console.error("Error deleting drug:", err);
             toast.error("Failed to delete drug record.");
@@ -219,7 +244,25 @@ export default function SectionedViewDrug() {
     };
 
     const patentExpiry = getPatentExpiry();
-    const lastUpdatedDate = drugToDisplay.updatedAt ? unixToDate(drugToDisplay.updatedAt) : "May 20, 2024";
+    const createdByUser = drugToDisplay.createdByName || 
+                          drugToDisplay.createdByEmail || 
+                          drugToDisplay.ProductOverview?.createdByName || 
+                          drugToDisplay.ProductOverview?.createdByEmail || 
+                          flatDrug.createdByName || 
+                          flatDrug.createdByEmail || 
+                          (drugToDisplay.createdBy && String(drugToDisplay.createdBy).trim()) || 
+                          (currentUserName && currentUserName.trim()) || 
+                          "testadmin";
+
+    const displayCid = drugToDisplay?.cid || 
+                       drugToDisplay?.ProductOverview?.cid || 
+                       flatDrug?.cid || 
+                       (cid && !/^[0-9a-fA-F]{24}$/.test(cid) ? cid : null) || 
+                       "D001";
+
+    const lastUpdatedDate = drugToDisplay.updatedAt
+        ? formatDraftDate(drugToDisplay.updatedAt)
+        : (drugToDisplay.createdAt ? formatDraftDate(drugToDisplay.createdAt) : "—");
 
     const getSectionData = (key?: string) => {
         if (!key || !drugToDisplay) return null;
@@ -255,15 +298,26 @@ export default function SectionedViewDrug() {
                             <h2 className="text-2xl font-extrabold text-slate-900 leading-tight font-display my-1 truncate">
                                 {flatDrug.drugName || "N/A"}
                             </h2>
-                            <div className="flex flex-wrap items-center gap-2 mt-1">
+                            <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
                                 <span className="bg-[#e6f4ea] text-[#137333] border border-[#ceead6] text-[10px] font-bold px-2.5 py-0.5 rounded-lg shadow-xs">
-                                    CID: {cid || "N/A"}
+                                    CID: {displayCid}
                                 </span>
                                 <span className="bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-bold px-2.5 py-0.5 rounded-lg shadow-xs">
                                     Current Version: {version || "—"}
                                 </span>
                                 <span className="bg-primary-light text-primary border border-emerald-100 text-[10px] font-bold px-2.5 py-0.5 rounded-lg shadow-xs">
                                     Status: Published
+                                </span>
+                                <span className="text-slate-300 hidden sm:inline">&nbsp;|&nbsp;</span>
+                                <span className="inline-flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 border border-slate-200/80 px-2.5 py-0.5 rounded-lg shadow-2xs">
+                                    <FiUser className="w-3.5 h-3.5 text-slate-400" />
+                                    <span className="text-slate-500">Created by:</span>
+                                    <span className="font-bold text-slate-800">{createdByUser}</span>
+                                </span>
+                                <span className="inline-flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 border border-slate-200/80 px-2.5 py-0.5 rounded-lg shadow-2xs">
+                                    <FiClock className="w-3.5 h-3.5 text-slate-400" />
+                                    <span className="text-slate-500">Last Updated:</span>
+                                    <span className="font-bold text-slate-800">{lastUpdatedDate}</span>
                                 </span>
                             </div>
                         </div>

@@ -84,11 +84,6 @@ const DrugsTable: React.FC = () => {
   const gridRef = useRef<AgGridReact<any>>(null);
   const dispatch = useAppDispatch();
   const drugsData = useAppSelector((state) => state.drugs.drugsData);
-  const drugsLoading = useAppSelector((state) => state.drugs.drugsLoading);
-
-  const refetchDrugs = useCallback(() => {
-    dispatch(fetchDrugs());
-  }, [dispatch]);
   const { fetchData } = useGet();
   const [bookmarks, setBookmarks] = useState<any[]>([]);
   const [showBookmarksOnly, setShowBookmarksOnly] = useState<boolean>(false);
@@ -108,16 +103,14 @@ const DrugsTable: React.FC = () => {
   };
 
   useEffect(() => {
-    getBookmarks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    dispatch(fetchDrugs());
+  }, [dispatch]);
 
-  // Proactively fetch list of drugs directly if context is empty and not loading
   useEffect(() => {
-    if (drugsData.length === 0 && !drugsLoading && refetchDrugs) {
-      refetchDrugs();
+    if (showBookmarksOnly && bookmarks.length === 0) {
+      getBookmarks();
     }
-  }, [drugsData.length, drugsLoading, refetchDrugs]);
+  }, [showBookmarksOnly, bookmarks.length]);
 
   const uniqueCategoryArr = Array.isArray(categoryArr)
     ? categoryArr.filter((item, idx, arr) =>
@@ -149,17 +142,11 @@ const DrugsTable: React.FC = () => {
   }
 
   const fuzzyMatch = (text: string, query: string): boolean => {
+    if (!text || !query) return false;
     const n = text.toLowerCase();
     const q = query.toLowerCase().trim();
     if (!q) return false;
-    if (n.includes(q)) return true; // exact match or exact substring match
-
-    // Fuzzy match: all chars of query appear in order inside name
-    let qi = 0;
-    for (let i = 0; i < n.length && qi < q.length; i++) {
-      if (n[i] === q[qi]) qi++;
-    }
-    return qi === q.length;
+    return n.includes(q);
   };
 
   const displayQuery = searchtext && searchtext !== 'all' ? decodeURIComponent(searchtext) : '';
@@ -275,39 +262,48 @@ const DrugsTable: React.FC = () => {
   }, [resultsWithBookmarks, showBookmarksOnly]);
 
   // Column definitions matching the screenshot
-  const columnDefs = useMemo<ColDef[]>(() => [
-    { headerName: 'Bookmark', field: 'bookmark', cellRenderer: BookmarkCellRenderer, width: 110, sortable: false, filter: true, suppressColumnsToolPanel: true },
-    { headerName: 'CID', field: 'cid', width: 100, sortable: true, filter: true, valueFormatter },
-    { headerName: 'Drug Name', field: 'ProductOverview.drugName', cellRenderer: BrandNameCellRenderer, width: 160, sortable: true, filter: true, autoHeight: true, cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' } },
-    { headerName: 'API Name', field: 'ProductOverview.apiName', width: 150, sortable: true, filter: true, autoHeight: true, cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' }, valueFormatter },
-    { headerName: 'IUPAC Name', field: 'PhysicalChemicalProperties.iupacName', width: 160, sortable: true, filter: true, autoHeight: true, cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' }, valueFormatter },
-    { headerName: 'Company', field: 'ProductOverview.companyName', width: 160, sortable: true, filter: true, autoHeight: true, valueFormatter: (params: any) => params.value || params.data?.company || params.data?.companyName || '-' },
-    { headerName: 'Region', field: 'ProductOverview.firstApprovedRegion', width: 150, sortable: true, filter: true, autoHeight: true, valueFormatter: (params: any) => params.value || params.data?.RegulatoryInsights?.regionalApproval || params.data?.region || params.data?.firstApprovedRegion || '-' },
-    { headerName: 'Molecular Formula', field: 'PhysicalChemicalProperties.molecularFormula', minWidth: 220, flex: 1, sortable: true, filter: true, autoHeight: true, cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' }, valueFormatter },
-    { headerName: 'Molecular Weight', field: 'PhysicalChemicalProperties.molecularWeight', minWidth: 200, flex: 1, sortable: true, filter: true, autoHeight: true, cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' }, valueFormatter },
+  const columnDefs = useMemo<ColDef[]>(() => {
+    const cellWrapStyle = {
+      lineHeight: '1.5',
+      whiteSpace: 'normal',
+      wordBreak: 'break-word',
+      overflowWrap: 'anywhere',
+    };
 
-    // More columns hidden by default
-    { headerName: 'CAS Number', field: 'PhysicalChemicalProperties.casNumber', width: 140, sortable: true, filter: true, hide: true, valueFormatter },
-    { headerName: 'Chemical Name', field: 'PhysicalChemicalProperties.chemicalName', width: 160, sortable: true, filter: true, hide: true, valueFormatter },
-    { headerName: 'Therapeutic Class', field: 'ProductOverview.therapeuticClass', width: 180, sortable: true, filter: true, hide: true, valueFormatter },
-    { headerName: 'Description', field: 'ExecutiveSummary', width: 400, sortable: true, filter: true, hide: true, autoHeight: true, cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' }, valueFormatter },
-    { headerName: 'Created Date', field: 'createdAt', width: 150, sortable: true, filter: true, hide: true, valueFormatter },
-    { headerName: 'Updated Date', field: 'updatedAt', width: 150, sortable: true, filter: true, hide: true, valueFormatter },
+    return [
+      { headerName: 'Bookmark', field: 'bookmark', cellRenderer: BookmarkCellRenderer, width: 100, sortable: false, filter: true, suppressColumnsToolPanel: true },
+      { headerName: 'CID', field: 'cid', width: 90, sortable: true, filter: true, valueFormatter },
+      { headerName: 'Drug Name', field: 'ProductOverview.drugName', cellRenderer: BrandNameCellRenderer, minWidth: 150, width: 170, wrapText: true, autoHeight: true, cellStyle: cellWrapStyle, sortable: true, filter: true },
+      { headerName: 'API Name', field: 'ProductOverview.apiName', minWidth: 160, width: 180, wrapText: true, autoHeight: true, cellStyle: cellWrapStyle, sortable: true, filter: true, valueFormatter },
+      { headerName: 'IUPAC Name', field: 'PhysicalChemicalProperties.iupacName', minWidth: 260, width: 300, wrapText: true, autoHeight: true, cellStyle: cellWrapStyle, sortable: true, filter: true, valueFormatter },
+      { headerName: 'Company', field: 'ProductOverview.companyName', minWidth: 180, width: 200, wrapText: true, autoHeight: true, cellStyle: cellWrapStyle, sortable: true, filter: true, valueFormatter: (params: any) => params.value || params.data?.company || params.data?.companyName || '-' },
+      { headerName: 'Region', field: 'ProductOverview.firstApprovedRegion', minWidth: 160, width: 180, wrapText: true, autoHeight: true, cellStyle: cellWrapStyle, sortable: true, filter: true, valueFormatter: (params: any) => params.value || params.data?.RegulatoryInsights?.regionalApproval || params.data?.region || params.data?.firstApprovedRegion || '-' },
+      { headerName: 'Molecular Formula', field: 'PhysicalChemicalProperties.molecularFormula', minWidth: 180, width: 200, wrapText: true, autoHeight: true, cellStyle: cellWrapStyle, sortable: true, filter: true, valueFormatter },
+      { headerName: 'Molecular Weight', field: 'PhysicalChemicalProperties.molecularWeight', minWidth: 140, width: 160, wrapText: true, autoHeight: true, cellStyle: cellWrapStyle, sortable: true, filter: true, valueFormatter },
 
-    // Actions column pinned to the right
-    {
-      headerName: 'Actions',
-      field: 'actions',
-      cellRenderer: ActionMenuCellRenderer,
-      width: 110,
-      pinned: 'right',
-      sortable: false,
-      filter: false,
-      resizable: false,
-      suppressHeaderMenuButton: true,
-      suppressColumnsToolPanel: true
-    }
-  ], []);
+      // More columns hidden by default
+      { headerName: 'CAS Number', field: 'PhysicalChemicalProperties.casNumber', width: 140, sortable: true, filter: true, hide: true, valueFormatter },
+      { headerName: 'Chemical Name', field: 'PhysicalChemicalProperties.chemicalName', minWidth: 200, width: 240, wrapText: true, autoHeight: true, cellStyle: cellWrapStyle, sortable: true, filter: true, hide: true, valueFormatter },
+      { headerName: 'Therapeutic Class', field: 'ProductOverview.therapeuticClass', minWidth: 180, width: 220, wrapText: true, autoHeight: true, cellStyle: cellWrapStyle, sortable: true, filter: true, hide: true, valueFormatter },
+      { headerName: 'Description', field: 'ExecutiveSummary', minWidth: 300, width: 400, wrapText: true, autoHeight: true, cellStyle: cellWrapStyle, sortable: true, filter: true, hide: true, valueFormatter },
+      { headerName: 'Created Date', field: 'createdAt', width: 150, sortable: true, filter: true, hide: true, valueFormatter },
+      { headerName: 'Updated Date', field: 'updatedAt', width: 150, sortable: true, filter: true, hide: true, valueFormatter },
+
+      // Actions column pinned to the right
+      {
+        headerName: 'Actions',
+        field: 'actions',
+        cellRenderer: ActionMenuCellRenderer,
+        width: 100,
+        pinned: 'right',
+        sortable: false,
+        filter: false,
+        resizable: false,
+        suppressHeaderMenuButton: true,
+        suppressColumnsToolPanel: true
+      }
+    ];
+  }, []);
 
   const onGridReady = useCallback((params: GridReadyEvent): void => {
     params.api.hideOverlay();
@@ -550,7 +546,17 @@ const DrugsTable: React.FC = () => {
               paginationPageSize={20}
               sideBar={{ toolPanels: ['columns'] }}
               loadingOverlayComponent={() => <div><Loader /></div>}
-              defaultColDef={{ filter: true }}
+              defaultColDef={{
+                filter: true,
+                wrapText: true,
+                autoHeight: true,
+                cellStyle: {
+                  lineHeight: '1.5',
+                  whiteSpace: 'normal',
+                  wordBreak: 'break-word',
+                  overflowWrap: 'anywhere'
+                }
+              }}
               rowSelection="single"
               headerHeight={56}
             />

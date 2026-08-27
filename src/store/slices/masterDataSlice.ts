@@ -21,7 +21,7 @@ const initialState: MasterDataState = {
 
 export const fetchMasterData = createAsyncThunk(
   'masterData/fetchMasterData',
-  async (_, { rejectWithValue }) => {
+  async (_force: boolean | void, { rejectWithValue }) => {
     try {
       const [ta, rc, ra] = await Promise.all([
         masterDataService.getTherapeuticAreas(),
@@ -35,6 +35,15 @@ export const fetchMasterData = createAsyncThunk(
       };
     } catch (err: any) {
       return rejectWithValue(err.message || 'Failed to fetch master data');
+    }
+  },
+  {
+    condition: (force, { getState }) => {
+      if (force === true) return true;
+      const state = getState() as { masterData: MasterDataState };
+      if (state.masterData.loading || (state.masterData.regulatoryAuthorities && state.masterData.regulatoryAuthorities.length > 0)) {
+        return false;
+      }
     }
   }
 );

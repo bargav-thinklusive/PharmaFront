@@ -25,7 +25,7 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
   const handleSelectOption = (list: 'fda' | 'cmcintel') => {
     dispatch(setSelectedList(list));
     setDrugsListDropdownOpen(false);
-    navigate('/drugsList');
+    navigate(`/drugsList/${list}`);
   };
   const { canEditDrugs, canManageUsers, roles } = useRoles();
   const { clearDraft } = useDraft();
@@ -181,36 +181,42 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
               {/* Drugs List Dropdown — editor and admin only */}
               {canEditDrugs && (
                 <div ref={drugsListDropdownRef} className="relative flex items-center">
-                  <NavLink
-                    to="/drugsList"
+                  <button
+                    type="button"
                     onClick={(e) => {
-                      handleHeaderNavClick("/drugsList", e);
+                      e.preventDefault();
+                      e.stopPropagation();
                       setDrugsListDropdownOpen((p) => !p);
                     }}
-                    className={({ isActive }) =>
-                      `flex items-center gap-1.5 font-medium text-sm no-underline transition-colors pb-1 border-b-2 font-display cursor-pointer ${isActive || location.pathname.toLowerCase().includes("drugslist") || drugsListDropdownOpen
-                        ? "border-primary text-primary"
+                    className={`flex items-center gap-1.5 font-medium text-sm no-underline transition-colors pb-1 border-b-2 font-display cursor-pointer bg-transparent border-0 outline-none ${
+                      location.pathname.toLowerCase().includes("drugslist") || location.pathname.toLowerCase().includes("druglist") || drugsListDropdownOpen
+                        ? "border-b-2 border-primary text-primary"
                         : "text-[#334155] border-transparent hover:text-primary-hover"
-                      }`
-                    }
+                    }`}
                   >
                     Drugs List
                     <FiChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${drugsListDropdownOpen ? "rotate-180" : ""}`} />
-                  </NavLink>
+                  </button>
 
                   {drugsListDropdownOpen && (
                     <div className="absolute top-full left-0 bg-white border border-border-main rounded-md shadow-xl mt-2 min-w-[200px] overflow-hidden z-50 py-1.5 text-[13.5px] font-semibold text-gray-700">
                       <button
                         onClick={() => handleSelectOption('fda')}
-                        className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 transition-colors flex items-center justify-between cursor-pointer ${selectedList === 'fda' ? 'text-primary bg-primary-light/30' : ''
-                          }`}
+                        className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 transition-colors flex items-center justify-between cursor-pointer ${
+                          location.pathname.toLowerCase().includes('fda') || (location.pathname.toLowerCase().includes('drugslist') && selectedList === 'fda')
+                            ? 'text-primary bg-primary-light/30'
+                            : ''
+                        }`}
                       >
                         FDA Approved List
                       </button>
                       <button
                         onClick={() => handleSelectOption('cmcintel')}
-                        className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 transition-colors border-t border-gray-100 flex items-center justify-between cursor-pointer ${selectedList === 'cmcintel' ? 'text-primary bg-primary-light/30' : ''
-                          }`}
+                        className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 transition-colors border-t border-gray-100 flex items-center justify-between cursor-pointer ${
+                          location.pathname.toLowerCase().includes('cmcintel') || (location.pathname.toLowerCase().includes('drugslist') && selectedList === 'cmcintel')
+                            ? 'text-primary bg-primary-light/30'
+                            : ''
+                        }`}
                       >
                         cmcintel Library List
                       </button>
@@ -365,21 +371,21 @@ const AuthenticatedHeader: React.FC<AuthenticatedHeaderProps> = ({ isLoginPage }
                   <span className="text-[#334155] font-semibold text-xs uppercase tracking-wider">Drugs List</span>
                   <div className="flex flex-col gap-1.5 pl-3 border-l border-border-main">
                     <Link
-                      to="/drugsList"
-                      className={`text-sm no-underline font-medium ${selectedList === 'fda' ? 'text-primary font-bold' : 'text-body hover:text-primary-hover'}`}
+                      to="/drugsList/fda"
+                      className={`text-sm no-underline font-medium ${location.pathname.toLowerCase().includes('fda') || (location.pathname.toLowerCase().includes('drugslist') && selectedList === 'fda') ? 'text-primary font-bold' : 'text-body hover:text-primary-hover'}`}
                       onClick={(e) => {
-                        setSelectedList('fda');
-                        handleHeaderNavClick("/drugsList", e, true);
+                        dispatch(setSelectedList('fda'));
+                        handleHeaderNavClick("/drugsList/fda", e, true);
                       }}
                     >
                       FDA Approved List
                     </Link>
                     <Link
-                      to="/drugsList"
-                      className={`text-sm no-underline font-medium ${selectedList === 'cmcintel' ? 'text-primary font-bold' : 'text-body hover:text-primary-hover'}`}
+                      to="/drugsList/cmcintel"
+                      className={`text-sm no-underline font-medium ${location.pathname.toLowerCase().includes('cmcintel') || (location.pathname.toLowerCase().includes('drugslist') && selectedList === 'cmcintel') ? 'text-primary font-bold' : 'text-body hover:text-primary-hover'}`}
                       onClick={(e) => {
-                        setSelectedList('cmcintel');
-                        handleHeaderNavClick("/drugsList", e, true);
+                        dispatch(setSelectedList('cmcintel'));
+                        handleHeaderNavClick("/drugsList/cmcintel", e, true);
                       }}
                     >
                       cmcintel Library List

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import useRoles from "../../hooks/useRoles";
 import TokenService from "../../services/shared/TokenService";
+import { useAppSelector } from "../../store/hooks";
 
 interface ProtectedRouteProps {
   /** Roles that are allowed to access this route. If empty, any authenticated user can access. */
@@ -9,20 +10,13 @@ interface ProtectedRouteProps {
   children: ReactNode;
 }
 
-/**
- * ProtectedRoute — wraps a route element with authentication + role checks.
- *
- * Behaviour:
- *  1. If not authenticated (no token)       → redirect to /login (preserving attempted path)
- *  2. If authenticated but wrong role       → redirect to /unauthorized
- *  3. If authenticated and role matches     → render children
- */
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   allowedRoles = [],
   children,
 }) => {
   const location = useLocation();
   const { hasAnyRole } = useRoles();
+  const { userLoading } = useAppSelector((state) => state.user);
   const isAuthenticated = !!TokenService.getToken();
 
   // 1. Not logged in — record attempted path so login can redirect back
@@ -33,6 +27,15 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         replace
         state={{ from: location.pathname }}
       />
+    );
+  }
+
+  // If loading user profile, show loading indicator instead of immediate unauthorized redirect
+  if (userLoading && allowedRoles.length > 0 && !hasAnyRole(...allowedRoles)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="w-8 h-8 border-4 border-[#0e8a67] border-t-transparent rounded-full animate-spin" />
+      </div>
     );
   }
 

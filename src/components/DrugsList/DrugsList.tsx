@@ -1,6 +1,7 @@
 import type { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useCallback, useRef, useState, useEffect, useMemo } from 'react';
+import { useParams, useLocation } from 'react-router-dom';
 import { columns as fdaColumns, cmcintelColumns } from './columns';
 import {
   CellStyleModule,
@@ -22,7 +23,7 @@ import { FiBookmark, FiDownload, FiChevronDown } from 'react-icons/fi';
 import Loader from '../Loader';
 import { sampleRawData } from '../../sampleData/data';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchDrugs } from '../../store/slices/drugsSlice';
+import { fetchDrugs, setSelectedList } from '../../store/slices/drugsSlice';
 import useGet from '../../hooks/useGet';
 import BookMarkService from '../../services/BookmarkService';
 
@@ -46,9 +47,31 @@ const pageSize = 20; // Number of rows per page
 const DrugsList = () => {
   const gridRef = useRef<AgGridReact<any>>(null);
   const dispatch = useAppDispatch();
+  const { listType } = useParams<{ listType?: string }>();
+  const location = useLocation();
+
   const drugsData = useAppSelector((state) => state.drugs.drugsData);
-  const drugsLoading = useAppSelector((state) => state.drugs.drugsLoading);
   const selectedList = useAppSelector((state) => state.drugs.selectedList);
+
+  const path = location.pathname.toLowerCase();
+  const effectiveList: 'fda' | 'cmcintel' = (listType === 'cmcintel' || path.endsWith('/cmcintel'))
+    ? 'cmcintel'
+    : (listType === 'fda' || path.endsWith('/fda'))
+      ? 'fda'
+      : selectedList;
+
+  // Synchronize URL route with Redux state
+  useEffect(() => {
+    if (listType === 'cmcintel' || path.endsWith('/cmcintel')) {
+      if (selectedList !== 'cmcintel') {
+        dispatch(setSelectedList('cmcintel'));
+      }
+    } else if (listType === 'fda' || path.endsWith('/fda')) {
+      if (selectedList !== 'fda') {
+        dispatch(setSelectedList('fda'));
+      }
+    }
+  }, [listType, path, selectedList, dispatch]);
 
   const refetchDrugs = useCallback(() => {
     dispatch(fetchDrugs());
@@ -74,17 +97,16 @@ const DrugsList = () => {
   };
 
   useEffect(() => {
-    if (selectedList === 'cmcintel') {
-      getBookmarks();
-    }
-  }, [selectedList]);
-
-  // Trigger refetch of CMCIntel library list if empty
-  useEffect(() => {
-    if (selectedList === 'cmcintel' && drugsData.length === 0 && !drugsLoading && refetchDrugs) {
+    if (effectiveList === 'cmcintel') {
       refetchDrugs();
     }
-  }, [selectedList, drugsData.length, drugsLoading, refetchDrugs]);
+  }, [effectiveList, refetchDrugs]);
+
+  useEffect(() => {
+    if (showBookmarksOnly && bookmarks.length === 0) {
+      getBookmarks();
+    }
+  }, [showBookmarksOnly, bookmarks.length]);
 
   const onGridReady = useCallback((params: GridReadyEvent): void => {
     const api: GridApi = params.api;
@@ -93,7 +115,7 @@ const DrugsList = () => {
 
   // Compute bookmarks for drugsData when cmcintel is active
   const cmcintelRowDataWithBookmarks = useMemo(() => {
-    if (selectedList !== 'cmcintel') return [];
+    if (effectiveList !== 'cmcintel') return [];
     return drugsData.map((item: any) => {
       const itemCid = item?.cid;
       const itemVersion = item?.version;
@@ -109,21 +131,21 @@ const DrugsList = () => {
       });
       return { ...item, isBookmarked };
     });
-  }, [selectedList, drugsData, bookmarks]);
+  }, [effectiveList, drugsData, bookmarks]);
 
   const bookmarkedCount = useMemo(() => {
     return cmcintelRowDataWithBookmarks.filter((item: any) => item.isBookmarked).length;
   }, [cmcintelRowDataWithBookmarks]);
 
   const displayRowData = useMemo(() => {
-    if (selectedList !== 'cmcintel') return sampleRawData;
+    if (effectiveList !== 'cmcintel') return sampleRawData;
     if (showBookmarksOnly) {
       return cmcintelRowDataWithBookmarks.filter((item: any) => item.isBookmarked);
     }
     return cmcintelRowDataWithBookmarks;
-  }, [selectedList, cmcintelRowDataWithBookmarks, showBookmarksOnly]);
+  }, [effectiveList, cmcintelRowDataWithBookmarks, showBookmarksOnly]);
 
-  const activeColumnDefs = selectedList === 'cmcintel' ? cmcintelColumns : fdaColumns;
+  const activeColumnDefs = effectiveList === 'cmcintel' ? cmcintelColumns : fdaColumns;
 
   return (
     <div className="bg-page min-h-screen py-8 font-sans">
@@ -137,7 +159,7 @@ const DrugsList = () => {
                 <>
                   My <span className="text-[#0E8A67]">Bookmarked</span> Compounds
                 </>
-              ) : selectedList === 'cmcintel' ? (
+              ) : effectiveList === 'cmcintel' ? (
                 'cmcintel Library List'
               ) : (
                 'FDA Approved List'

@@ -26,8 +26,10 @@ export const formatDraftDate = (val: any): string => {
       const num = parseInt(str, 10);
       date = num > 4102444800 ? new Date(num) : new Date(num * 1000);
     } else {
-      if (!str.includes('T') && /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}/.test(str)) {
-        str = str.replace(' ', 'T');
+      if (str.includes('T') && !str.endsWith('Z') && !/[+-]\d{2}(:\d{2})?$/.test(str)) {
+        str += 'Z';
+      } else if (!str.includes('T') && /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}/.test(str)) {
+        str = str.replace(' ', 'T') + 'Z';
       }
       date = new Date(str);
     }
@@ -114,18 +116,37 @@ export const getNextVersion = (currentVer: any): string => {
 /**
  * Converts a Unix timestamp (seconds) to a readable date string (Jan-DD-YYYY).
  */
-export const unixToDate = (unix: number | string | null | undefined): string => {
+export const unixToDate = (unix: number | string | Date | null | undefined): string => {
   if (!unix || unix === "No data available") return "No data available";
-  const timestamp = typeof unix === 'string' ? parseInt(unix) : unix;
-  if (isNaN(timestamp)) return String(unix);
+  let date: Date | null = null;
+  if (typeof unix === 'number') {
+    date = unix > 4102444800 ? new Date(unix) : new Date(unix * 1000);
+  } else if (typeof unix === 'string') {
+    const str = unix.trim();
+    if (/^\d+$/.test(str)) {
+      const num = parseInt(str, 10);
+      date = num > 4102444800 ? new Date(num) : new Date(num * 1000);
+    } else {
+      let isoStr = str;
+      if (isoStr.includes('T') && !isoStr.endsWith('Z') && !/[+-]\d{2}(:\d{2})?$/.test(isoStr)) {
+        isoStr += 'Z';
+      } else if (!isoStr.includes('T') && /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}/.test(isoStr)) {
+        isoStr = isoStr.replace(' ', 'T') + 'Z';
+      }
+      const parsed = new Date(isoStr);
+      if (!isNaN(parsed.getTime())) {
+        date = parsed;
+      }
+    }
+  } else if (unix instanceof Date) {
+    date = unix;
+  }
 
-  // Heuristic: Check if it's likely a Unix timestamp in seconds (between 1970 and 2100)
-  if (timestamp > 100000000 && timestamp < 4102444800) {
-    const date = new Date(timestamp * 1000);
+  if (date && !isNaN(date.getTime())) {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const month = months[date.getUTCMonth()];
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    const year = date.getUTCFullYear();
+    const month = months[date.getMonth()];
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
     return `${month}-${day}-${year}`;
   }
   return String(unix);

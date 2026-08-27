@@ -4,6 +4,7 @@ import { FiTrash2, FiEdit2, FiChevronUp, FiChevronRight, } from "react-icons/fi"
 import type { FieldConfig } from "./index";
 import CustomSelect from "./CustomSelect";
 import { useAppSelector } from "../../store/hooks";
+import { formatKey } from "../../utils/utils";
 
 interface CustomFormProps {
     field: FieldConfig;
@@ -76,14 +77,20 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
     // Index of the row currently being edited
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
-    // Accordion expanded state
-    const [accordionOpen, setAccordionOpen] = useState(false);
+    // Accordion expanded state - default to true
+    const [accordionOpen, setAccordionOpen] = useState(true);
 
     // On mount: restore only previously saved values (e.g. from localStorage).
     useEffect(() => {
-        const values = form.getFieldValue?.(key) || [];
-        if (values.length > 0) {
-            setTableRows(values);
+        const rawValues = form.getFieldValue?.(key);
+        if (Array.isArray(rawValues)) {
+            setTableRows(rawValues);
+        } else if (rawValues && typeof rawValues === 'object') {
+            setTableRows([rawValues]);
+        } else if (typeof rawValues === 'string' && rawValues.trim()) {
+            setTableRows([{ [key]: rawValues }]);
+        } else {
+            setTableRows([]);
         }
     }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -112,7 +119,6 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
         setTableRows(updatedRows);
         syncToForm(updatedRows);
         setInputRow(getEmptyRow());
-        // Do not close accordion so user can add another entry, just reset fields
     };
 
     // Remove a row from the table by index
@@ -132,7 +138,7 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
     const handleEditClick = (index: number) => {
         setInputRow({ ...tableRows[index] });
         setEditingIndex(index);
-        setAccordionOpen(true); // Auto-expand when editing
+        setAccordionOpen(true);
     };
 
     const handleResetFields = () => {
@@ -242,20 +248,29 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
         return value || "—";
     };
 
+    const safeTableRows = Array.isArray(tableRows) ? tableRows : [];
+    const hasEntries = safeTableRows.length > 0;
+    const headerBg = hasEntries ? "bg-[#0e8a67]/10 border-[#0e8a67]/40 text-[#0e8a67]" : "bg-slate-50/80 border-slate-200 text-slate-800";
+    const badgeStyle = hasEntries ? "bg-[#0e8a67] text-white" : "bg-slate-100 text-slate-600 border border-slate-200";
 
+    const displayMainKey = formatKey(cleanLabel || key);
+    const isSingleField = dynamicFields?.length === 1;
 
     return (
         <div className="space-y-4 mb-6 text-left">
             {/* Accordion Box */}
-            <div className="border border-border-main rounded-2xl overflow-hidden bg-white shadow-sm">
-                {/* Accordion Trigger Header */}
+            <div className={`border rounded-2xl overflow-hidden bg-white shadow-xs transition-all ${hasEntries ? "border-[#0e8a67]/40" : "border-slate-200"}`}>
+                {/* Accordion Trigger Header with Main Key Title */}
                 <div
                     onClick={() => setAccordionOpen(!accordionOpen)}
-                    className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-alt/10 transition-colors bg-slate-50/50"
+                    className={`px-6 py-4 flex items-center justify-between cursor-pointer transition-colors ${headerBg}`}
                 >
                     <div className="flex items-center gap-3.5">
-                        <span className="text-sm font-bold text-slate-800 font-display">
-                            {editingIndex !== null ? `Editing: ${cleanLabel}` : cleanLabel}
+                        <span className="text-sm font-bold font-display">
+                            {editingIndex !== null ? `Editing: ${displayMainKey}` : displayMainKey}
+                        </span>
+                        <span className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full shadow-2xs ${badgeStyle}`}>
+                            {safeTableRows.length} {safeTableRows.length === 1 ? "entry" : "entries"}
                         </span>
                     </div>
                     {accordionOpen ? (
@@ -269,21 +284,23 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                 {accordionOpen && (
                     <div className="px-6 pb-6 pt-5 border-t border-border-main bg-white">
                         <div className="divide-y divide-slate-100 mb-4">
-                            {dynamicFields?.map((dynamicField) => {
+                            {dynamicFields?.map((dynamicField, dfIdx) => {
                                 return (
                                     <div
-                                        key={dynamicField.key}
+                                        key={`${dynamicField.key}-${dfIdx}`}
                                         className="py-3 flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-6"
                                     >
-                                        <div className="w-full sm:w-48 shrink-0 pt-2">
-                                            <label className="text-xs font-semibold text-slate-700 uppercase tracking-wide">
-                                                {dynamicField.label}
-                                                {dynamicField.required && (
-                                                    <span className="text-red-500 ml-0.5">*</span>
-                                                )}
-                                            </label>
-                                        </div>
-                                        <div className="w-full max-w-sm min-w-0">
+                                        {!isSingleField && (
+                                            <div className="w-full sm:w-48 shrink-0 pt-2">
+                                                <label className="text-xs font-semibold text-slate-700 uppercase tracking-wide">
+                                                    {dynamicField.label}
+                                                    {dynamicField.required && (
+                                                        <span className="text-red-500 ml-0.5">*</span>
+                                                    )}
+                                                </label>
+                                            </div>
+                                        )}
+                                        <div className={isSingleField ? "w-full min-w-0" : "w-full max-w-sm min-w-0"}>
                                             {renderInput(
                                                 dynamicField,
                                                 inputRow[dynamicField.key],
@@ -319,17 +336,17 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
             </div>
 
             {/* ── Committed rows table ── */}
-            {tableRows.length > 0 && (
+            {safeTableRows.length > 0 && (
                 <div className="overflow-x-auto rounded-xl border border-border-main shadow-sm bg-white">
                     <table className="min-w-full text-sm">
                         <thead>
                             <tr className="bg-alt/50 border-b border-border-main">
-                                {dynamicFields?.map((df) => (
+                                {dynamicFields?.map((df, dfIdx) => (
                                     <th
-                                        key={df.key}
+                                        key={`${df.key}-${dfIdx}`}
                                         className="px-4 py-3 text-left text-xs font-bold text-main uppercase tracking-wider whitespace-nowrap"
                                     >
-                                        {df.label}
+                                        {isSingleField ? displayMainKey : df.label}
                                     </th>
                                 ))}
                                 <th className="px-4 py-3 text-center text-xs font-bold text-main uppercase tracking-wider w-24">
@@ -338,7 +355,7 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {tableRows.map((row, rowIndex) => (
+                            {safeTableRows.map((row, rowIndex) => (
                                 <tr
                                     key={rowIndex}
                                     className="border-b border-border-main last:border-0 hover:bg-alt/20 transition-colors"

@@ -1,17 +1,14 @@
 import { useAppSelector } from "../store/hooks";
 import TokenService from "../services/shared/TokenService";
+import AuthService from "../services/AuthService";
 
 /**
  * useRoles — reads the current user's roles from Redux store and exposes
  * convenient boolean flags plus generic permission helpers.
- *
- * Permission matrix:
- *   Admin    → View all, Edit all, Delete all, Manage users
- *   Editor   → View all, Add drugs, Edit & Delete ONLY drugs created by themselves
- *   Subscriber → View/search all drugs only
  */
 export const useRoles = () => {
-  const { roles, user } = useAppSelector((state) => state.user);
+  const { roles: reduxRoles, user } = useAppSelector((state) => state.user);
+  const roles = (Array.isArray(reduxRoles) && reduxRoles.length > 0) ? reduxRoles : AuthService.getUserRoles();
 
   const hasRole = (role: string): boolean =>
     Array.isArray(roles) && roles.map((r: string) => String(r).toLowerCase()).includes(role.toLowerCase());

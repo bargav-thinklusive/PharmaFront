@@ -21,13 +21,22 @@ const initialState: DrugsState = {
 
 export const fetchDrugs = createAsyncThunk(
   'drugs/fetchDrugs',
-  async (_, { rejectWithValue }) => {
+  async (_force: boolean | void, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(drugService.getDrugs());
       const data = response.data;
       return Array.isArray(data) ? data : (data?.data || []);
     } catch (err: any) {
       return rejectWithValue(err.response?.data || 'Failed to fetch drugs');
+    }
+  },
+  {
+    condition: (force, { getState }) => {
+      if (force === true) return true;
+      const state = getState() as { drugs: DrugsState };
+      if (state.drugs.drugsLoading || (state.drugs.drugsData && state.drugs.drugsData.length > 0)) {
+        return false;
+      }
     }
   }
 );

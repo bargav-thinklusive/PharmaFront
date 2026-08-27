@@ -1,5 +1,6 @@
 import React from "react";
 import { GiPill } from "react-icons/gi";
+import { FiUser, FiClock } from "react-icons/fi";
 import { formatDraftDate } from "../../utils/utils";
 
 interface CompoundFormHeaderProps {
@@ -7,6 +8,7 @@ interface CompoundFormHeaderProps {
     drugId: string;
     cid?: string | number;
     version?: string | number;
+    createdBy?: string;
     lastUpdated?: string | number;
     overallProgressPct: number;
     completedStepsCount: number;
@@ -18,6 +20,7 @@ export const CompoundFormHeader: React.FC<CompoundFormHeaderProps> = ({
     drugId,
     cid,
     version,
+    createdBy,
     lastUpdated,
     overallProgressPct,
     completedStepsCount,
@@ -40,14 +43,25 @@ export const CompoundFormHeader: React.FC<CompoundFormHeaderProps> = ({
                             Approved Drug
                         </span>
                     </div>
-                    <div className="text-[10px] text-slate-400 font-medium mt-1 flex items-center gap-1.5 flex-wrap">
-                        <span className="font-semibold text-slate-700">Drug ID: {drugId || cid || "D004"}</span>
-                        {cid && drugId && String(drugId) !== String(cid) && (
-                            <span className="font-semibold text-slate-600">(CID: {cid})</span>
+                    <div className="text-[11px] text-slate-500 font-medium mt-1.5 flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-[#0e8a67] bg-green-50/80 px-2 py-0.5 rounded border border-green-200/60">CID: {cid || "D001"}</span>
+                        {drugId && String(drugId) !== String(cid) && (
+                            <span className="font-medium text-slate-400">(ID: {String(drugId).length === 24 ? String(drugId).slice(-6) : drugId})</span>
                         )}
-                        <span>&nbsp;|&nbsp;</span>
+                        <span className="text-slate-300">|</span>
                         <span className="font-semibold text-slate-700">Version: {version || "1.0"} (Draft)</span>
-                        <span>&nbsp;|&nbsp; Last Updated: {formatDraftDate(lastUpdated || Date.now())}</span>
+                        <span className="text-slate-300">|</span>
+                        <span className="inline-flex items-center gap-1 text-slate-600">
+                            <FiUser className="w-3.5 h-3.5 text-slate-400" />
+                            <span className="text-slate-500">Created by:</span>
+                            <span className="font-semibold text-slate-800">{createdBy || "testadmin"}</span>
+                        </span>
+                        <span className="text-slate-300">|</span>
+                        <span className="inline-flex items-center gap-1 text-slate-600">
+                            <FiClock className="w-3.5 h-3.5 text-slate-400" />
+                            <span className="text-slate-500">Last Updated:</span>
+                            <span className="font-semibold text-slate-800">{formatDraftDate(lastUpdated || Date.now())}</span>
+                        </span>
                     </div>
                 </div>
             </div>

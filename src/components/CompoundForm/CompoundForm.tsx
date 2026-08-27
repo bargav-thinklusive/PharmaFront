@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import DynamicFormBuilder from "../shared";
 import { addExecutiveSummary, addProductOverview, addPhysicalChemicalProperties, addDrugSubstance, addDrugProductInformation, addAppendices, addRegulatoryInsights, addLabelingInformation, addGenericEntrants, addBaBeStudies, addSources, addGlossary } from "./columns";
-import { formatCreatedDrug } from "./helper";
+import { formatCreatedDrug, flattenDrug } from "./helper";
 import usePost from "../../hooks/usePost";
 import usePut from "../../hooks/usePut";
 import DrugService from "../../services/DrugService";
 import { toast } from "react-toastify";
 import useDraft from "../../hooks/useDraft";
-import TokenService from "../../services/shared/TokenService";
+import axiosInstance from "../../services/shared/AxiosService";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchDrugs, setSelectedList } from "../../store/slices/drugsSlice";
 import { fetchDrafts } from "../../store/slices/draftsSlice";
@@ -42,9 +42,10 @@ const CompoundForm = () => {
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
     const dispatch = useAppDispatch();
-    const user = useAppSelector((state) => state.user.user);
     const drafts = useAppSelector((state) => state.drafts.drafts);
     const masterData = useAppSelector((state) => state.masterData);
+    const currentUser = useAppSelector((state) => state.user.user?.data || state.user.user);
+    const currentUserName = currentUser?.name || currentUser?.email || "testadmin";
 
     const { postData } = usePost();
     const { putData } = usePut();
@@ -71,11 +72,29 @@ const CompoundForm = () => {
         formDataRef.current = formData;
     }, [formData]);
 
+    const drugId = searchParams.get("drugId") || searchParams.get("id");
+    const lastFetchedDrugIdRef = useRef<string | null>(null);
+
     useEffect(() => {
         if (location.state?.initialData && Object.keys(location.state.initialData).length > 0) {
-            formDataRef.current = location.state.initialData;
-            setFormData(location.state.initialData);
-            if (draftId) setLoadedDraftId(draftId);
+            const flattened = flattenDrug(location.state.initialData);
+            formDataRef.current = flattened;
+            setFormData(flattened);
+            return;
+        }
+
+        if (drugId && lastFetchedDrugIdRef.current !== drugId) {
+            lastFetchedDrugIdRef.current = drugId;
+            axiosInstance.get(drugService.getDrugById(drugId)).then((res: any) => {
+                const data = res?.data?.data || res?.data || res;
+                if (data) {
+                    const flattened = flattenDrug(data);
+                    formDataRef.current = flattened;
+                    setFormData(flattened);
+                }
+            }).catch((err: any) => {
+                console.error("Error fetching drug details for edit:", err);
+            });
             return;
         }
 
@@ -87,14 +106,15 @@ const CompoundForm = () => {
 
         const draft = loadDraft(draftId);
         if (draft && draft.formData && Object.keys(draft.formData).length > 0) {
-            formDataRef.current = draft.formData;
-            setFormData(draft.formData);
+            const flattened = flattenDrug(draft.formData);
+            formDataRef.current = flattened;
+            setFormData(flattened);
             if (draft.currentStep !== undefined) {
                 setCurrentStep(draft.currentStep);
             }
             setLoadedDraftId(draftId);
         }
-    }, [draftId, drafts, loadDraft, loadedDraftId, location.state]);
+    }, [draftId, drugId, drafts, loadDraft, loadedDraftId, location.state]);
 
     const steps = [
         { title: "Product Overview", fields: addProductOverview },
@@ -229,8 +249,7 @@ const CompoundForm = () => {
 
     const submitForm = async () => {
         try {
-            const currentUser = user?.data || TokenService.decodeToken();
-            const formattedData = await formatCreatedDrug(formDataRef.current, currentUser);
+            const formattedData = await formatCreatedDrug(formDataRef.current);
             
             const originalId = formDataRef.current._id || formDataRef.current.original_id || formDataRef.current.id;
             const originalVersion = formDataRef.current.originalVersion;
@@ -252,11 +271,11 @@ const CompoundForm = () => {
             }
 
             if (draftId) await clearDraft(draftId);
-            if (setSelectedList) setSelectedList('cmcintel');
+            dispatch(setSelectedList('cmcintel'));
             if (refetchDrugs) await refetchDrugs();
             if (refetchDrafts) await refetchDrafts();
             toast.success(isUpdate ? "Drug entry successfully updated" : "Drug entry successfully submitted");
-            navigate("/drugsList");
+            navigate("/drugsList/cmcintel");
         } catch (error: any) {
             console.error(error);
             if (error.response?.status === 400) {
@@ -347,27 +366,32 @@ const CompoundForm = () => {
 
         let filledCount = 0;
         let totalCount = 0;
+        let requiredCount = 0;
+        let filledRequiredCount = 0;
 
         stepFields.forEach(f => {
-            if (f.type === "dynamic") {
-                // For dynamic list fields, we check if rows have been added
-                const val = formData[f.key];
-                totalCount++;
-                if (Array.isArray(val) && val.length > 0) {
-                    filledCount++;
-                }
+            const val = formData[f.key];
+            totalCount++;
+            let isFilled = false;
+            if (f.type === "dynamic" || Array.isArray(val)) {
+                if (Array.isArray(val) && val.length > 0) isFilled = true;
             } else {
-                const val = formData[f.key];
-                totalCount++;
-                if (val !== undefined && val !== null && String(val).trim() !== "") {
-                    filledCount++;
-                }
+                if (val !== undefined && val !== null && String(val).trim() !== "") isFilled = true;
+            }
+
+            if (isFilled) filledCount++;
+            if (f.required) {
+                requiredCount++;
+                if (isFilled) filledRequiredCount++;
             }
         });
 
         if (filledCount === 0) return "Not Started";
-        if (filledCount === totalCount) return "Completed";
-        return "In Progress";
+        if (requiredCount > 0) {
+            if (filledRequiredCount === requiredCount) return "Completed";
+            return "In Progress";
+        }
+        return "Completed";
     };
 
     const getSubsectionStats = (stepIndex: number) => {
@@ -443,6 +467,22 @@ const CompoundForm = () => {
         return val !== undefined && val !== null && String(val).trim() !== "";
     }).length;
 
+    const drugCreator = formData.createdByName || 
+                        formData.createdByEmail || 
+                        (formData.createdBy && String(formData.createdBy).trim()) || 
+                        formData.ProductOverview?.createdByName || 
+                        formData.ProductOverview?.createdByEmail || 
+                        (formData.ProductOverview?.createdBy && String(formData.ProductOverview?.createdBy).trim()) || 
+                        currentUserName;
+
+    const displayCid = formData.cid || 
+                       formData.ProductOverview?.cid || 
+                       (searchParams.get("cid")) || 
+                       (drugId && !/^[0-9a-fA-F]{24}$/.test(drugId) ? drugId : null) || 
+                       formData.drugId || 
+                       formData._id || 
+                       "D001";
+
     return (
         <div className="flex flex-col min-h-[calc(100vh-64px)] bg-[#f8fafc] font-sans p-6 sm:p-8">
             <div className="max-w-7xl mx-auto w-full flex flex-col gap-6">
@@ -450,8 +490,9 @@ const CompoundForm = () => {
                 <CompoundFormHeader
                     drugName={formData.drugName || formData.ProductOverview?.drugName}
                     drugId={formData.drugId || formData._id}
-                    cid={formData.cid || formData.ProductOverview?.cid}
+                    cid={displayCid}
                     version={formData.version || formData.ProductOverview?.version}
+                    createdBy={drugCreator}
                     lastUpdated={loadedDraftId ? (loadDraft(loadedDraftId)?.lastModified) : (formData.updatedAt || formData.createdAt)}
                     overallProgressPct={overallProgressPct}
                     completedStepsCount={completedStepsCount}
