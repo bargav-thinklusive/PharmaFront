@@ -260,9 +260,24 @@ export default function SectionedViewDrug() {
                        (cid && !/^[0-9a-fA-F]{24}$/.test(cid) ? cid : null) || 
                        "D001";
 
-    const lastUpdatedDate = drugToDisplay.updatedAt
-        ? formatDraftDate(drugToDisplay.updatedAt)
-        : (drugToDisplay.createdAt ? formatDraftDate(drugToDisplay.createdAt) : "—");
+    const rawUpdatedDate = drugToDisplay?.updatedAt || 
+                           drugToDisplay?.ProductOverview?.updatedAt || 
+                           flatDrug?.updatedAt || 
+                           drugToDisplay?.createdAt || 
+                           drugToDisplay?.ProductOverview?.createdAt || 
+                           flatDrug?.createdAt || 
+                           drugToDisplay?.lastModified || 
+                           flatDrug?.lastModified;
+
+    const resolvedDate = rawUpdatedDate || (() => {
+        const id = drugToDisplay?._id || drugToDisplay?.id || flatDrug?._id || flatDrug?.id || cid;
+        if (id && typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id)) {
+            return parseInt(id.substring(0, 8), 16) * 1000;
+        }
+        return null;
+    })();
+
+    const lastUpdatedDate = resolvedDate ? formatDraftDate(resolvedDate) : "—";
 
     const getSectionData = (key?: string) => {
         if (!key || !drugToDisplay) return null;

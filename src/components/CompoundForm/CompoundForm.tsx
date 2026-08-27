@@ -493,7 +493,24 @@ const CompoundForm = () => {
                     cid={displayCid}
                     version={formData.version || formData.ProductOverview?.version}
                     createdBy={drugCreator}
-                    lastUpdated={loadedDraftId ? (loadDraft(loadedDraftId)?.lastModified) : (formData.updatedAt || formData.createdAt)}
+                    lastUpdated={
+                        loadedDraftId
+                            ? (loadDraft(loadedDraftId)?.lastModified)
+                            : (
+                                formData.updatedAt ||
+                                formData.ProductOverview?.updatedAt ||
+                                formData.createdAt ||
+                                formData.ProductOverview?.createdAt ||
+                                formData.lastModified ||
+                                (() => {
+                                    const id = formData._id || formData.id || formData.drugId;
+                                    if (id && typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id)) {
+                                        return parseInt(id.substring(0, 8), 16) * 1000;
+                                    }
+                                    return undefined;
+                                })()
+                            )
+                    }
                     overallProgressPct={overallProgressPct}
                     completedStepsCount={completedStepsCount}
                     totalStepsCount={steps.length}
