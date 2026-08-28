@@ -1,4 +1,4 @@
-import { normalizeValue, toTitleCase } from '../../../utils/utils';
+import { normalizeValue, toTitleCase, formatDraftDate } from '../../../utils/utils';
 import { KeyValueDisplay, DataTable, DrugSubstanceSpecificationsTable, renderLink } from '../shared/renderValue';
 
 interface SectionContentProps {
@@ -6,6 +6,12 @@ interface SectionContentProps {
     sectionIndex?: string;
     section?: any;
 }
+
+const METADATA_KEYS_TO_SKIP = [
+    '_id', 'id', 'original_id', 'cid', 'version', 'references',
+    'createdBy', 'createdByEmail', 'created_by', 'updatedBy', 'updatedByEmail',
+    'userId', 'user_id'
+];
 
 /**
  * Helper to detect if an object matches the ImageObject pattern (has imageData)
@@ -315,7 +321,7 @@ export default function SectionContent({ data, sectionIndex, section }: SectionC
 
     // Unwrap section wrapper objects (e.g. Sources: { sources: [...] } -> [...])
     if (targetData && typeof targetData === 'object' && !Array.isArray(targetData)) {
-        const rawKeys = Object.keys(targetData).filter(k => !['_id', 'cid', 'version'].includes(k));
+        const rawKeys = Object.keys(targetData).filter(k => !METADATA_KEYS_TO_SKIP.includes(k));
         if (rawKeys.length === 1) {
             const singleKey = rawKeys[0];
             const singleKeyNorm = singleKey.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -355,10 +361,16 @@ export default function SectionContent({ data, sectionIndex, section }: SectionC
 
     entries.forEach(([key, value]) => {
         // Skip metadata fields in the nested views
-        if (['_id', 'cid', 'version'].includes(key)) return;
+        if (METADATA_KEYS_TO_SKIP.includes(key)) return;
 
         if (key === 'drugSubstanceSpecifications') {
             complexFields.push([key, value]);
+            return;
+        }
+
+        // Format dates cleanly like the view header
+        if (['createdAt', 'updatedAt', 'created_at', 'updated_at', 'lastModified'].includes(key)) {
+            simpleFields[key] = formatDraftDate(value);
             return;
         }
 

@@ -102,7 +102,10 @@ export default function SectionedViewDrug() {
     const displayData = useMemo(() => {
         if (!drugToDisplay) return null;
         return Object.keys(drugToDisplay).reduce((acc: any, key) => {
-            if (!['_id', 'cid', 'version', 'createdAt', 'updatedAt', 'references'].includes(key)) {
+            if (![
+                '_id', 'id', 'original_id', 'cid', 'version', 'createdAt', 'updatedAt', 'references',
+                'createdBy', 'createdByEmail', 'created_by', 'updatedBy', 'updatedByEmail', 'userId', 'user_id'
+            ].includes(key)) {
                 acc[key] = drugToDisplay[key];
             }
             return acc;

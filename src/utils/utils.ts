@@ -1,5 +1,9 @@
 
 export const formatKey = (key: string): string => {
+  if (key === 'createdByName') return 'Created By';
+  if (key === 'updatedByName') return 'Updated By';
+  if (key === 'createdAt') return 'Created At';
+  if (key === 'updatedAt') return 'Updated At';
   const result = key.replace(/([A-Z])/g, " $1");
   return result.charAt(0).toUpperCase() + result.slice(1);
 };

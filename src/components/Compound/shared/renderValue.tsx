@@ -1,5 +1,11 @@
 import React from 'react';
-import { formatKey, normalizeValue } from '../../../utils/utils';
+import { formatKey, normalizeValue, formatDraftDate } from '../../../utils/utils';
+
+const METADATA_KEYS_TO_SKIP = [
+    '_id', 'id', 'original_id', 'cid', 'version', 'references',
+    'createdBy', 'createdByEmail', 'created_by', 'updatedBy', 'updatedByEmail',
+    'userId', 'user_id'
+];
 
 // --- Shared Helper Components ---
 
@@ -151,20 +157,33 @@ export function renderValue(value: any): React.ReactNode {
     }
 
     if (typeof value === 'object' && value !== null) {
-        return Object.entries(value).map(([k, v], idx) => (
-            <div key={idx} className="mb-1">
-                <strong>{formatKey(k)}:</strong> {renderValue(v)}
-            </div>
-        ));
+        return Object.entries(value)
+            .filter(([k]) => !METADATA_KEYS_TO_SKIP.includes(k))
+            .map(([k, v], idx) => {
+                const displayKey = formatKey(k);
+                let val = v;
+                if (['createdAt', 'updatedAt', 'created_at', 'updated_at', 'lastModified'].includes(k)) {
+                    val = formatDraftDate(v);
+                }
+                return (
+                    <div key={idx} className="mb-1">
+                        <strong>{displayKey}:</strong> {renderValue(val)}
+                    </div>
+                );
+            });
     }
     return renderLink(normalizeValue(value));
 }
 
 export function DataTable({ data }: { data: any[] }) {
     if (!data || data.length === 0) return <div>No data available</div>;
-    const headers = Object.keys(data[0]);
+    const headers = Object.keys(data[0]).filter(h => !METADATA_KEYS_TO_SKIP.includes(h));
 
     const renderCell = (header: string, value: any) => {
+        if (['createdAt', 'updatedAt', 'created_at', 'updated_at', 'lastModified'].includes(header)) {
+            return formatDraftDate(value);
+        }
+
         // Detect image fields by key name or value type
         const isImageKey = /^images?$/i.test(header) || /image/i.test(header) || /structure/i.test(header);
         const isFile = typeof File !== 'undefined' && value instanceof File;
@@ -231,23 +250,30 @@ export function DataTable({ data }: { data: any[] }) {
 }
 
 export function KeyValueDisplay({ data, className = '' }: { data: Record<string, any>; className?: string }) {
-    const filteredData = Object.entries(data || {});
+    const filteredData = Object.entries(data || {}).filter(([k]) => !METADATA_KEYS_TO_SKIP.includes(k));
     if (filteredData.length === 0) return null;
 
     return (
         <div className={`border-2 border-primary rounded bg-white max-w-3xl ${className}`}>
             <table className="w-full text-sm text-black border-collapse">
                 <tbody>
-                    {filteredData.map(([key, value]) => (
-                        <tr key={key} className="border-b border-primary/10">
-                            <td className="w-56 p-3 text-black font-semibold border-r border-primary/20">
-                                {formatKey(key)}
-                            </td>
-                            <td className="py-2 px-4 whitespace-pre-wrap">
-                                {renderValue(value)}
-                            </td>
-                        </tr>
-                    ))}
+                    {filteredData.map(([key, value]) => {
+                        const displayKey = formatKey(key);
+                        let displayValue = value;
+                        if (['createdAt', 'updatedAt', 'created_at', 'updated_at', 'lastModified'].includes(key)) {
+                            displayValue = formatDraftDate(value);
+                        }
+                        return (
+                            <tr key={key} className="border-b border-primary/10">
+                                <td className="w-56 p-3 text-black font-semibold border-r border-primary/20">
+                                    {displayKey}
+                                </td>
+                                <td className="py-2 px-4 whitespace-pre-wrap">
+                                    {renderValue(displayValue)}
+                                </td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
         </div>
