@@ -232,11 +232,12 @@ async function processImagesToBase64(data: any): Promise<any> {
             };
         } else if (Array.isArray(val) && val.length > 0 && val[0] instanceof File) {
             // Convert Array of Files
-            result[key] = await Promise.all(val.map(async (file: File) => ({
+            const converted = await Promise.all(val.map(async (file: File) => ({
                 fileName: file.name,
                 contentType: file.type,
                 imageData: await fileToBase64(file)
             })));
+            result[key] = converted.length === 1 ? converted[0] : converted;
         } else if (typeof val === 'object') {
             result[key] = await processImagesToBase64(val);
         } else {

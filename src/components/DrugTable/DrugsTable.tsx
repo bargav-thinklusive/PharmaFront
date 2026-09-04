@@ -279,9 +279,21 @@ const DrugsTable: React.FC = () => {
       { headerName: 'Company', field: 'ProductOverview.companyName', minWidth: 180, width: 200, wrapText: true, autoHeight: true, cellStyle: cellWrapStyle, sortable: true, filter: true, valueFormatter: (params: any) => params.value || params.data?.company || params.data?.companyName || '-' },
       { headerName: 'Region', field: 'ProductOverview.firstApprovedRegion', minWidth: 160, width: 180, wrapText: true, autoHeight: true, cellStyle: cellWrapStyle, sortable: true, filter: true, valueFormatter: (params: any) => params.value || params.data?.RegulatoryInsights?.regionalApproval || params.data?.region || params.data?.firstApprovedRegion || '-' },
       { headerName: 'Molecular Formula', field: 'PhysicalChemicalProperties.molecularFormula', minWidth: 180, width: 200, wrapText: true, autoHeight: true, cellStyle: cellWrapStyle, sortable: true, filter: true, valueFormatter },
-      { headerName: 'Molecular Weight', field: 'PhysicalChemicalProperties.molecularWeight', minWidth: 140, width: 160, wrapText: true, autoHeight: true, cellStyle: cellWrapStyle, sortable: true, filter: true, valueFormatter },
+      {
+        headerName: 'Therapeutic Area',
+        field: 'ProductOverview.therapeuticArea',
+        minWidth: 200,
+        width: 240,
+        wrapText: true,
+        autoHeight: true,
+        cellStyle: cellWrapStyle,
+        sortable: true,
+        filter: true,
+        valueFormatter: (params: any) => params.value || params.data?.ProductOverview?.therapeuticArea || params.data?.therapeuticArea || '-'
+      },
 
       // More columns hidden by default
+      { headerName: 'Molecular Weight', field: 'PhysicalChemicalProperties.molecularWeight', width: 140, sortable: true, filter: true, hide: true, valueFormatter },
       { headerName: 'CAS Number', field: 'PhysicalChemicalProperties.casNumber', width: 140, sortable: true, filter: true, hide: true, valueFormatter },
       { headerName: 'Chemical Name', field: 'PhysicalChemicalProperties.chemicalName', minWidth: 200, width: 240, wrapText: true, autoHeight: true, cellStyle: cellWrapStyle, sortable: true, filter: true, hide: true, valueFormatter },
       { headerName: 'Therapeutic Class', field: 'ProductOverview.therapeuticClass', minWidth: 180, width: 220, wrapText: true, autoHeight: true, cellStyle: cellWrapStyle, sortable: true, filter: true, hide: true, valueFormatter },
@@ -558,7 +570,7 @@ const DrugsTable: React.FC = () => {
                 }
               }}
               rowSelection="single"
-              headerHeight={56}
+              headerHeight={64}
             />
           </div>
         </div>

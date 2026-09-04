@@ -80,8 +80,19 @@ export function renderLink(text: string) {
  * Helper to detect if an object matches the ImageObject pattern (has imageData)
  */
 const isImageObject = (obj: any): boolean => {
-    return obj && typeof obj === 'object' && ('imageData' in obj || 'image' in obj || 'url' in obj) &&
-        (typeof obj.imageData === 'string' || typeof obj.image === 'string' || typeof obj.url === 'string');
+    if (!obj || typeof obj !== 'object') return false;
+    if (typeof obj.imageData === 'string' || typeof obj.url === 'string') return true;
+    if (obj.image) {
+        if (typeof obj.image === 'string') return true;
+        if (typeof obj.image === 'object') {
+            if (Array.isArray(obj.image) && obj.image.length > 0) {
+                const first = obj.image[0];
+                if (first && typeof first === 'object' && (first.imageData || first.url || first.image || first.src)) return true;
+            }
+            if (obj.image.imageData || obj.image.url) return true;
+        }
+    }
+    return false;
 };
 
 const getImgSrc = (item: any): string | null => {
@@ -95,16 +106,24 @@ const getImgSrc = (item: any): string | null => {
     if (!item || typeof item !== 'object') return null;
 
     let src: any = item.imageData || item.image || item.url || item.src || null;
+    if (Array.isArray(src) && src.length > 0) {
+        src = src[0];
+    }
     if (typeof src === 'object' && src !== null) {
         src = src.imageData || src.url || src.image || src.src || null;
     }
+    if (Array.isArray(src) && src.length > 0) {
+        src = src[0];
+    }
+
     if (typeof src === 'string') {
         if (src.startsWith('data:image/') || src.startsWith('blob:')) return src;
         if (src.startsWith('http://') || src.startsWith('https://')) return src;
         if (src.startsWith('/uploads/')) return `http://localhost:8000${src}`;
         if (src.startsWith('uploads/')) return `http://localhost:8000/${src}`;
+        return src;
     }
-    return typeof src === 'string' ? src : null;
+    return null;
 };
 
 const handleImgErrorFallback = (e: any) => {
@@ -227,7 +246,7 @@ export function DataTable({ data }: { data: any[] }) {
                 <thead className="text-xs text-primary-active uppercase bg-primary-light border-b-2 border-primary">
                     <tr>
                         {headers.map((header, idx) => (
-                            <th key={header} className={`px-6 py-3 font-bold ${idx < headers.length - 1 ? 'border-r border-primary/20' : ''}`}>
+                            <th key={header} className={`px-6 py-4 font-bold ${idx < headers.length - 1 ? 'border-r border-primary/20' : ''}`}>
                                 {formatKey(header)}
                             </th>
                         ))}
@@ -407,8 +426,8 @@ export function DrugSubstanceSpecificationsTable({ data }: { data: any }) {
             <table className="w-full text-sm text-left text-slate-800 border-collapse">
                 <thead className="text-xs uppercase bg-emerald-50 text-[#0e8a67] font-bold border-b-2 border-[#0e8a67]">
                     <tr>
-                        <th className="px-6 py-3 border-r border-[#0e8a67]/20 w-1/3">Key</th>
-                        <th className="px-6 py-3">Value</th>
+                        <th className="px-6 py-4 border-r border-[#0e8a67]/20 w-1/3">Key</th>
+                        <th className="px-6 py-4">Value</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 bg-white">

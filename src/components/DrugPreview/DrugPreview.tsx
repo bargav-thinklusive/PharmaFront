@@ -71,7 +71,7 @@ const DrugPreview: React.FC = () => {
                         rowData={[drug]}
                         columnDefs={columns}
                         rowSelection="single"
-                        headerHeight={56}
+                        headerHeight={64}
                     />
                 </div>
             </div>

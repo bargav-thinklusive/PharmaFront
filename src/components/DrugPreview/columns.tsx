@@ -108,14 +108,14 @@ export const columns: any = [
     valueFormatter: valueFormatter
   },
   {
-    headerName: "Molecular Weight",
+    headerName: "Therapeutic Area",
     headerClass: "table-header",
-    field: "PhysicalChemicalProperties.molecularWeight",
+    field: "ProductOverview.therapeuticArea",
     sortable: true,
     filter: true,
     autoHeight: true,
     cellStyle: { lineHeight: '1.5', whiteSpace: 'pre-line' },
-    valueFormatter: valueFormatter
+    valueFormatter: (params: any) => params.value || params.data?.ProductOverview?.therapeuticArea || params.data?.therapeuticArea || '-'
   },
   {
     headerName: "Approval Date",
