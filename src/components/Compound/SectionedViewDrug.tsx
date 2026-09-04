@@ -3,7 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchDrugs } from '../../store/slices/drugsSlice';
 import { flattenDrug } from '../CompoundForm/helper';
-import { trackDrugSearch, formatDraftDate } from '../../utils/utils';
+import {
+    trackDrugSearch,
+    getPatentExpiry,
+    getFirstApprovedYear,
+    getCreatedByUser,
+    getDisplayCid,
+    getDrugLastModifiedDate,
+    exportAsJson
+} from '../../utils/utils';
 import useDelete from '../../hooks/useDelete';
 import DrugService from '../../services/DrugService';
 import { toast } from 'react-toastify';
@@ -200,17 +208,8 @@ export default function SectionedViewDrug() {
     const handleExportJson = () => {
         setExportMenuOpen(false);
         try {
-            const fileName = (flatDrug.drugName || drugToDisplay.ProductOverview?.drugName || 'drug_entry').replace(/[^a-zA-Z0-9_-]/g, '_');
-            const jsonString = JSON.stringify(drugToDisplay, null, 2);
-            const blob = new Blob([jsonString], { type: "application/json;charset=utf-8;" });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute("download", `${fileName}_metadata.json`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
+            const fileName = flatDrug.drugName || drugToDisplay.ProductOverview?.drugName || 'drug_entry';
+            exportAsJson(drugToDisplay, fileName);
             toast.success("Metadata exported as JSON!");
         } catch (err) {
             console.error("JSON Export error:", err);
@@ -232,55 +231,11 @@ export default function SectionedViewDrug() {
     const routeOfAdministration = flatDrug.dosageForms || "Oral";
     const marketAvailability = "Widely available in global markets.";
 
-    const firstApprovedYear = flatDrug.firstApprovedDate
-        ? new Date(typeof flatDrug.firstApprovedDate === 'number' ? flatDrug.firstApprovedDate * 1000 : flatDrug.firstApprovedDate).getFullYear()
-        : "—";
-
-    const getPatentExpiry = () => {
-        if (flatDrug.lossOfExclusivity && flatDrug.lossOfExclusivity.length > 0) {
-            return flatDrug.lossOfExclusivity[0].expiredDate || flatDrug.lossOfExclusivity[0].expiryDate || "—";
-        }
-        if (flatDrug.drugPatents && flatDrug.drugPatents.length > 0) {
-            return flatDrug.drugPatents[0].expiryDate || "—";
-        }
-        return "—";
-    };
-
-    const patentExpiry = getPatentExpiry();
-    const createdByUser = drugToDisplay.createdByName || 
-                          drugToDisplay.createdByEmail || 
-                          drugToDisplay.ProductOverview?.createdByName || 
-                          drugToDisplay.ProductOverview?.createdByEmail || 
-                          flatDrug.createdByName || 
-                          flatDrug.createdByEmail || 
-                          (drugToDisplay.createdBy && String(drugToDisplay.createdBy).trim()) || 
-                          (currentUserName && currentUserName.trim()) || 
-                          "testadmin";
-
-    const displayCid = drugToDisplay?.cid || 
-                       drugToDisplay?.ProductOverview?.cid || 
-                       flatDrug?.cid || 
-                       (cid && !/^[0-9a-fA-F]{24}$/.test(cid) ? cid : null) || 
-                       "D001";
-
-    const rawUpdatedDate = drugToDisplay?.updatedAt || 
-                           drugToDisplay?.ProductOverview?.updatedAt || 
-                           flatDrug?.updatedAt || 
-                           drugToDisplay?.createdAt || 
-                           drugToDisplay?.ProductOverview?.createdAt || 
-                           flatDrug?.createdAt || 
-                           drugToDisplay?.lastModified || 
-                           flatDrug?.lastModified;
-
-    const resolvedDate = rawUpdatedDate || (() => {
-        const id = drugToDisplay?._id || drugToDisplay?.id || flatDrug?._id || flatDrug?.id || cid;
-        if (id && typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id)) {
-            return parseInt(id.substring(0, 8), 16) * 1000;
-        }
-        return null;
-    })();
-
-    const lastUpdatedDate = resolvedDate ? formatDraftDate(resolvedDate) : "—";
+    const firstApprovedYear = getFirstApprovedYear(flatDrug.firstApprovedDate);
+    const patentExpiry = getPatentExpiry(flatDrug);
+    const createdByUser = getCreatedByUser(drugToDisplay, currentUserName);
+    const displayCid = getDisplayCid(drugToDisplay, cid);
+    const lastUpdatedDate = getDrugLastModifiedDate(drugToDisplay, cid);
 
     const getSectionData = (key?: string) => {
         if (!key || !drugToDisplay) return null;

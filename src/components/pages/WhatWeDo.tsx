@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { FiDatabase, FiShield, FiGlobe, FiFileText, FiCheckCircle, FiBarChart2, FiUsers, FiChevronRight, FiChevronLeft, FiActivity, FiBox } from 'react-icons/fi';
+import { FiDatabase, FiShield, FiFileText, FiCheckCircle, FiBarChart2, FiUsers, FiChevronRight, FiChevronLeft, FiActivity } from 'react-icons/fi';
 import MoleculeBackground from '../shared/MoleculeBackground';
 import Image1 from "../../../public/assets/Whatwedoimage1.png";
-import Image2 from "../../../public/assets/Whatwedoimage21.jpg";
-import Image3 from "../../../public/assets/Whatwedoimage3.png";
+import Image2 from "../../../public/assets/Whatwedoimage2.png";
 
 const WhatWeDo: React.FC = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
-    const images = [Image1, Image2, Image3];
+    const images = [Image1, Image2];
 
     const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + images.length) % images.length);
     const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % images.length);
@@ -42,50 +41,27 @@ const WhatWeDo: React.FC = () => {
                 description: "Empowering innovation through enriched data, advanced analytics, and expert insights."
             }
         ],
-        // Slide 2 Content (4 items)
+        // Slide 2 Content (Generic drug development pipeline - 4 items)
         [
             {
-                icon: <FiUsers className="w-8 h-8" />,
-                title: "Anticipate Expectations",
-                description: "We help teams anticipate regulatory expectations, reduce CMC risk, and accelerate approvals."
-            },
-            {
-                icon: <FiGlobe className="w-8 h-8" />,
-                title: "Global CMC Intel",
-                description: "Country-specific expectations, comparative requirements, and evolving regulatory trends."
+                icon: <FiActivity className="w-8 h-8" />,
+                title: "API Sourcing",
+                description: "Qualified active ingredient suppliers with comprehensive vendor and impurity history."
             },
             {
                 icon: <FiFileText className="w-8 h-8" />,
-                title: "Module 3 Strategy",
-                description: "Drug Substance & Product CMC strategy, specifications, stability, and comparability."
+                title: "Formulation Development",
+                description: "Matches reference drug release profiles using historical formulation and CMC intelligence."
             },
             {
-                icon: <FiBox className="w-8 h-8" />,
-                title: "Placeholder Box",
-                description: "Data will be added later for this column."
-            }
-        ],
-        // Slide 3 Content (4 items)
-        [
+                icon: <FiBarChart2 className="w-8 h-8" />,
+                title: "Bioequivalence Testing",
+                description: "Flags relevant bioequivalence precedents to confirm absorption matches the original drug."
+            },
             {
                 icon: <FiShield className="w-8 h-8" />,
-                title: "Content Coming Soon",
-                description: "Additional content for this section will be added soon."
-            },
-            {
-                icon: <FiBox className="w-8 h-8" />,
-                title: "Placeholder Box",
-                description: "Data will be added later for this column."
-            },
-            {
-                icon: <FiBox className="w-8 h-8" />,
-                title: "Placeholder Box",
-                description: "Data will be added later for this column."
-            },
-            {
-                icon: <FiBox className="w-8 h-8" />,
-                title: "Placeholder Box",
-                description: "Data will be added later for this column."
+                title: "Regulatory Approval",
+                description: "Streamlines ANDA review, market authorization, and approval history tracking."
             }
         ]
     ];

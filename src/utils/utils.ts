@@ -324,4 +324,105 @@ export const trackDrugSearch = (drugName: string) => {
   } catch (e) {
     console.error(e);
   }
+};
+
+/**
+ * Extracts patent or loss-of-exclusivity expiry date from drug data and formats it.
+ */
+export const getPatentExpiry = (drugData: any): string => {
+  if (!drugData) return "—";
+  const loe = drugData.lossOfExclusivity || drugData.ProductOverview?.lossOfExclusivity;
+  const patents = drugData.drugPatents || drugData.ProductOverview?.drugPatents;
+  let rawDate = "—";
+  if (Array.isArray(loe) && loe.length > 0) {
+    rawDate = loe[0]?.expiredDate || loe[0]?.expiryDate || "—";
+  } else if (Array.isArray(patents) && patents.length > 0) {
+    rawDate = patents[0]?.expiryDate || patents[0]?.expiredDate || "—";
+  }
+  if (rawDate && rawDate !== "—") {
+    const formatted = unixToDate(rawDate);
+    return formatted && formatted !== "No data available" ? formatted : rawDate;
+  }
+  return "—";
+};
+
+/**
+ * Extracts the 4-digit approval year from a drug's firstApprovedDate value.
+ */
+export const getFirstApprovedYear = (dateVal: any): string => {
+  if (!dateVal) return "—";
+  try {
+    const d = new Date(typeof dateVal === 'number' ? (dateVal > 4102444800 ? dateVal : dateVal * 1000) : dateVal);
+    const y = d.getFullYear();
+    return isNaN(y) ? "—" : String(y);
+  } catch {
+    return "—";
+  }
+};
+
+/**
+ * Resolves creator name from drug metadata or fallback user name.
+ */
+export const getCreatedByUser = (drug: any, fallbackName: string = "testadmin"): string => {
+  if (!drug) return fallbackName;
+  return (
+    drug.createdByName ||
+    drug.createdByEmail ||
+    drug.ProductOverview?.createdByName ||
+    drug.ProductOverview?.createdByEmail ||
+    (drug.createdBy && String(drug.createdBy).trim()) ||
+    (fallbackName && fallbackName.trim()) ||
+    "testadmin"
+  );
+};
+
+/**
+ * Resolves a readable CID for a drug record, falling back if given a 24-char ObjectId.
+ */
+export const getDisplayCid = (drug: any, fallbackCid?: string | null): string => {
+  return (
+    drug?.cid ||
+    drug?.ProductOverview?.cid ||
+    (fallbackCid && !/^[0-9a-fA-F]{24}$/.test(fallbackCid) ? fallbackCid : null) ||
+    "D001"
+  );
+};
+
+/**
+ * Resolves and formats the last modified or created date for a drug, falling back to ObjectId timestamp.
+ */
+export const getDrugLastModifiedDate = (drug: any, fallbackId?: string | null): string => {
+  if (!drug && !fallbackId) return "—";
+  const rawUpdatedDate =
+    drug?.updatedAt ||
+    drug?.ProductOverview?.updatedAt ||
+    drug?.createdAt ||
+    drug?.ProductOverview?.createdAt ||
+    drug?.lastModified;
+
+  let resolvedDate = rawUpdatedDate;
+  if (!resolvedDate) {
+    const id = drug?._id || drug?.id || fallbackId;
+    if (id && typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id)) {
+      resolvedDate = parseInt(id.substring(0, 8), 16) * 1000;
+    }
+  }
+  return resolvedDate ? formatDraftDate(resolvedDate) : "—";
+};
+
+/**
+ * Downloads a JavaScript object or array as a formatted JSON file.
+ */
+export const exportAsJson = (data: any, defaultFileName: string = "export"): void => {
+  const fileName = defaultFileName.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const jsonString = JSON.stringify(data, null, 2);
+  const blob = new Blob([jsonString], { type: "application/json;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute("download", `${fileName}_metadata.json`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 };

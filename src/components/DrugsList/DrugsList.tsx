@@ -19,7 +19,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import '../../components/AgGridHeaderStyle/AgGridHeaderStyle.css';
 import '../DrugTable/DrugsTable.css';
 import { ColumnsToolPanelModule, ExcelExportModule, ServerSideRowModelApiModule } from 'ag-grid-enterprise';
-import { FiBookmark, FiDownload, FiChevronDown } from 'react-icons/fi';
+import { FiBookmark, FiDownload, FiChevronDown, FiDatabase } from 'react-icons/fi';
 import Loader from '../Loader';
 import { sampleRawData } from '../../sampleData/data';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
@@ -148,8 +148,14 @@ const DrugsList = () => {
   const activeColumnDefs = effectiveList === 'cmcintel' ? cmcintelColumns : fdaColumns;
 
   return (
-    <div className="bg-page min-h-screen py-8 font-sans">
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-12 pt-4">
+    <div className="min-h-screen bg-page font-sans">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        {/* ── Breadcrumbs ── */}
+        <div className="flex items-center gap-2 text-xs text-body mb-3 select-none">
+          <FiDatabase className="w-3.5 h-3.5" />
+          <span>{effectiveList === 'cmcintel' ? 'cmcintel Library List' : 'FDA Approved List'}</span>
+        </div>
 
         {/* ── Page Header & Top Right Action Buttons ── */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
@@ -218,11 +224,11 @@ const DrugsList = () => {
           </div>
         )}
 
-        {/* ── Table Container ── */}
-        <div className="test-container bg-white rounded-2xl shadow-sm border border-border-main overflow-hidden flex flex-col">
+        {/* ── Table Container Card ── */}
+        <div className="w-full bg-white rounded-2xl shadow-sm border border-border-main overflow-hidden flex flex-col">
           <div
             className="ag-theme-quartz w-full"
-            style={{ height: "calc(100vh - 230px)", minHeight: "450px" }}
+            style={{ height: 'calc(100vh - 240px)', minHeight: '450px' }}
           >
             <AgGridReact
               ref={gridRef}
@@ -242,17 +248,14 @@ const DrugsList = () => {
                 return String(Math.random());
               }}
               onGridReady={onGridReady}
-              sideBar={{
-                toolPanels: ["columns"],
-              }}
               pagination={true}
               paginationPageSize={pageSize}
+              sideBar={{ toolPanels: ['columns'] }}
               loadingOverlayComponent={() => <div><Loader /></div>}
               defaultColDef={{
                 filter: true,
               }}
-              rowSelection="single"
-              headerHeight={56}
+              headerHeight={64}
             />
           </div>
         </div>

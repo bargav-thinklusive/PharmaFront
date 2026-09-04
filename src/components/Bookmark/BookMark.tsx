@@ -137,7 +137,7 @@ const Bookmark: React.FC = () => {
                 loadingOverlayComponent={() => <div><Loader /></div>}
                 defaultColDef={{ filter: true }}
                 rowSelection="single"
-                headerHeight={56}
+                headerHeight={64}
               />
             </div>
           </div>

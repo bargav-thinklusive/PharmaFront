@@ -22,7 +22,13 @@ const isImageObject = (obj: any): boolean => {
     if (typeof obj.imageData === 'string' || typeof obj.url === 'string') return true;
     if (obj.image) {
         if (typeof obj.image === 'string') return true;
-        if (typeof obj.image === 'object' && (obj.image.imageData || obj.image.url)) return true;
+        if (typeof obj.image === 'object') {
+            if (Array.isArray(obj.image) && obj.image.length > 0) {
+                const first = obj.image[0];
+                if (first && typeof first === 'object' && (first.imageData || first.url || first.image || first.src)) return true;
+            }
+            if (obj.image.imageData || obj.image.url) return true;
+        }
     }
     return false;
 };
@@ -38,8 +44,14 @@ const getImgSrc = (item: any): string | null => {
     if (!item || typeof item !== 'object') return null;
 
     let src: any = item.imageData || item.url || item.image || item.src || null;
+    if (Array.isArray(src) && src.length > 0) {
+        src = src[0];
+    }
     if (typeof src === 'object' && src !== null) {
         src = src.imageData || src.url || src.image || src.src || null;
+    }
+    if (Array.isArray(src) && src.length > 0) {
+        src = src[0];
     }
 
     if (typeof src === 'string') {
@@ -47,8 +59,32 @@ const getImgSrc = (item: any): string | null => {
         if (src.startsWith('http://') || src.startsWith('https://')) return src;
         if (src.startsWith('/uploads/')) return `http://localhost:8000${src}`;
         if (src.startsWith('uploads/')) return `http://localhost:8000/${src}`;
+        return src;
     }
-    return typeof src === 'string' ? src : null;
+    return null;
+};
+
+// Helper to extract clean filename or caption from any image structure
+const getImageCaption = (item: any): string => {
+    if (!item) return '';
+    if (typeof item === 'string') {
+        const parts = item.split('/');
+        return parts[parts.length - 1] || '';
+    }
+    if (item.fileName || item.name || item.title) return item.fileName || item.name || item.title;
+    if (item.image) {
+        if (typeof item.image === 'string') {
+            const parts = item.image.split('/');
+            return parts[parts.length - 1] || '';
+        }
+        if (typeof item.image === 'object') {
+            if (Array.isArray(item.image) && item.image.length > 0) {
+                return item.image[0]?.fileName || item.image[0]?.name || item.image[0]?.title || '';
+            }
+            return item.image.fileName || item.image.name || item.image.title || '';
+        }
+    }
+    return '';
 };
 
 /**
@@ -74,7 +110,23 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
         normalizedTitle.includes('image');
 
     if (isImageField || isImageObject(data) || (Array.isArray(data) && data.length > 0 && isImageObject(data[0]))) {
-        const images = Array.isArray(data) ? data : [data];
+        const rawImages = Array.isArray(data) ? data : [data];
+        // Flatten list so nested image arrays also get individual cards
+        const images: any[] = [];
+        rawImages.forEach((item) => {
+            if (item && typeof item === 'object' && Array.isArray(item.image)) {
+                item.image.forEach((subImg: any) => {
+                    images.push({
+                        ...subImg,
+                        fileName: subImg?.fileName || subImg?.name || item?.fileName || item?.name,
+                        title: subImg?.title || item?.title,
+                    });
+                });
+            } else {
+                images.push(item);
+            }
+        });
+
         return (
             <div className="space-y-4">
                 {renderHeader()}
@@ -82,12 +134,13 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
                     {images.map((item, i) => {
                         const imgSource = getImgSrc(item);
                         if (!imgSource) return null;
+                        const caption = getImageCaption(item) || `Image ${i + 1}`;
                         return (
-                            <div key={i} className="border p-2 rounded bg-white shadow-sm overflow-hidden flex flex-col items-center">
+                            <div key={i} className="border p-3 rounded-xl bg-white shadow-xs border-slate-200 overflow-hidden flex flex-col items-center">
                                 <img
                                     src={imgSource}
-                                    alt={item.fileName || item.name || item.title || `Image ${i + 1}`}
-                                    className="max-w-full h-auto max-h-[400px] object-contain cursor-pointer hover:scale-[1.02] transition-transform"
+                                    alt={caption}
+                                    className="max-w-full h-auto max-h-[400px] object-contain cursor-pointer hover:scale-[1.02] transition-transform rounded-lg"
                                     onClick={() => window.open(imgSource, '_blank')}
                                     onError={(e: any) => {
                                         const target = e.target || e.currentTarget;
@@ -99,9 +152,9 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
                                         }
                                     }}
                                 />
-                                {(item.fileName || item.name || item.title) && (
-                                    <p className="mt-2 text-center text-sm font-medium text-gray-600">
-                                        {item.fileName || item.name || item.title}
+                                {caption && (
+                                    <p className="mt-2.5 text-center text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-200/70 px-3 py-1 rounded-md max-w-full truncate" title={caption}>
+                                        {caption}
                                     </p>
                                 )}
                             </div>

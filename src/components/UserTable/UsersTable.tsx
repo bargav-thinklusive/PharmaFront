@@ -251,7 +251,7 @@ const UsersTable: React.FC = () => {
                   onDeleteUser: confirmDeleteUser,
                 }}
                 rowHeight={60}
-                headerHeight={52}
+                headerHeight={64}
               />
             </div>
 

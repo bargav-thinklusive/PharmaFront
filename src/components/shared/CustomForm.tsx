@@ -4,7 +4,8 @@ import { FiTrash2, FiEdit2, FiChevronUp, FiChevronRight, } from "react-icons/fi"
 import type { FieldConfig } from "./index";
 import CustomSelect from "./CustomSelect";
 import { useAppSelector } from "../../store/hooks";
-import { formatKey } from "../../utils/utils";
+import { formatKey, unixToDate } from "../../utils/utils";
+import { formatDateForInput } from "../CompoundForm/helper";
 
 interface CustomFormProps {
     field: FieldConfig;
@@ -149,6 +150,31 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
     const commonClasses =
         "w-full px-3.5 py-2.5 border border-border-main rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm text-main placeholder-[#94A3B8] bg-white transition-shadow";
 
+    const getFileDisplayNames = (val: any): string => {
+        if (!val) return "—";
+        if (typeof val === "string") {
+            const trimmed = val.trim();
+            if (!trimmed) return "—";
+            const parts = trimmed.split('/');
+            return parts[parts.length - 1] || trimmed;
+        }
+        if (Array.isArray(val)) {
+            if (val.length === 0) return "—";
+            const names = val.map((f: any) => {
+                if (typeof f === "string") {
+                    const parts = f.split('/');
+                    return parts[parts.length - 1] || f;
+                }
+                return f?.name || f?.fileName || f?.title || (f?.imageData ? "Image" : null);
+            }).filter(Boolean);
+            return names.length > 0 ? names.join(", ") : "—";
+        }
+        if (typeof val === "object") {
+            return val.name || val.fileName || val.title || (val.imageData ? "Image" : "—");
+        }
+        return "—";
+    };
+
     const renderInput = (dynamicField: any, value: any, onChange: (v: any) => void) => {
         switch (dynamicField.type) {
             case "text":
@@ -177,7 +203,7 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                 return (
                     <input
                         type={dynamicField.includeTime ? "datetime-local" : "date"}
-                        value={value || ""}
+                        value={formatDateForInput(value) || ""}
                         onChange={(e) => onChange(e.target.value)}
                         className={commonClasses}
                     />
@@ -209,20 +235,31 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                     />
                 );
 
-            case "file":
+            case "file": {
+                const existingNames = getFileDisplayNames(value);
+                const hasExisting = existingNames && existingNames !== "—";
                 return (
-                    <input
-                        type="file"
-                        accept="image/*,.pdf,.doc,.docx"
-                        multiple
-                        onChange={(e) => {
-                            const files = e.target.files;
-                            if (!files) return;
-                            onChange(Array.from(files));
-                        }}
-                        className={commonClasses}
-                    />
+                    <div className="space-y-1.5 w-full">
+                        <input
+                            type="file"
+                            accept="image/*,.pdf,.doc,.docx"
+                            multiple
+                            onChange={(e) => {
+                                const files = e.target.files;
+                                if (!files || files.length === 0) return;
+                                onChange(Array.from(files));
+                            }}
+                            className={commonClasses}
+                        />
+                        {hasExisting && (
+                            <div className="text-xs text-slate-500 flex items-center gap-1.5 px-1">
+                                <span className="font-semibold text-slate-700">Attached File:</span>
+                                <span className="text-[#0e8a67] font-medium truncate">{existingNames}</span>
+                            </div>
+                        )}
+                    </div>
                 );
+            }
 
             default:
                 return (
@@ -237,13 +274,40 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
         }
     };
 
+    const isDateField = (dynamicField: any, val: any): boolean => {
+        if (dynamicField?.type === "datepicker") return true;
+        const k = (dynamicField?.key || "").toLowerCase();
+        if (k.includes("date") || k.includes("expiry")) return true;
+        if (typeof val === 'number' && val > 100000000 && val < 4102444800) return true;
+        if (typeof val === 'string' && /^\d{10}$/.test(val.trim())) return true;
+        return false;
+    };
+
+    const formatDateForDisplay = (val: any): string => {
+        if (val === null || val === undefined || val === "" || val === "—") return "—";
+        if (typeof val === 'string') {
+            const trimmed = val.trim();
+            if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+                const [y, m, d] = trimmed.split('-');
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const monthName = months[parseInt(m, 10) - 1] || m;
+                return `${monthName}-${d}-${y}`;
+            }
+        }
+        const formatted = unixToDate(val);
+        if (!formatted || formatted === "No data available" || formatted === "N/A" || formatted === "null" || formatted === "undefined") {
+            return "—";
+        }
+        return formatted;
+    };
+
     // Render a table cell value (display-only)
     const renderCellValue = (dynamicField: any, value: any) => {
         if (dynamicField.type === "file") {
-            if (Array.isArray(value) && value.length > 0) {
-                return value.map((f: any) => f.name).join(", ");
-            }
-            return "—";
+            return getFileDisplayNames(value);
+        }
+        if (isDateField(dynamicField, value)) {
+            return formatDateForDisplay(value);
         }
         return value || "—";
     };
@@ -344,12 +408,12 @@ const CustomForm: React.FC<CustomFormProps> = ({ field, form }) => {
                                 {dynamicFields?.map((df, dfIdx) => (
                                     <th
                                         key={`${df.key}-${dfIdx}`}
-                                        className="px-4 py-3 text-left text-xs font-bold text-main uppercase tracking-wider whitespace-nowrap"
+                                        className="px-4 py-4 text-left text-xs font-bold text-main uppercase tracking-wider whitespace-nowrap"
                                     >
                                         {isSingleField ? displayMainKey : df.label}
                                     </th>
                                 ))}
-                                <th className="px-4 py-3 text-center text-xs font-bold text-main uppercase tracking-wider w-24">
+                                <th className="px-4 py-4 text-center text-xs font-bold text-main uppercase tracking-wider w-24">
                                     Actions
                                 </th>
                             </tr>

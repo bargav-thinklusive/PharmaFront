@@ -16,7 +16,7 @@
   --ag-input-focus-border-color: #0E8A67;
 
   /* Sizing */
-  --ag-header-height: 56px;
+  --ag-header-height: 64px;
   --ag-row-height: 48px;
   --ag-cell-horizontal-padding: 16px;
   --ag-header-cell-horizontal-padding: 16px;
@@ -33,15 +33,20 @@
 .ag-theme-quartz .ag-header {
   border-bottom: 1px solid #E2E8F0 !important;
   background-color: #F8FAFC !important;
+  min-height: 64px !important;
 }
 
 .ag-theme-quartz .ag-header-row {
   background-color: #F8FAFC !important;
+  height: 64px !important;
+  min-height: 64px !important;
 }
 
 /* Light column separators in header */
 .ag-theme-quartz .ag-header-cell {
   border-right: 1px solid #E2E8F0 !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
 .ag-theme-quartz .ag-header-cell:last-child {

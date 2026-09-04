@@ -19,6 +19,7 @@ import { CompoundFormActions } from "./CompoundFormActions";
 import { ConfirmModal } from "../shared/ConfirmModal";
 import { FiSave, FiSend } from "react-icons/fi";
 import { therapeuticAreasData } from "../../data/therapeuticAreasData";
+import { findExistingDraft } from "../../utils/utils";
 
 const drugService = new DrugService();
 
@@ -270,7 +271,13 @@ const CompoundForm = () => {
                 await postData(drugService.createDrug(), formattedData);
             }
 
-            if (draftId) await clearDraft(draftId);
+            const matchingDraft = (draftId && drafts.find((d: any) => d.id === draftId)) ||
+                                  findExistingDraft(drafts, formDataRef.current);
+            if (matchingDraft?.id) {
+                await clearDraft(matchingDraft.id);
+            } else if (draftId) {
+                await clearDraft(draftId);
+            }
             dispatch(setSelectedList('cmcintel'));
             if (refetchDrugs) await refetchDrugs();
             if (refetchDrafts) await refetchDrafts();
@@ -582,6 +589,7 @@ const CompoundForm = () => {
                             currentStep={currentStep}
                             isLastStep={isLastStep}
                             isSavingDraft={isSavingDraft}
+                            isEdit={Boolean(drugId || formDataRef.current._id || formDataRef.current.id || formDataRef.current.original_id)}
                             handleBack={handleBack}
                             handleSaveDraftClick={handleSaveDraftClick}
                             handleNext={handleNext}
