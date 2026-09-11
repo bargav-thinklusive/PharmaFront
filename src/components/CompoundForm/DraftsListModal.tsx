@@ -1,9 +1,9 @@
-import React from "react";
+import { useState, useEffect, type MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import useDraft from "../../hooks/useDraft";
+import { fetchDrafts } from "../../store/slices/draftsSlice";
 import { FiFileText, FiTrash2, FiX, FiPlus } from "react-icons/fi";
-
 import { formatDraftDate, getDraftTime } from "../../utils/utils";
 import { ConfirmModal } from "../shared/ConfirmModal";
 
@@ -12,11 +12,18 @@ interface DraftsListModalProps {
     onClose: () => void;
 }
 
-export const DraftsListModal: React.FC<DraftsListModalProps> = ({ isOpen, onClose }) => {
+export const DraftsListModal = ({ isOpen, onClose }: DraftsListModalProps) => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     const drafts = useAppSelector((state) => state.drafts.drafts);
     const { clearDraft } = useDraft();
-    const [deletingDraftId, setDeletingDraftId] = React.useState<string | null>(null);
+    const [deletingDraftId, setDeletingDraftId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (isOpen) {
+            dispatch(fetchDrafts());
+        }
+    }, [isOpen, dispatch]);
 
     if (!isOpen) return null;
 
@@ -25,8 +32,8 @@ export const DraftsListModal: React.FC<DraftsListModalProps> = ({ isOpen, onClos
         navigate(`/drug-form?draftId=${draftId}`);
     };
 
-    const handleRemoveDraftClick = (e: React.MouseEvent, draftId: string) => {
-        e.stopPropagation(); // Prevent opening the draft when clicking delete
+    const handleRemoveDraftClick = (e: MouseEvent, draftId: string) => {
+        e.stopPropagation();
         setDeletingDraftId(draftId);
     };
 
@@ -42,13 +49,32 @@ export const DraftsListModal: React.FC<DraftsListModalProps> = ({ isOpen, onClos
         navigate("/drug-form");
     };
 
-    // Sort drafts by last modified date (newest first)
-    const sortedDrafts = [...drafts].sort((a: any, b: any) => getDraftTime(b) - getDraftTime(a));
+    const seenDrugs = new Set<string>();
+    const sortedDrafts = [...drafts]
+        .sort((a: any, b: any) => getDraftTime(b) - getDraftTime(a))
+        .filter((draft: any) => {
+            if (!draft) return false;
+            const fData = draft.formData || {};
+            const key = (
+                fData._id ||
+                fData.id ||
+                fData.original_id ||
+                fData.cid ||
+                fData.ProductOverview?.cid ||
+                draft.drugName ||
+                fData.drugName ||
+                fData.ProductOverview?.drugName ||
+                draft.id
+            ).toString().trim().toLowerCase();
+
+            if (seenDrugs.has(key)) return false;
+            seenDrugs.add(key);
+            return true;
+        });
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-xs transition-opacity duration-300">
             <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
-                {/* Header */}
                 <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                         <div className="w-9 h-9 rounded-lg bg-primary-light text-primary flex items-center justify-center">
@@ -71,7 +97,6 @@ export const DraftsListModal: React.FC<DraftsListModalProps> = ({ isOpen, onClos
                     </button>
                 </div>
 
-                {/* Drafts List */}
                 <div className="flex-1 max-h-[380px] overflow-y-auto px-6 py-4">
                     {sortedDrafts.length === 0 ? (
                         <div className="text-center py-10 flex flex-col items-center">
@@ -103,7 +128,6 @@ export const DraftsListModal: React.FC<DraftsListModalProps> = ({ isOpen, onClos
                                         </div>
                                     </div>
 
-                                     {/* Action Buttons */}
                                     <button
                                         onClick={(e) => handleRemoveDraftClick(e, draft.id)}
                                         title="Delete draft"
@@ -117,7 +141,6 @@ export const DraftsListModal: React.FC<DraftsListModalProps> = ({ isOpen, onClos
                     )}
                 </div>
 
-                {/* Footer */}
                 <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
                     <button
                         onClick={onClose}

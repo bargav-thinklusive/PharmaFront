@@ -8,7 +8,7 @@ import TagsInput from "./TagSelector";
 import { FiInfo, FiChevronDown, FiChevronRight, FiChevronUp } from "react-icons/fi";
 import ToggleSwitch from "./Switch";
 import CustomSelect from "./CustomSelect";
-import { formatDateForInput } from "../CompoundForm/helper";
+import { formatDateForInput, isValueFilled, getBadgeStyle } from "../../utils/formUtils";
 
 // ─── Shared input class strings ───────────────────────────────────────────────
 const baseInput =
@@ -177,6 +177,7 @@ interface DynamicFormBuilderProps {
     notFoundContent?: { [key: string]: React.ReactNode };
     onChange?: (changedValues: any, allValues: any) => void;
 }
+
 
 // ─── DynamicFormBuilder ───────────────────────────────────────────────────────
 const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
@@ -577,46 +578,29 @@ const DynamicFormBuilder: React.FC<DynamicFormBuilderProps> = ({
                 let filledCount = 0;
                 groupFields.forEach(f => {
                     const val = form.getFieldValue ? form.getFieldValue(f.key) : form[f.key];
-                    if (f.type === "dynamic") {
-                        if (Array.isArray(val) && val.length > 0) filledCount++;
-                    } else if (Array.isArray(val)) {
-                        if (val.length > 0) filledCount++;
-                    } else if (val !== undefined && val !== null && String(val).trim() !== "") {
+                    if (isValueFilled(f, val)) {
                         filledCount++;
                     }
                 });
 
-                let headerBg = "bg-slate-50/80 border-slate-200 text-slate-800";
-                let badgeStyle = "bg-slate-100 text-slate-600 border border-slate-200";
-
-                if (totalCount > 0) {
-                    if (filledCount === totalCount) {
-                        headerBg = "bg-[#0e8a67]/10 border-[#0e8a67]/40 text-[#0e8a67]";
-                        badgeStyle = "bg-[#0e8a67] text-white";
-                    } else if (filledCount > 0) {
-                        headerBg = "bg-amber-50 border-amber-300 text-amber-900";
-                        badgeStyle = "bg-amber-500 text-white";
-                    }
-                }
+                const style = getBadgeStyle(filledCount, totalCount);
 
                 return (
                     <div
                         key={header.key || groupIdx}
-                        className={`border rounded-2xl bg-white shadow-xs overflow-hidden transition-all ${
-                            filledCount === totalCount && totalCount > 0 ? "border-[#0e8a67]/40" : filledCount > 0 ? "border-amber-300" : "border-slate-200"
-                        }`}
+                        className={`border rounded-2xl bg-white shadow-xs overflow-hidden transition-all ${style.borderClass}`}
                     >
                         {/* Accordion trigger header */}
                         <div
                             onClick={() => toggleHeader(header.key)}
-                            className={`px-6 py-4 flex items-center justify-between cursor-pointer transition-colors ${headerBg}`}
+                            className={`px-6 py-4 flex items-center justify-between cursor-pointer transition-colors ${style.headerBg}`}
                         >
                             <div className="flex items-center gap-3.5">
                                 <span className="text-sm font-bold font-display">
                                     {header.label}
                                 </span>
                                 {totalCount > 0 && (
-                                    <span className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full shadow-2xs ${badgeStyle}`}>
+                                    <span className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full shadow-2xs ${style.badgeClass}`}>
                                         {filledCount}/{totalCount}
                                     </span>
                                 )}

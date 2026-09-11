@@ -3,22 +3,19 @@ import DraftService from "../services/DraftService";
 import axiosInstance from "../services/shared/AxiosService";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchDrafts } from "../store/slices/draftsSlice";
+import { findExistingDraft } from "../utils/utils";
 
 const draftService = new DraftService();
 
 export interface DraftState {
-    id: string;          // Unique identifier for the draft
-    lastModified: number; // Timestamp
+    id: string;
+    lastModified: number;
     formData: any;
     currentStep: number;
-    userId?: string;   // embedded so we can find the draft even without a token
-    drugName?: string; // human-readable label shown in the header/home banner
+    userId?: string;
+    drugName?: string;
 }
 
-/**
- * Fallback standalone helper (for backwards compatibility/typing).
- * Active code should retrieve drafts from Redux store instead.
- */
 export function getAllDrafts(): DraftState[] {
     return [];
 }
@@ -31,7 +28,6 @@ const useDraft = () => {
         await dispatch(fetchDrafts());
     }, [dispatch]);
 
-    /** Persist current form state to secure backend database */
     const saveDraft = useCallback(async (formData: any, currentStep: number, existingDraftId?: string | null): Promise<string> => {
         const extractedDrugName = (
             formData?.drugName ||
@@ -46,7 +42,16 @@ const useDraft = () => {
             throw new Error("Cannot save draft without a Drug Name.");
         }
 
-        const draftId = existingDraftId || Date.now().toString(36) + Math.random().toString(36).substring(2);
+        let draftId = existingDraftId;
+        if (!draftId) {
+            const existing = findExistingDraft(drafts, formData);
+            if (existing && existing.id) {
+                draftId = existing.id;
+            }
+        }
+        if (!draftId) {
+            draftId = Date.now().toString(36) + Math.random().toString(36).substring(2);
+        }
         
         const payload = {
             id: draftId,
@@ -66,11 +71,8 @@ const useDraft = () => {
             throw e;
         }
         return draftId;
-    }, [refetchDrafts]);
+    }, [drafts, refetchDrafts]);
 
-    /**
-     * Load a previously saved draft by its specific ID from UserContext.
-     */
     const loadDraft = useCallback((draftId: string | null): DraftState | null => {
         if (!draftId) return null;
         try {
@@ -82,9 +84,6 @@ const useDraft = () => {
         }
     }, [drafts]);
 
-    /**
-     * Remove a specific draft after a successful final submission or manual delete
-     */
     const clearDraft = useCallback(async (draftId: string | null) => {
         if (!draftId) return;
         try {

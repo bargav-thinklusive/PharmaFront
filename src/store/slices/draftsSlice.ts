@@ -17,24 +17,15 @@ const initialState: DraftsState = {
   error: null,
 };
 
-export const fetchDrafts = createAsyncThunk(
+export const fetchDrafts = createAsyncThunk<any[], void | undefined>(
   'drafts/fetchDrafts',
-  async (_force: boolean | void, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(draftService.getDrafts());
       const data = response.data;
       return Array.isArray(data) ? data : (data?.data || []);
     } catch (err: any) {
       return rejectWithValue(err.response?.data || 'Failed to fetch drafts');
-    }
-  },
-  {
-    condition: (force, { getState }) => {
-      if (force === true) return true;
-      const state = getState() as { drafts: DraftsState };
-      if (state.drafts.draftsLoading || (state.drafts.drafts && state.drafts.drafts.length > 0)) {
-        return false;
-      }
     }
   }
 );
