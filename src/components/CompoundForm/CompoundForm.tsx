@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import DynamicFormBuilder from "../shared";
 import { addExecutiveSummary, addProductOverview, addPhysicalChemicalProperties, addDrugSubstance, addDrugProductInformation, addAppendices, addRegulatoryInsights, addLabelingInformation, addGenericEntrants, addBaBeStudies, addSources, addGlossary } from "./columns";
 import { formatCreatedDrug, flattenDrug } from "./helper";
+import { isValueFilled, getBadgeStyle } from "../../utils/formUtils";
 import usePost from "../../hooks/usePost";
 import usePut from "../../hooks/usePut";
 import DrugService from "../../services/DrugService";
@@ -17,9 +18,9 @@ import { CompoundFormHeader } from "./CompoundFormHeader";
 import { CompoundFormSidebar } from "./CompoundFormSidebar";
 import { CompoundFormActions } from "./CompoundFormActions";
 import { ConfirmModal } from "../shared/ConfirmModal";
-import { FiSave, FiSend } from "react-icons/fi";
+import { FiSave, FiSend, FiChevronLeft, FiX } from "react-icons/fi";
 import { therapeuticAreasData } from "../../data/therapeuticAreasData";
-import { findExistingDraft } from "../../utils/utils";
+
 
 const drugService = new DrugService();
 
@@ -64,6 +65,7 @@ const CompoundForm = () => {
     const [isSavingDraft, setIsSavingDraft] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [showSaveDraftConfirm, setShowSaveDraftConfirm] = useState(false);
+    const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
     const [loadedDraftId, setLoadedDraftId] = useState<string | null>(null);
 
@@ -209,6 +211,20 @@ const CompoundForm = () => {
         }
     };
 
+    
+    const handleCancelClick = () => {
+        setShowCancelConfirm(true);
+    };
+
+    const executeCancel = () => {
+        setShowCancelConfirm(false);
+        if (window.history.length > 1) {
+            navigate(-1);
+        } else {
+            navigate("/drugsList/cmcintel");
+        }
+    };
+
     const handleSaveDraftClick = () => {
         if (!validateRequiredFieldsForDraft()) {
             toast.error("Please fill in the required fields (Drug Name & API Name) before saving a draft.", { autoClose: 5000 });
@@ -252,32 +268,38 @@ const CompoundForm = () => {
         try {
             const formattedData = await formatCreatedDrug(formDataRef.current);
             
-            const originalId = formDataRef.current._id || formDataRef.current.original_id || formDataRef.current.id;
-            const originalVersion = formDataRef.current.originalVersion;
-            const currentVersion = formattedData.ProductOverview?.version || formDataRef.current.version;
+            const targetName = (formDataRef.current.drugName || formDataRef.current.ProductOverview?.drugName || "").trim().toLowerCase();
+            const targetCid = formDataRef.current.cid || formDataRef.current.ProductOverview?.cid || searchParams.get("cid");
+            const rawOriginalId = formDataRef.current._id || formDataRef.current.original_id || formDataRef.current.id || drugId;
+            
+            let isUpdate = Boolean(rawOriginalId);
+            let updateTargetId = rawOriginalId;
 
-            // Scenario 1: If version is NOT updated/changed, overwrite existing drug (PUT).
-            // Scenario 2: If version IS updated/changed, save as a new drug record (POST).
-            let isUpdate = false;
-            if (originalId) {
-                if (!originalVersion || String(currentVersion).trim() === String(originalVersion).trim()) {
-                    isUpdate = true;
-                }
-            }
-
-            if (isUpdate && originalId) {
-                await putData(drugService.updateDrug(originalId), formattedData);
+            if (isUpdate && updateTargetId) {
+                await putData(drugService.updateDrug(updateTargetId), formattedData);
             } else {
                 await postData(drugService.createDrug(), formattedData);
             }
 
-            const matchingDraft = (draftId && drafts.find((d: any) => d.id === draftId)) ||
-                                  findExistingDraft(drafts, formDataRef.current);
-            if (matchingDraft?.id) {
-                await clearDraft(matchingDraft.id);
-            } else if (draftId) {
+            // Remove all matching drafts for this drug
+            const allMatchingDrafts = drafts.filter((d: any) => {
+                if (!d) return false;
+                if (draftId && d.id === draftId) return true;
+                const fd = d.formData || {};
+                if (updateTargetId && (String(fd._id) === String(updateTargetId) || String(fd.id) === String(updateTargetId) || String(fd.original_id) === String(updateTargetId))) return true;
+                if (targetCid && (String(fd.cid) === String(targetCid) || String(fd.ProductOverview?.cid) === String(targetCid))) return true;
+                const dName = (d.drugName || fd.drugName || fd.ProductOverview?.drugName || "").trim().toLowerCase();
+                if (targetName && dName === targetName) return true;
+                return false;
+            });
+
+            for (const d of allMatchingDrafts) {
+                await clearDraft(d.id);
+            }
+            if (draftId && !allMatchingDrafts.some(d => d.id === draftId)) {
                 await clearDraft(draftId);
             }
+
             dispatch(setSelectedList('cmcintel'));
             if (refetchDrugs) await refetchDrugs();
             if (refetchDrafts) await refetchDrafts();
@@ -367,38 +389,25 @@ const CompoundForm = () => {
         })),
     };
 
+        
     const getStepStatus = (stepIndex: number) => {
         const stepFields = steps[stepIndex].fields.filter(f => f.type !== "header");
         if (stepFields.length === 0) return "Not Started";
 
         let filledCount = 0;
         let totalCount = 0;
-        let requiredCount = 0;
-        let filledRequiredCount = 0;
 
         stepFields.forEach(f => {
             const val = formData[f.key];
             totalCount++;
-            let isFilled = false;
-            if (f.type === "dynamic" || Array.isArray(val)) {
-                if (Array.isArray(val) && val.length > 0) isFilled = true;
-            } else {
-                if (val !== undefined && val !== null && String(val).trim() !== "") isFilled = true;
-            }
-
-            if (isFilled) filledCount++;
-            if (f.required) {
-                requiredCount++;
-                if (isFilled) filledRequiredCount++;
+            if (isValueFilled(f, val)) {
+                filledCount++;
             }
         });
 
         if (filledCount === 0) return "Not Started";
-        if (requiredCount > 0) {
-            if (filledRequiredCount === requiredCount) return "Completed";
-            return "In Progress";
-        }
-        return "Completed";
+        if (filledCount === totalCount) return "Completed";
+        return "In Progress";
     };
 
     const getSubsectionStats = (stepIndex: number) => {
@@ -461,17 +470,29 @@ const CompoundForm = () => {
         return { complete, inProgress, notStarted, hasSubsections: hasHeaders || fields.some(f => f.type === "dynamic") };
     };
 
+        let totalAllFieldsCount = 0;
+    let totalAllFilledCount = 0;
+    steps.forEach((step) => {
+        const stepFields = step.fields.filter(f => f.type !== "header");
+        stepFields.forEach(f => {
+            totalAllFieldsCount++;
+            const val = formData[f.key];
+            if (isValueFilled(f, val)) {
+                totalAllFilledCount++;
+            }
+        });
+    });
+
     const completedStepsCount = steps.filter((_, idx) => getStepStatus(idx) === "Completed").length;
-    const overallProgressPct = steps.length > 0 ? Math.round((completedStepsCount / steps.length) * 100) : 0;
+    const overallProgressPct = totalAllFieldsCount > 0 ? Math.round((totalAllFilledCount / totalAllFieldsCount) * 100) : 0;
     const isLastStep = currentStep === steps.length - 1;
 
     // Field completion stats helper
-    const currentFields = steps[currentStep].fields.filter(f => f.type !== "header" && f.type !== "dynamic");
+    const currentFields = steps[currentStep].fields.filter(f => f.type !== "header");
     const totalFieldsCount = currentFields.length;
     const completedFieldsCount = currentFields.filter(f => {
         const val = formData[f.key];
-        if (Array.isArray(val)) return val.length > 0;
-        return val !== undefined && val !== null && String(val).trim() !== "";
+        return isValueFilled(f, val);
     }).length;
 
     const drugCreator = formData.createdByName || 
@@ -494,6 +515,18 @@ const CompoundForm = () => {
         <div className="flex flex-col min-h-[calc(100vh-64px)] bg-[#f8fafc] font-sans p-6 sm:p-8">
             <div className="max-w-7xl mx-auto w-full flex flex-col gap-6">
                 {/* ── Full-Width Top Header Card ── */}
+                {/* ─── Breadcrumb / Top Cancel Button (matching View Drug Back button) ─── */}
+                <div className="flex justify-start">
+                    <button
+                        type="button"
+                        onClick={handleCancelClick}
+                        className="inline-flex items-center gap-2 px-4 py-2 border border-slate-200 bg-white text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors shadow-xs cursor-pointer"
+                    >
+                        <FiChevronLeft className="w-4 h-4 text-slate-500" />
+                        Cancel
+                    </button>
+                </div>
+
                 <CompoundFormHeader
                     drugName={formData.drugName || formData.ProductOverview?.drugName}
                     drugId={formData.drugId || formData._id}
@@ -552,38 +585,43 @@ const CompoundForm = () => {
                             </div>
                         </div>
 
-                        {steps[currentStep].fields.some((f) => f.type === "header" || f.type === "dynamic") ? (
+                                                {steps[currentStep].fields.some((f) => f.type === "header" || f.type === "dynamic") ? (
                             <DynamicFormBuilder
                                 fields={steps[currentStep].fields}
                                 form={formWithErrors}
                                 dynamicOptions={dynamicOptions}
                                 columns={1}
                             />
-                        ) : (
-                            <div className="bg-white rounded-2xl shadow-sm border border-border-main overflow-hidden">
-                                {/* Card header */}
-                                <div className="px-6 sm:px-8 py-5 border-b border-border-main flex items-center justify-between bg-alt/10">
-                                    <div>
-                                        <h2 className="text-lg font-bold text-main font-display">
-                                            {steps[currentStep].title}
-                                        </h2>
+                        ) : (() => {
+                            const style = getBadgeStyle(completedFieldsCount, totalFieldsCount);
+                            return (
+                                <div className={`bg-white rounded-2xl shadow-sm border overflow-hidden transition-all ${style.borderClass}`}>
+                                    {/* Card header */}
+                                    <div className={`px-6 sm:px-8 py-4 border-b flex items-center justify-between transition-colors ${style.headerCardBg}`}>
+                                        <div className="flex items-center gap-3">
+                                            <h2 className="text-base font-bold font-display">
+                                                {steps[currentStep].title}
+                                            </h2>
+                                        </div>
+                                        {totalFieldsCount > 0 && (
+                                            <span className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full shadow-2xs ${style.badgeClass}`}>
+                                                {completedFieldsCount}/{totalFieldsCount}
+                                            </span>
+                                        )}
                                     </div>
-                                    <div className="text-xs font-semibold text-body bg-alt px-3 py-1.5 rounded-full border border-border-main shadow-xs">
-                                        {completedFieldsCount} of {totalFieldsCount} fields completed
-                                    </div>
-                                </div>
 
-                                {/* Form fields */}
-                                <div className="p-6 sm:p-8">
-                                    <DynamicFormBuilder
-                                        fields={steps[currentStep].fields}
-                                        form={formWithErrors}
-                                        dynamicOptions={dynamicOptions}
-                                        columns={1}
-                                    />
+                                    {/* Form fields */}
+                                    <div className="p-6 sm:p-8">
+                                        <DynamicFormBuilder
+                                            fields={steps[currentStep].fields}
+                                            form={formWithErrors}
+                                            dynamicOptions={dynamicOptions}
+                                            columns={1}
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            );
+                        })()}
                         {/* Bottom Actions Bar */}
                         <CompoundFormActions
                             currentStep={currentStep}
@@ -599,7 +637,7 @@ const CompoundForm = () => {
                 </div>
             </div>
 
-            {/* ── Confirmation Modal ── */}
+                        {/* ─── Confirmation Modal ─── */}
             <ConfirmModal
                 isOpen={showConfirm}
                 onClose={() => setShowConfirm(false)}
@@ -615,7 +653,7 @@ const CompoundForm = () => {
                 confirmButtonColor="bg-primary hover:bg-primary-hover"
             />
 
-            {/* ── Save Draft Confirmation Modal ── */}
+            {/* ─── Save Draft Confirmation Modal ─── */}
             <ConfirmModal
                 isOpen={showSaveDraftConfirm}
                 onClose={() => setShowSaveDraftConfirm(false)}
@@ -629,6 +667,20 @@ const CompoundForm = () => {
                 icon={<FiSave className="w-6 h-6 text-amber-500" />}
                 iconBgColor="bg-amber-50 border-amber-200"
                 confirmButtonColor="bg-amber-500 hover:bg-amber-600"
+            />
+
+            {/* ─── Cancel Confirmation Modal ─── */}
+            <ConfirmModal
+                isOpen={showCancelConfirm}
+                onClose={() => setShowCancelConfirm(false)}
+                onConfirm={executeCancel}
+                title="Cancel Editing"
+                description="Are you sure you want to cancel? Any unsaved modifications will be discarded."
+                confirmText="Yes, Cancel"
+                cancelText="Continue Editing"
+                icon={<FiX className="w-6 h-6 text-red-500" />}
+                iconBgColor="bg-red-50 border-red-200"
+                confirmButtonColor="bg-red-600 hover:bg-red-700"
             />
         </div>
     );

@@ -1,94 +1,12 @@
 import { convertDatesToUnix, fileToBase64 } from "../../utils/utils";
+import {
+    formatDateForInput,
+    extractSources,
+    extractGlossary,
+    extractAppendices,
+} from "../../utils/formUtils";
 
-export const formatDateForInput = (val: any): string => {
-    if (!val || val === "No data available" || val === "N/A") return "";
-    let dateObj: Date | null = null;
-    if (typeof val === 'number') {
-        dateObj = val > 4102444800 ? new Date(val) : new Date(val * 1000);
-    } else if (typeof val === 'string') {
-        let str = val.trim();
-        if (!str || str === "No data available" || str === "N/A") return "";
-        if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str; // Already YYYY-MM-DD
-        if (/^\d{4}$/.test(str)) return `${str}-01-01`; // Year only -> YYYY-01-01
-
-        const dmyMatch = str.match(/^(\d{1,2})[/\-](\d{1,2})[/\-](\d{4})$/);
-        if (dmyMatch) {
-            const p1 = parseInt(dmyMatch[1], 10);
-            const p2 = parseInt(dmyMatch[2], 10);
-            const yr = parseInt(dmyMatch[3], 10);
-            if (p1 > 12) {
-                const month = String(p2).padStart(2, '0');
-                const day = String(p1).padStart(2, '0');
-                return `${yr}-${month}-${day}`;
-            }
-        }
-
-        if (/^\d+$/.test(str)) {
-            const num = parseInt(str, 10);
-            dateObj = num > 4102444800 ? new Date(num) : new Date(num * 1000);
-        } else {
-            dateObj = new Date(str);
-        }
-    } else if (val instanceof Date) {
-        dateObj = val;
-    }
-
-    if (dateObj && !isNaN(dateObj.getTime())) {
-        const year = dateObj.getFullYear();
-        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-        const day = String(dateObj.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-    return String(val);
-};
-
-const extractSources = (srcData: any) => {
-    const raw = srcData?.sources ?? srcData;
-    if (Array.isArray(raw)) {
-        return raw.map((item: any) => typeof item === 'string' ? { source: item } : item);
-    }
-    if (typeof raw === 'string' && raw.trim()) {
-        return raw.split('\n').filter(s => s.trim()).map(s => ({ source: s.trim() }));
-    }
-    if (typeof raw === 'object' && raw !== null) {
-        return [raw];
-    }
-    return [];
-};
-
-const extractGlossary = (glossaryData: any) => {
-    const raw = glossaryData?.glossary ?? glossaryData;
-    if (Array.isArray(raw)) {
-        return raw.map((item: any) => typeof item === 'string' ? { term: 'Term', definition: item } : item);
-    }
-    if (typeof raw === 'string' && raw.trim()) {
-        return raw.split('\n').filter(s => s.trim()).map(s => {
-            const parts = s.split(':');
-            if (parts.length > 1) {
-                return { term: parts[0].trim(), definition: parts.slice(1).join(':').trim() };
-            }
-            return { term: 'Term', definition: s.trim() };
-        });
-    }
-    if (typeof raw === 'object' && raw !== null) {
-        return Object.entries(raw).map(([t, d]) => ({ term: t, definition: String(d) }));
-    }
-    return [];
-};
-
-const extractAppendices = (appData: any) => {
-    const raw = appData?.appendices ?? appData;
-    if (Array.isArray(raw)) {
-        return raw.map((item: any) => typeof item === 'string' ? { appendix: item } : item);
-    }
-    if (typeof raw === 'string' && raw.trim()) {
-        return [{ appendix: raw.trim() }];
-    }
-    if (typeof raw === 'object' && raw !== null) {
-        return [raw];
-    }
-    return [];
-};
+export { formatDateForInput, extractSources, extractGlossary, extractAppendices };
 
 /**
  * Flattens a stored drug record (nested sections) into

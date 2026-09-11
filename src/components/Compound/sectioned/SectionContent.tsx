@@ -284,20 +284,121 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
     }
 
     if (normalizedTitle.includes('glossary')) {
-        let items: any[] = [];
-        if (Array.isArray(data)) {
-            items = data;
-        } else if (typeof data === 'string' && data.trim()) {
-            items = data.split('\n').filter(s => s.trim()).map(s => {
-                const parts = s.split(':');
-                if (parts.length > 1) {
-                    return { term: parts[0].trim(), definition: parts.slice(1).join(':').trim() };
+        let items: { term: string; definition: string }[] = [];
+
+        const isGenericLabel = (str: string) => {
+            const s = String(str || '').trim().toLowerCase();
+            return !s || s === 'term' || s === 'item' || s === 'key' || s === 'name' || s.startsWith('term ') || s.startsWith('item ');
+        };
+
+        const parseSingleString = (s: string): { term: string; definition: string } | null => {
+            if (!s || !s.trim()) return null;
+            const str = s.trim();
+            const parenMatch = str.match(/^([^(]+)\(([^)]+)\)$/);
+            if (parenMatch && parenMatch[1].trim() && parenMatch[2].trim()) {
+                return { term: parenMatch[1].trim(), definition: parenMatch[2].trim() };
+            }
+            if (str.includes(':')) {
+                const idx = str.indexOf(':');
+                const t = str.slice(0, idx).trim();
+                const d = str.slice(idx + 1).trim();
+                if (t && d && !isGenericLabel(t)) {
+                    return { term: t, definition: d };
                 }
-                return { term: `Term`, definition: s.trim() };
-            });
+            }
+            if (str.includes(' - ')) {
+                const idx = str.indexOf(' - ');
+                const t = str.slice(0, idx).trim();
+                const d = str.slice(idx + 3).trim();
+                if (t && d && !isGenericLabel(t)) {
+                    return { term: t, definition: d };
+                }
+            }
+            return null;
+        };
+
+        let rawUnits: { term: string; definition: string }[] = [];
+        if (Array.isArray(data)) {
+            for (const item of data) {
+                if (typeof item === 'object' && item !== null) {
+                    const rawTerm = item.term ?? item.Term ?? item.key ?? item.Key ?? item.name ?? item.Name ?? '';
+                    const rawDef = item.definition ?? item.Definition ?? item.value ?? item.Value ?? item.desc ?? item.description ?? '';
+                    
+                    if (rawTerm && rawDef && !isGenericLabel(String(rawTerm))) {
+                        rawUnits.push({ term: String(rawTerm).trim(), definition: String(rawDef).trim() });
+                    } else if (rawTerm && isGenericLabel(String(rawTerm)) && rawDef) {
+                        rawUnits.push({ term: '', definition: String(rawDef).trim() });
+                    } else if (rawTerm && !rawDef) {
+                        rawUnits.push({ term: '', definition: String(rawTerm).trim() });
+                    } else if (!rawTerm && rawDef) {
+                        rawUnits.push({ term: '', definition: String(rawDef).trim() });
+                    } else {
+                        for (const [k, v] of Object.entries(item)) {
+                            if (k !== '_id' && k !== 'id') {
+                                if (isGenericLabel(k)) {
+                                    rawUnits.push({ term: '', definition: String(v || '').trim() });
+                                } else {
+                                    rawUnits.push({ term: k.trim(), definition: String(v || '').trim() });
+                                }
+                            }
+                        }
+                    }
+                } else if (typeof item === 'string' && item.trim()) {
+                    const parts = item.split(';').map(p => p.trim()).filter(Boolean);
+                    for (const p of parts) {
+                        rawUnits.push({ term: '', definition: p });
+                    }
+                }
+            }
+        } else if (typeof data === 'string' && data.trim()) {
+            const parts = data.split(';').map(p => p.trim()).filter(Boolean);
+            for (const p of parts) {
+                rawUnits.push({ term: '', definition: p });
+            }
         } else if (typeof data === 'object' && data !== null) {
-            items = Object.entries(data).map(([t, d]) => ({ term: t, definition: d }));
+            for (const [k, v] of Object.entries(data)) {
+                if (k !== '_id' && k !== 'id') {
+                    if (isGenericLabel(k)) {
+                        rawUnits.push({ term: '', definition: String(v || '').trim() });
+                    } else {
+                        rawUnits.push({ term: k.trim(), definition: String(v || '').trim() });
+                    }
+                }
+            }
         }
+
+        const finalItems: { term: string; definition: string }[] = [];
+        for (let i = 0; i < rawUnits.length; i++) {
+            const unit = rawUnits[i];
+            
+            if (unit.term && unit.definition) {
+                finalItems.push(unit);
+                continue;
+            }
+
+            const val = (unit.definition || unit.term || '').trim();
+            if (!val) continue;
+
+            const parsed = parseSingleString(val);
+            if (parsed) {
+                finalItems.push(parsed);
+                continue;
+            }
+
+            if (i + 1 < rawUnits.length) {
+                const nextVal = (rawUnits[i + 1].definition || rawUnits[i + 1].term || '').trim();
+                const nextParsed = parseSingleString(nextVal);
+                if (!rawUnits[i + 1].term && !nextParsed && nextVal) {
+                    finalItems.push({ term: val, definition: nextVal });
+                    i++;
+                    continue;
+                }
+            }
+
+            finalItems.push({ term: val, definition: '' });
+        }
+
+        items = finalItems;
 
         if (items.length === 0) {
             return (
@@ -311,17 +412,25 @@ function SubsectionRenderer({ title, data, index }: { title: string; data: any; 
         return (
             <div className="space-y-4">
                 {renderHeader()}
-                <div className="space-y-4">
-                    {items.map((item, i) => {
-                        const term = typeof item === 'object' && item !== null ? (item.term || item.key || `Term ${i + 1}`) : `Item ${i + 1}`;
-                        const def = typeof item === 'object' && item !== null ? (item.definition || item.value || Object.values(item)[0]) : item;
-                        return (
-                            <div key={i} className="p-4 border border-emerald-200/60 rounded-xl bg-emerald-50/40 shadow-xs">
-                                <h3 className="font-bold text-[#0e8a67] mb-1 text-sm font-display">{i + 1}. {toTitleCase(term)}</h3>
-                                <div className="text-slate-700 text-xs sm:text-sm whitespace-pre-wrap leading-relaxed">{renderLink(normalizeValue(def))}</div>
+                <div className="space-y-3">
+                    {items.map((item, i) => (
+                        <div key={i} className="p-4 border border-emerald-200/60 rounded-xl bg-emerald-50/40 shadow-xs hover:border-emerald-300 transition-colors">
+                            <div className="flex items-start sm:items-center gap-2.5 flex-wrap">
+                                <span className="text-xs font-semibold text-slate-400">{i + 1}.</span>
+                                <span className="font-extrabold text-[#0e8a67] text-sm font-display bg-emerald-100/70 text-[#0c7557] px-2.5 py-0.5 rounded-lg border border-emerald-200/80 shadow-2xs">
+                                    {item.term}
+                                </span>
+                                {item.definition && (
+                                    <>
+                                        <span className="text-slate-400 font-bold hidden sm:inline">-</span>
+                                        <span className="text-slate-800 text-sm font-medium leading-relaxed">
+                                            {renderLink(normalizeValue(item.definition))}
+                                        </span>
+                                    </>
+                                )}
                             </div>
-                        );
-                    })}
+                        </div>
+                    ))}
                 </div>
             </div>
         );
